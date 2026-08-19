@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Leagues - Pick 5</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../icons/favicon.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../src/css/v1/leagues/leagues.css">
+</head>
+<body>
+  <div class="leagues-container">
+
+    <header class="leagues-header">
+      <div class="logo-container">
+        <img src="../icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="logo">
+      </div>
+      <div class="user-info">
+        <span class="welcome-text">Hello, <span id="user-name">Guest</span></span>
+        <div class="header-buttons">
+          <button id="how-to-play-btn" type="button">How to Play</button>
+          <button id="edit-profile-btn" type="button">Edit Profile</button>
+          <button id="logout-btn" type="button">Log Out</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="leagues-main">
+      <div class="leagues-box">
+        <h1>Your Leagues</h1>
+        <ul id="leagues-list" class="leagues-list"></ul>
+
+        <button id="new-league-btn" type="button" class="new-league-btn">+ New</button>
+
+        <div id="new-league-panel" class="new-league-panel hidden">
+          <div class="panel-tabs">
+            <button id="tab-create" type="button" class="panel-tab active">Create</button>
+            <button id="tab-join" type="button" class="panel-tab">Join</button>
+          </div>
+
+          <form id="create-league-form" class="panel-form">
+            <input type="text" id="create-league-name" placeholder="League name" maxlength="30" required>
+            <button type="submit">Create League</button>
+          </form>
+
+          <form id="join-league-form" class="panel-form hidden">
+            <input type="text" id="join-league-code" placeholder="6-digit invite code" required>
+            <button type="submit">Join League</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- How to Play Modal -->
+  <div id="how-to-play-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>How to Play</h2>
+        <span class="close-btn" id="close-how-to-play">&times;</span>
+      </div>
+      <div class="modal-body">
+        <ul class="how-to-play-list">
+          <li>Each week, pick the winner of <strong>5 games</strong> from that week's matchups.</li>
+          <li>Choose one of your 5 picks as your <strong>Bonus Pick</strong>.</li>
+          <li>A correct pick earns <strong>10 points</strong>. A correct bonus pick earns <strong>10 points + that team's final score</strong>.</li>
+          <li>An incorrect pick, or a tied game, earns <strong>0 points</strong>.</li>
+          <li>Your bonus team must be different every week.</li>
+          <li>You must submit all 18 weeks before the season begins. Once submitted, picks can't be changed.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Edit Profile Modal -->
+  <div id="edit-profile-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <span class="close-btn" id="close-edit-profile">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtext">This is your fallback identity across Pick 5. Within a league, you can override your name and/or photo just for that league.</p>
+        <form id="edit-profile-form">
+          <label for="global-display-name">Display Name:</label>
+          <input type="text" id="global-display-name" placeholder="Enter new name" maxlength="30">
+
+          <label for="global-photo-url">Profile Picture URL:</label>
+          <input type="url" id="global-photo-url" placeholder="Paste image URL here">
+
+          <button type="submit">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- League Management Modal (owner gear) -->
+  <div id="manage-league-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="manage-league-title">Manage League</h2>
+        <span class="close-btn" id="close-manage-league">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="manage-league-identity-box">
+          <label for="manage-league-name">League Name:</label>
+          <input type="text" id="manage-league-name" maxlength="30">
+
+          <div class="manage-league-photo-row">
+            <img id="manage-league-photo-preview" src="../icons/default_avatar.png" alt="League photo" class="manage-league-photo-preview">
+            <div class="manage-league-photo-field">
+              <label for="manage-league-photo">League Photo URL:</label>
+              <input type="url" id="manage-league-photo" placeholder="Paste image URL here">
+            </div>
+          </div>
+
+          <div class="manage-league-invite-row">
+            <span>Invite code: <strong id="manage-league-invite-code">------</strong></span>
+            <button id="save-league-name-btn" type="button">Save</button>
+          </div>
+        </div>
+
+        <h3>Members</h3>
+        <ul id="manage-league-members" class="members-list"></ul>
+
+        <h3>Transfer Ownership</h3>
+        <div class="inline-field">
+          <select id="transfer-owner-select"></select>
+          <button id="transfer-owner-btn" type="button">Transfer</button>
+        </div>
+
+        <h3>Danger Zone</h3>
+        <button id="archive-league-btn" type="button" class="danger-btn">Archive League</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../../src/js/leagues/leagues.js"></script>
+</body>
+</html>

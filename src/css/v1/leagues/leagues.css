@@ -1,0 +1,592 @@
+body {
+  font-family: "Montserrat", Arial, sans-serif;
+  background: #e0e1dc;
+  margin: 0;
+  padding: 0;
+}
+
+button, h1, h2, h3, input, select {
+  font-family: "Montserrat", sans-serif;
+}
+
+.leagues-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.leagues-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: #1d2d44;
+  color: white;
+  padding: 14px 20px;
+  border-bottom: 2px solid #000;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-container .logo {
+  height: 56px;
+}
+
+.user-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info button {
+  padding: 6px 12px;
+  background: #3f5c77;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.user-info button:hover {
+  background: #557294;
+}
+
+/* Main */
+.leagues-main {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.leagues-box {
+  background: #1d2d44;
+  border: 1px solid #000;
+  border-radius: 8px;
+  padding: 28px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.leagues-box h1 {
+  color: white;
+  margin-top: 0;
+}
+
+.leagues-list {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.league-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.no-leagues {
+  color: white;
+  font-style: italic;
+}
+
+.league-enter-btn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  text-align: left;
+  padding: 24px 28px;
+  min-height: 140px;
+  background: white;
+  border: 2px solid #1d2d44;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #1d2d44;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.league-enter-btn:hover {
+  background: #f0f0f0;
+}
+
+.league-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.league-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.league-name {
+  font-weight: bold;
+  font-size: 26px;
+}
+
+.league-my-name,
+.league-my-position {
+  font-size: 17px;
+  color: #444;
+}
+
+.league-gear-btn {
+  align-self: stretch;
+  padding: 10px 20px;
+  border: 2px solid #1d2d44;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.league-gear-btn:hover {
+  background: #f0f0f0;
+}
+
+.new-league-btn {
+  padding: 10px 18px;
+  background: #3f5c77;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.new-league-btn:hover {
+  background: #557294;
+}
+
+.new-league-panel {
+  margin-top: 16px;
+  padding: 16px;
+  background: white;
+  border: 2px solid #1d2d44;
+  border-radius: 8px;
+}
+
+.new-league-panel.hidden {
+  display: none;
+}
+
+.panel-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.panel-tab {
+  padding: 6px 14px;
+  border: none;
+  background: #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.panel-tab.active {
+  background: #1d2d44;
+  color: white;
+}
+
+.panel-form {
+  display: flex;
+  gap: 8px;
+}
+
+.panel-form.hidden {
+  display: none;
+}
+
+.panel-form input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.panel-form button {
+  padding: 8px 14px;
+  background: #1d2d44;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Modals (shared shape with dashboard.css's .modal, duplicated here since
+   leagues.html doesn't load dashboard.css) */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 8px;
+  max-width: 420px;
+  width: 90%;
+  max-height: 85vh;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dark title bar matching the rest of the app's card-header look, instead
+   of a floating close-x over a big empty gap above the title. */
+.modal-header {
+  background: #1d2d44;
+  color: #fff;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-subtext {
+  font-size: 13px;
+  color: #555;
+  margin: 0 0 14px;
+}
+
+.how-to-play-list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #222;
+}
+
+.close-btn {
+  flex-shrink: 0;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+  color: #fff;
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  opacity: 1;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-content label {
+  font-weight: bold;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="url"] {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-content button[type="submit"] {
+  padding: 8px 16px;
+  background: #1d2d44;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  align-self: flex-start;
+}
+
+.inline-field {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.inline-field input,
+.inline-field select {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.inline-field button {
+  padding: 6px 12px;
+  background: #3f5c77;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.manage-league-identity-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #1d2d44;
+  border: 1px solid #000;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.manage-league-identity-box label {
+  color: white;
+  font-weight: bold;
+}
+
+.manage-league-identity-box input[type="text"],
+.manage-league-identity-box input[type="url"] {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.manage-league-invite-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.manage-league-invite-row span {
+  color: white;
+}
+
+.manage-league-invite-row button {
+  padding: 6px 12px;
+  background: #3f5c77;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.manage-league-photo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.manage-league-photo-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #ccc;
+}
+
+.manage-league-photo-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.manage-league-photo-field input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.members-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.member-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.member-row span {
+  flex: 1;
+}
+
+.kick-btn {
+  padding: 4px 10px;
+  background: #b33;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.danger-btn {
+  padding: 8px 16px;
+  background: #b33;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.danger-btn:hover {
+  background: #d44;
+}
+
+/* =========================
+   Mobile Layout (≤ 500px)
+   ========================= */
+@media (max-width: 500px) {
+  /* Logo centered on its own row, then user info (welcome text + action
+     buttons) left-aligned below it — the default single-row flex-wrap was
+     letting these break across lines unpredictably depending on name
+     length, which looked messy. */
+  .leagues-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+
+  .logo-container {
+    justify-content: center;
+  }
+
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .welcome-text {
+    font-size: 14px;
+  }
+
+  .header-buttons {
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .header-buttons button {
+    flex: 1 1 auto;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .leagues-main {
+    padding: 0 10px;
+  }
+
+  .leagues-box {
+    padding: 16px;
+  }
+
+  .league-enter-btn {
+    gap: 14px;
+    padding: 14px;
+    min-height: 0;
+  }
+
+  .league-photo {
+    width: 64px;
+    height: 64px;
+  }
+
+  .league-name {
+    font-size: 18px;
+  }
+
+  .league-my-name,
+  .league-my-position {
+    font-size: 13px;
+  }
+
+  .league-gear-btn {
+    padding: 10px 14px;
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Leagues - Pick 5</title>
+  <script>(function(){var t=localStorage.getItem("pick5-theme");if(t!=="light"&&t!=="dark"&&t!=="original")t="light";document.documentElement.setAttribute("data-theme",t);})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+
+  <link rel="stylesheet" href="../src/css/m3-tokens.css">
+  <link rel="stylesheet" href="../src/css/leagues/leagues.css">
+</head>
+<body>
+  <div class="leagues-container">
+
+    <header class="top-app-bar m3-top-app-bar">
+      <div class="brand">
+        <img src="icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="brand-logo">
+      </div>
+      <div class="user-info">
+        <span class="welcome-text">Hello, <span id="user-name">...</span></span>
+        <div class="m3-menu-wrap">
+          <button id="menu-trigger" type="button" class="m3-icon-btn" aria-label="Menu" aria-haspopup="true" aria-expanded="false">
+            <span class="hamburger-bars"><span></span><span></span><span></span></span>
+          </button>
+          <div id="header-menu" class="m3-menu hidden">
+            <button id="how-to-play-btn" type="button" class="m3-menu-item">How to Play</button>
+            <button id="edit-profile-btn" type="button" class="m3-menu-item">Edit Profile</button>
+            <button id="theme-btn" type="button" class="m3-menu-item">Theme</button>
+            <div class="m3-menu-divider"></div>
+            <button id="logout-btn" type="button" class="m3-menu-item danger">Log Out</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="leagues-main">
+      <h1 class="page-title">Your Leagues</h1>
+      <ul id="leagues-list" class="m3-list leagues-list"></ul>
+    </main>
+
+    <button id="new-league-btn" type="button" class="m3-fab fab">
+      <span>＋</span> New League
+    </button>
+
+    <!-- Create/Join panel — a real M3 dialog now instead of an inline
+         expanding panel, opened by the FAB. -->
+    <div id="new-league-panel" class="modal hidden">
+      <div class="modal-content m3-dialog">
+        <div class="modal-header">
+          <h2>New League</h2>
+          <span class="close-btn" id="close-new-league">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="panel-tabs">
+            <button id="tab-create" type="button" class="panel-tab active">Create</button>
+            <button id="tab-join" type="button" class="panel-tab">Join</button>
+          </div>
+
+          <form id="create-league-form" class="panel-form">
+            <input class="m3-field" type="text" id="create-league-name" placeholder="League name" maxlength="30" required>
+            <button type="submit" class="m3-btn m3-btn-filled">Create League</button>
+          </form>
+
+          <form id="join-league-form" class="panel-form hidden">
+            <input class="m3-field" type="text" id="join-league-code" placeholder="6-digit invite code" required>
+            <button type="submit" class="m3-btn m3-btn-filled">Join League</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to Play Modal -->
+  <div id="how-to-play-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <h2>How to Play</h2>
+        <span class="close-btn" id="close-how-to-play">&times;</span>
+      </div>
+      <div class="modal-body">
+        <ul class="how-to-play-list">
+          <li>Each week, pick the winner of <strong>5 games</strong> from that week's matchups.</li>
+          <li>Choose one of your 5 picks as your <strong>Bonus Pick</strong>.</li>
+          <li>A correct pick earns <strong>10 points</strong>. A correct bonus pick earns <strong>10 points + that team's final score</strong>.</li>
+          <li>An incorrect pick, or a tied game, earns <strong>0 points</strong>.</li>
+          <li>Your bonus team must be different every week.</li>
+          <li>You must submit all 18 weeks before the season begins. Once submitted, picks can't be changed.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Edit Profile Modal -->
+  <div id="edit-profile-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <span class="close-btn" id="close-edit-profile">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtext">This is your fallback identity across Pick 5. Within a league, you can override your name and/or photo just for that league.</p>
+        <form id="edit-profile-form">
+          <label for="global-display-name">Display Name:</label>
+          <input class="m3-field" type="text" id="global-display-name" placeholder="Enter new name" maxlength="30">
+
+          <label for="global-photo-url">Profile Picture URL:</label>
+          <input class="m3-field" type="url" id="global-photo-url" placeholder="Paste image URL here">
+
+          <button type="submit" class="m3-btn m3-btn-filled">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Modal -->
+  <div id="theme-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <h2>Theme</h2>
+        <span class="close-btn" id="close-theme">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtext">Choose how Pick 5 looks on this device.</p>
+        <div class="m3-segmented" id="theme-segmented" role="group" aria-label="Theme">
+          <button type="button" class="m3-segment" data-theme-option="original">Original</button>
+          <button type="button" class="m3-segment" data-theme-option="light">Light</button>
+          <button type="button" class="m3-segment" data-theme-option="dark">Dark</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- League Management Modal (owner gear) -->
+  <div id="manage-league-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <h2 id="manage-league-title">Manage League</h2>
+        <span class="close-btn" id="close-manage-league">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="manage-league-identity-box">
+          <label for="manage-league-name">League Name:</label>
+          <input class="m3-field" type="text" id="manage-league-name" maxlength="30">
+
+          <div class="manage-league-photo-row">
+            <img id="manage-league-photo-preview" src="icons/default_avatar.png" alt="League photo" class="manage-league-photo-preview">
+            <div class="manage-league-photo-field">
+              <label for="manage-league-photo">League Photo URL:</label>
+              <input class="m3-field" type="url" id="manage-league-photo" placeholder="Paste image URL here">
+            </div>
+          </div>
+
+          <div class="manage-league-invite-row">
+            <span>Invite code: <strong id="manage-league-invite-code">------</strong></span>
+            <button id="save-league-name-btn" type="button" class="m3-btn m3-btn-tonal">Save</button>
+          </div>
+        </div>
+
+        <h3>Members</h3>
+        <ul id="manage-league-members" class="members-list"></ul>
+
+        <h3>Transfer Ownership</h3>
+        <div class="inline-field">
+          <select id="transfer-owner-select" class="m3-field"></select>
+          <button id="transfer-owner-btn" type="button" class="m3-btn m3-btn-tonal">Transfer</button>
+        </div>
+
+        <h3>Danger Zone</h3>
+        <button id="archive-league-btn" type="button" class="m3-btn m3-btn-danger">Archive League</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../src/js/leagues/leagues.js"></script>
+
+  <!-- leagues.js toggles #new-league-panel's "hidden" class (it predates
+       this panel being a real full-screen modal overlay), but doesn't wire
+       up a close button or outside-click for it since the /v1 page's
+       version is just an inline expanding panel, not an overlay that
+       covers its own trigger button. Added here rather than editing the
+       shared leagues.js. -->
+  <script type="module">
+    const panel = document.getElementById("new-league-panel");
+    document.getElementById("close-new-league").onclick = () => panel.classList.add("hidden");
+    window.addEventListener("click", (e) => {
+      if (e.target === panel) panel.classList.add("hidden");
+    });
+  </script>
+
+  <script type="module">
+    import { initHeaderMenu } from "../src/js/util/header-menu.js";
+    import { initThemeSwitcher } from "../src/js/util/theme.js";
+    initHeaderMenu();
+    initThemeSwitcher();
+
+    const themeModal = document.getElementById("theme-modal");
+    document.getElementById("theme-btn").onclick = () => themeModal.classList.remove("hidden");
+    document.getElementById("close-theme").onclick = () => themeModal.classList.add("hidden");
+    window.addEventListener("click", (e) => {
+      if (e.target === themeModal) themeModal.classList.add("hidden");
+    });
+  </script>
+</body>
+</html>

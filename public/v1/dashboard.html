@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - NFL Pick 5</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../icons/favicon.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../src/css/v1/dashboard/dashboard.css">
+</head>
+<body>
+  <div class="dashboard-container">
+
+    <!-- Header -->
+    <header class="dashboard-header">
+      <a href="leagues.html" class="logo-link" aria-label="Back to your leagues">
+        <img src="../icons/PICK5LOGO_transparent.png" alt="Logo" class="logo">
+      </a>
+
+      <div class="league-shortcut" id="league-shortcut" style="display:none;">
+        <a href="leagues.html" class="icon-btn home-btn" aria-label="Back to your leagues">🏠</a>
+        <select id="league-select"></select>
+      </div>
+
+      <div class="user-info">
+        <span>Hello, <span id="user-name">...</span></span>
+        <button id="message-board-btn" class="icon-btn" type="button" aria-label="Message board" style="display:none;">💬</button>
+        <button id="league-stats-btn" class="icon-btn" type="button" aria-label="League stats" style="display:none;">📊</button>
+        <button id="how-to-play-btn" class="icon-btn" type="button" aria-label="How to play">❓</button>
+        <button id="settings-btn" class="icon-btn" type="button" aria-label="Settings" style="display:none;">⚙</button>
+        <div class="buttons">
+          <button id="logout-btn" style="display:none;">LOG OUT</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="dashboard-tabs">
+      <button data-tab="leaderboard">LEADERBOARD</button>
+      <button data-tab="my-week">DASHBOARD</button>
+      <button data-tab="picks">PICKS</button>
+    </nav>
+
+    <!-- Main Grid Layout -->
+    <div class="dashboard-grid">
+
+      <!-- Week Nav Bar -->
+      <aside class="week-nav-bar">
+        <h3>Week Navigation</h3>
+        <div id="week-buttons"></div>
+      </aside>
+
+      <!-- Content Sections -->
+      <main class="dashboard-main">
+
+        <!-- Leaderboard Section -->
+        <section id="leaderboard-section" class="tab-section">
+          <h2 id="leaderboard-title">[WEEK # / OVERALL] LEADERBOARD</h2>
+          <div id="leaderboard-podium" class="leaderboard-podium"></div>
+          <table class="leaderboard-table">
+            <thead>
+              <tr><th>Pos</th><th>Player</th><th>Points</th></tr>
+            </thead>
+            <tbody id="leaderboard-list"></tbody>
+          </table>
+        </section>
+
+        <!-- My Week / Dashboard Section -->
+        <section id="my-week-section" class="tab-section hidden">
+          <h2 id="my-week-title">WEEK # DASHBOARD</h2>
+          <div class="my-week-grid">
+
+            <div class="my-week-col my-week-picks">
+              <h3>My Picks</h3>
+              <div id="my-week-bonus" class="my-week-bonus-row"></div>
+              <ul id="my-week-teams-to-watch" class="my-week-team-list"></ul>
+            </div>
+
+            <div class="my-week-col my-week-profile">
+              <img id="my-week-profile-pic" src="../icons/default_avatar.png" alt="Your profile picture" class="my-week-avatar">
+              <div id="my-week-name" class="my-week-name">Name</div>
+              <div id="my-week-overall-pos" class="my-week-overall-pos-box">Overall: --</div>
+            </div>
+
+            <div class="my-week-col my-week-forecast">
+              <div id="my-week-win-chance" class="my-week-win-chance-box">% chance to win the week: --</div>
+              <h3>Hate Watch List</h3>
+              <ul id="my-week-hate-watch" class="my-week-team-list"></ul>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Picks Section -->
+        <section id="picks-section" class="tab-section hidden">
+          <h2 id="picks-title">[WEEK #] PICKS</h2>
+
+          <!-- Controls -->
+          <div class="picks-controls">
+            <label for="select-player">SELECT PLAYER:</label>
+            <select id="select-player"></select>
+
+            <label for="select-team">SELECT TEAM:</label>
+            <select id="select-team"></select>
+            <span id="team-pick-counter" style="display: none;"></span>
+
+            <button id="toggle-scores-btn">SHOW/HIDE MATCHUPS</button>
+          </div>
+
+          <!-- Layout split -->
+          <div class="picks-layout">
+            <!-- Left: Picks -->
+            <div id="weekly-picks-grid" class="weekly-picks-grid"></div>
+
+            <!-- Right: Matchups -->
+            <aside id="matchups-container" class="matchups-container hidden">
+              <h3>This Week's Matchups</h3>
+              <div id="matchups-list"></div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="dashboard-footer">
+      <span>Last Updated:</span>
+      <span id="last-updated-time">[TIME]</span>
+    </footer>
+  </div>
+
+  <!-- ❓ How to Play Modal -->
+  <div id="how-to-play-modal" class="modal hidden">
+    <span class="popover-caret" id="how-to-play-caret"></span>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>How to Play</h2>
+        <span class="close-btn" id="close-how-to-play">&times;</span>
+      </div>
+      <div class="modal-body">
+        <ul class="how-to-play-list">
+          <li>Each week, pick the winner of <strong>5 games</strong> from that week's matchups.</li>
+          <li>Choose one of your 5 picks as your <strong>Bonus Pick</strong>.</li>
+          <li>A correct pick earns <strong>10 points</strong>. A correct bonus pick earns <strong>10 points + that team's final score</strong>.</li>
+          <li>An incorrect pick, or a tied game, earns <strong>0 points</strong>.</li>
+          <li>Your bonus team must be different every week.</li>
+          <li>You must submit all 18 weeks before the season begins. Once submitted, picks can't be changed.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💬 Message Board Modal -->
+  <div id="message-board-modal" class="modal hidden">
+    <span class="popover-caret" id="message-board-caret"></span>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Message Board</h2>
+        <span class="close-btn" id="close-message-board">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="post-form">
+          <textarea id="post-body" placeholder="Say something to the league..." maxlength="250" required></textarea>
+          <span id="post-body-counter" class="post-body-counter">0/250</span>
+          <button type="submit">Post</button>
+        </form>
+        <ul id="posts-list" class="posts-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 League Stats Modal -->
+  <div id="league-stats-modal" class="modal hidden">
+    <span class="popover-caret" id="league-stats-caret"></span>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>League Stats</h2>
+        <span class="close-btn" id="close-league-stats">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="stats-tabs">
+          <button id="stats-tab-season" type="button" class="stats-tab active">This Season</button>
+          <button id="stats-tab-hof" type="button" class="stats-tab">Hall of Fame</button>
+        </div>
+
+        <div id="stats-season-panel" class="stats-panel">
+          <table class="stats-table">
+            <thead>
+              <tr><th>Player</th><th>Highest Week</th><th>Weeks Won</th><th>Win %</th><th>Streak</th></tr>
+            </thead>
+            <tbody id="stats-season-body"></tbody>
+          </table>
+        </div>
+
+        <div id="stats-hof-panel" class="stats-panel hidden">
+          <div class="inline-field">
+            <select id="hof-year-select"></select>
+            <button id="hof-load-btn" type="button">View</button>
+          </div>
+          <div id="hof-awards" class="hof-awards"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⚙️ Per-League Profile Modal -->
+  <div id="settings-modal" class="modal hidden">
+    <span class="popover-caret" id="settings-caret"></span>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Profile (this league)</h2>
+        <span class="close-btn" id="close-settings">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtext">Change how you appear in this league. Your global identity is edited from the Leagues menu.</p>
+        <form id="settings-form">
+          <label for="display-name">Display Name:</label>
+          <input type="text" id="display-name" placeholder="Enter new name" maxlength="30">
+
+          <label for="profile-url">Profile Picture URL:</label>
+          <input type="url" id="profile-url" placeholder="Paste image url here">
+
+          <button type="submit">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="../../src/js/v1/dashboard.js"></script>
+
+</body>
+</html>

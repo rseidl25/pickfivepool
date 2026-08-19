@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - NFL Pick 5</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../icons/favicon.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../src/css/v1/auth/login.css">
+</head>
+<body>
+  <div class="container">
+    <img src="../icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="site-logo">
+    <h2>Login</h2>
+    <form id="login-form">
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <a class="link" id="auth-link" href="signup.html">Don’t have an account? Sign Up</a>
+  </div>
+
+  <!-- Load Firebase auth handling -->
+  <script type="module" src="../../src/js/auth/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFL Pick 5 - Picks</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../icons/favicon.png">
+
+  <!-- Styles -->
+  <!-- Cache-busting query string — bump this whenever picks.css changes
+       during active development, since browsers can otherwise keep serving
+       a stale cached copy even after the file's been edited on disk. -->
+  <link rel="stylesheet" href="../../src/css/v1/picks/picks.css?v=15">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header id="site-header">
+      <div class="site-header-topbar">
+        <img src="../icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="site-logo">
+        <a href="leagues.html" id="header-home-btn">← Back to Leagues</a>
+      </div>
+      <div id="week-nav-container">
+        <span class="week-label">Select Week:</span>
+        <div id="week-nav"></div>
+        <button id="submit-btn" disabled>Next</button>
+      </div>
+    </header>
+
+    <!-- Week title (left) + league name/player name stacked (right),
+         sitting directly above the matchups/picks container. -->
+    <div id="league-player-row">
+      <h1 id="week-title">Week 1</h1>
+      <div class="player-info-stack">
+        <div id="top-league-name"></div>
+        <div id="top-user-display"></div>
+      </div>
+    </div>
+
+    <!-- Main layout -->
+    <div id="main-content">
+      
+      <!-- Left Column -->
+      <div class="left-panel">
+        <div id="matchups" class="matchups"></div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="sidebar">
+        
+        <!-- Picks Section -->
+        <div class="sidebar-panel">
+          <div id="picks-box" class="picks-box">
+            <h2>Your Picks (0/5)</h2>
+            <div class="picks-progress-track"><div id="picks-progress-fill" class="picks-progress-fill"></div></div>
+            <div id="picks-list" class="picks-list"></div>
+            <p>Select one of your picks as your <strong>Bonus Pick</strong></p>
+          </div>
+        </div>
+
+        <!-- Bonus Tracker -->
+        <div class="sidebar-panel">
+          <div id="bonus-tracker" class="picks-box">
+            <h2>Bonus Tracker</h2>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile-only: sticky bet-slip-style bar for jumping to Your Picks
+         without scrolling; opens .sidebar as a bottom sheet. -->
+    <div id="picks-drawer-backdrop" class="picks-drawer-backdrop"></div>
+    <button id="picks-bottom-bar" type="button" class="picks-bottom-bar">
+      <span id="picks-bottom-summary">🏈 Your Picks: 0/5</span>
+      <span class="chevron">▲</span>
+    </button>
+
+    <!-- Summary Screen -->
+    <div id="summary-screen" style="display:none;">
+      <h2>SUMMARY OF PICKS</h2>
+      <div id="summary-content"></div>
+    </div>
+
+    <!-- Summary Actions -->
+    <div id="summary-actions" style="display:none;">
+      <button id="back-btn">Back</button>
+      <button id="final-submit-btn">Submit</button>
+    </div>
+
+  </div>
+
+  <!-- Auth Guard -->
+  <script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { app } from "../src/js/auth/firebase_init.js";
+    import { getSeasonConfig } from "../src/js/util/api.js";
+
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      const season = await getSeasonConfig();
+      if (season.locked) {
+        console.warn("🚫 Picks page closed, redirecting...");
+        window.location.href = "dashboard.html";
+        return;
+      }
+
+      if (!user) {
+        console.warn("⚠️ Not logged in, redirecting...");
+        window.location.href = "login.html";
+      } else {
+        console.log("✅ Logged in as:", user.uid);
+      }
+    });
+  </script>
+
+  <!-- Scripts -->
+  <script type="module" src="../../src/js/v1/picks.js?v=10"></script>
+  <script type="module" src="../../src/js/picks/picks_firebase.js"></script>
+  <script type="module" src="../../src/js/auth/auth.js"></script>
+</body>
+</html>

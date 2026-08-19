@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFL Pick 5</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../icons/favicon.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../src/css/v1/auth/index.css">
+  <style>
+    .disabled-btn {
+      opacity: 0.5;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="../icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="site-logo">
+    <h1>NFL Pick 5</h1>
+    <button id="signup-btn">Sign Up</button>
+    <button onclick="window.location.href='login.html'">Log In</button>
+  </div>
+
+  <!-- Control Sign Up availability -->
+  <script type="module">
+    import { getSeasonConfig } from "../src/js/util/api.js";
+
+    const signupBtn = document.getElementById("signup-btn");
+
+    const season = await getSeasonConfig();
+    if (!season.locked) {
+      signupBtn.onclick = () => window.location.href = "signup.html";
+    } else {
+      signupBtn.classList.add("disabled-btn");
+      signupBtn.textContent = "Sign Up Closed";
+    }
+  </script>
+</body>
+</html>

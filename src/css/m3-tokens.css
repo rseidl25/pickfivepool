@@ -1,0 +1,528 @@
+/* =========================================================
+   Material Design 3 — Design Tokens (v2 redesign)
+   =========================================================
+   Color roles generated from this app's brand colors (navy #1d2d44, gold
+   #ffd700) using Google's own HCT color science (material-color-utilities),
+   mapped onto M3's standard role/tone table.
+   Reference: https://m3.material.io/styles/color/roles
+   ========================================================= */
+
+:root {
+  /* Buttons/accents: real Material Design blue palette (material.io blue
+     50-900), not a brand-derived tint — this is the "light blue" family
+     used for filled buttons, FABs, selected chips/segments, etc. */
+  --md-sys-color-primary: #1976d2;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #bbdefb;
+  --md-sys-color-on-primary-container: #0d47a1;
+
+  --md-sys-color-secondary: #42a5f5;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #e3f2fd;
+  --md-sys-color-on-secondary-container: #0d47a1;
+
+  --md-sys-color-tertiary: #705d00;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #ffe16d;
+  --md-sys-color-on-tertiary-container: #221b00;
+
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
+
+  /* Containers/surfaces: real Material Design grey palette (material.io
+     grey 50-900) — true neutral gray, no color tint, for page background
+     and container chrome (header, nav rail, footer). */
+  --md-sys-color-surface: #fafafa;
+  --md-sys-color-on-surface: #212121;
+  --md-sys-color-surface-variant: #e0e0e0;
+  --md-sys-color-on-surface-variant: #616161;
+  --md-sys-color-outline: #9e9e9e;
+  --md-sys-color-outline-variant: #e0e0e0;
+  --md-sys-color-background: #fafafa;
+  --md-sys-color-on-background: #212121;
+  --md-sys-color-inverse-surface: #2e2e2e;
+  --md-sys-color-inverse-on-surface: #fafafa;
+  --md-sys-color-inverse-primary: #90caf9;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+
+  --md-sys-color-surface-dim: #e0e0e0;
+  --md-sys-color-surface-bright: #ffffff;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f5f5f5;
+  --md-sys-color-surface-container: #eeeeee;
+  --md-sys-color-surface-container-high: #e4e4e4;
+  --md-sys-color-surface-container-highest: #dadada;
+
+  --brand-gold: #e9c400;
+  --brand-gold-container: #ffe16d;
+  --brand-navy-deep: #0b1c32;
+  --bonus-pick-highlight: #fde656;
+  --team-select-highlight: #add8e6;
+
+  /* Fixed (not theme-varied) so the two trend-chart lines stay legible and
+     consistent whether the card behind them is white, near-black, or navy. */
+  --trend-points-color: #00acc1;
+  --trend-rank-color: #e9c400;
+
+  /* Fixed go/back action colors for the picks-submission flow (Next/Submit
+     vs Back) — a deliberate green/red pair carried over from v1, not meant
+     to shift with theme since they signal "proceed" / "undo" rather than
+     brand identity. */
+  --action-go: #16a34a;
+  --action-go-hover: #15803d;
+  --action-back: #dc2626;
+  --action-back-hover: #b91c1c;
+
+  /* Fixed "valid/complete" status green for week chips — the app's own
+     "secondary" role is blue in Light/Dark themes (only Original's happens
+     to land on a tan that reads green-adjacent against navy), so it can't
+     do double duty as a real green status color. */
+  --status-valid-bg: #bbf7d0;
+  --status-valid-border: #16a34a;
+  --status-valid-text: #065f46;
+
+  /* Fixed "this is the week you're on" ring for week chips — a lighter blue
+     than --md-sys-color-primary so it reads as a highlight rather than
+     blending into Original theme's navy. */
+  --week-active-outline: #297cfb;
+
+  --md-sys-shape-corner-none: 0px;
+  --md-sys-shape-corner-xs: 4px;
+  --md-sys-shape-corner-sm: 8px;
+  --md-sys-shape-corner-md: 12px;
+  --md-sys-shape-corner-lg: 16px;
+  --md-sys-shape-corner-xl: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  --md-sys-elevation-0: none;
+  --md-sys-elevation-1: 0 1px 2px rgba(0,0,0,0.30), 0 1px 3px 1px rgba(0,0,0,0.15);
+  --md-sys-elevation-2: 0 1px 2px rgba(0,0,0,0.30), 0 2px 6px 2px rgba(0,0,0,0.15);
+  --md-sys-elevation-3: 0 1px 3px rgba(0,0,0,0.30), 0 4px 8px 3px rgba(0,0,0,0.15);
+  --md-sys-elevation-4: 0 1px 3px rgba(0,0,0,0.30), 0 6px 10px 4px rgba(0,0,0,0.15);
+  --md-sys-elevation-5: 0 1px 3px rgba(0,0,0,0.30), 0 8px 12px 6px rgba(0,0,0,0.15);
+
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.3, 0, 0.1, 1);
+  --md-sys-motion-duration-short: 150ms;
+  --md-sys-motion-duration-medium: 300ms;
+  --md-sys-motion-duration-long: 450ms;
+
+  --md-type-font: "Montserrat", sans-serif;
+  --md-type-display-lg: 700 44px/1.15 var(--md-type-font);
+  --md-type-display-md: 700 34px/1.2 var(--md-type-font);
+  --md-type-headline-lg: 700 28px/1.25 var(--md-type-font);
+  --md-type-headline-md: 700 24px/1.3 var(--md-type-font);
+  --md-type-headline-sm: 700 20px/1.3 var(--md-type-font);
+  --md-type-title-lg: 600 20px/1.3 var(--md-type-font);
+  --md-type-title-md: 600 16px/1.4 var(--md-type-font);
+  --md-type-title-sm: 600 14px/1.4 var(--md-type-font);
+  --md-type-body-lg: 400 16px/1.5 var(--md-type-font);
+  --md-type-body-md: 400 14px/1.45 var(--md-type-font);
+  --md-type-body-sm: 400 12px/1.4 var(--md-type-font);
+  --md-type-label-lg: 600 14px/1.3 var(--md-type-font);
+  --md-type-label-md: 600 12px/1.3 var(--md-type-font);
+  --md-type-label-sm: 600 11px/1.3 var(--md-type-font);
+}
+
+/* ---- Theme: Dark (explicit selection, not OS-linked) ---- */
+:root[data-theme="dark"] {
+  /* Buttons/accents: same Material blue family, shifted lighter/darker for
+     dark-surface contrast (light blue reads well on a near-black page). */
+  --md-sys-color-primary: #64b5f6;
+  --md-sys-color-on-primary: #0a2540;
+  --md-sys-color-primary-container: #1565c0;
+  --md-sys-color-on-primary-container: #e3f2fd;
+
+  --md-sys-color-secondary: #90caf9;
+  --md-sys-color-on-secondary: #0d3c61;
+  --md-sys-color-secondary-container: #1976d2;
+  --md-sys-color-on-secondary-container: #e3f2fd;
+
+  --md-sys-color-tertiary: #e9c400;
+  --md-sys-color-on-tertiary: #3a3000;
+  --md-sys-color-tertiary-container: #544600;
+  --md-sys-color-on-tertiary-container: #ffe16d;
+
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000a;
+  --md-sys-color-on-error-container: #ffdad6;
+
+  /* Containers/surfaces: true neutral dark gray (Google's Material dark
+     theme baseline — #121212 background, lighter grays for elevation),
+     not a tinted derivative of the brand navy. */
+  --md-sys-color-surface: #121212;
+  --md-sys-color-on-surface: #e6e6e6;
+  --md-sys-color-surface-variant: #2a2a2a;
+  --md-sys-color-on-surface-variant: #b0b0b0;
+  --md-sys-color-outline: #6b6b6b;
+  --md-sys-color-outline-variant: #3f3f46;
+  --md-sys-color-background: #121212;
+  --md-sys-color-on-background: #e6e6e6;
+  --md-sys-color-inverse-surface: #e6e6e6;
+  --md-sys-color-inverse-on-surface: #1e1e1e;
+  --md-sys-color-inverse-primary: #1565c0;
+
+  --md-sys-color-surface-dim: #121212;
+  --md-sys-color-surface-bright: #333333;
+  --md-sys-color-surface-container-lowest: #0a0a0a;
+  --md-sys-color-surface-container-low: #1a1a1a;
+  --md-sys-color-surface-container: #1e1e1e;
+  --md-sys-color-surface-container-high: #262626;
+  --md-sys-color-surface-container-highest: #2e2e2e;
+
+  --brand-gold: #e9c400;
+  --brand-gold-container: #544600;
+  --brand-navy-deep: #d5e3ff;
+}
+
+/* ---- Theme: Original (v1's navy/gold flat palette, mapped onto the v2
+   M3 component structure — same layout, recolored to match the original
+   app's look: dark navy primary, gold accents, solid black outlines). ---- */
+:root[data-theme="original"] {
+  --md-sys-color-primary: #1d2d44;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #3f5c77;
+  --md-sys-color-on-primary-container: #ffffff;
+
+  --md-sys-color-secondary: #3f5c77;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #e9dea7;
+  --md-sys-color-on-secondary-container: #1d2d44;
+
+  --md-sys-color-tertiary: #7a5b00;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #ffd700;
+  --md-sys-color-on-tertiary-container: #1d2d44;
+
+  --md-sys-color-error: #b33333;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #fecaca;
+  --md-sys-color-on-error-container: #7f1d1d;
+
+  --md-sys-color-surface: #e0e1dc;
+  --md-sys-color-on-surface: #1a1a1a;
+  --md-sys-color-surface-variant: #f4f4f2;
+  --md-sys-color-on-surface-variant: #444444;
+  --md-sys-color-outline: #000000;
+  --md-sys-color-outline-variant: #999999;
+  --md-sys-color-background: #e0e1dc;
+  --md-sys-color-on-background: #1a1a1a;
+  --md-sys-color-inverse-surface: #1d2d44;
+  --md-sys-color-inverse-on-surface: #ffffff;
+  --md-sys-color-inverse-primary: #b7c7e5;
+
+  --md-sys-color-surface-dim: #d6d6d4;
+  --md-sys-color-surface-bright: #ffffff;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f9f9f8;
+  --md-sys-color-surface-container: #ffffff;
+  --md-sys-color-surface-container-high: #f4f4f2;
+  --md-sys-color-surface-container-highest: #eeeeee;
+
+  --brand-gold: #ffd700;
+  --brand-gold-container: #ffd700;
+  --brand-navy-deep: #1d2d44;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--md-type-font); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+
+/* ---- Buttons ---- */
+.m3-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 24px; border-radius: var(--md-sys-shape-corner-full);
+  border: none; font: var(--md-type-label-lg); letter-spacing: 0.1px; cursor: pointer;
+  white-space: nowrap; text-decoration: none;
+  transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+              background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+.m3-btn-filled { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.m3-btn-filled:hover:not(:disabled) { box-shadow: var(--md-sys-elevation-1); }
+.m3-btn-tonal { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.m3-btn-tonal:hover:not(:disabled) { box-shadow: var(--md-sys-elevation-1); }
+.m3-btn-outlined { background: transparent; color: var(--md-sys-color-primary); border: 1px solid var(--md-sys-color-outline); }
+.m3-btn-outlined:hover:not(:disabled) { background: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent); }
+.m3-btn-text { background: transparent; color: var(--md-sys-color-primary); padding: 0 12px; }
+.m3-btn-text:hover:not(:disabled) { background: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent); }
+.m3-btn-danger { background: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
+
+/* ---- Icon button ---- */
+.m3-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: var(--md-sys-shape-corner-full);
+  border: none; background: transparent; color: var(--md-sys-color-on-surface-variant);
+  font-size: 20px; cursor: pointer;
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-icon-btn:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent); }
+.m3-icon-btn.selected { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+
+/* ---- Unread indicator dot (hamburger trigger + menu item) ---- */
+.unread-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--md-sys-color-error);
+  flex-shrink: 0;
+}
+.unread-dot.hidden { display: none; }
+/* Sits on the trigger's corner, ringed in the surface color so it reads as
+   a badge floating over the icon rather than touching it edge-to-edge. */
+#menu-trigger { position: relative; }
+#menu-trigger-dot {
+  position: absolute; top: 4px; right: 4px;
+  border: 2px solid var(--md-sys-color-surface);
+}
+/* Original theme's header is a solid navy bar, so the ring needs to match
+   that background instead of the base (light) surface token, or it'd show
+   as a pale square around the dot. */
+:root[data-theme="original"] #menu-trigger-dot { border-color: var(--md-sys-color-primary); }
+/* Inline next to the "Message Board" label — .m3-menu-item is already a
+   flex row, so margin-left:auto pushes it flush right. */
+.unread-dot-inline { margin-left: auto; }
+
+/* ---- FAB ---- */
+.m3-fab {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 56px; padding: 0 20px; border-radius: var(--md-sys-shape-corner-lg);
+  border: none; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
+  font: var(--md-type-label-lg); box-shadow: var(--md-sys-elevation-3); cursor: pointer;
+  transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-fab:hover { box-shadow: var(--md-sys-elevation-4); }
+
+/* ---- Cards ---- */
+.m3-card { border-radius: var(--md-sys-shape-corner-md); border: none; }
+.m3-card-elevated { background: var(--md-sys-color-surface-container-low); box-shadow: var(--md-sys-elevation-1); }
+.m3-card-filled { background: var(--md-sys-color-surface-container-highest); }
+.m3-card-outlined { background: var(--md-sys-color-surface); border: 1px solid var(--md-sys-color-outline-variant); }
+
+/* ---- Chips ---- */
+.m3-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 32px; padding: 0 16px; border-radius: var(--md-sys-shape-corner-sm);
+  border: 1px solid var(--md-sys-color-outline); background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface-variant); font: var(--md-type-label-lg); cursor: pointer;
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+              border-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-chip:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, var(--md-sys-color-surface)); }
+.m3-chip.selected { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); border-color: transparent; }
+.m3-chip:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+.m3-chip:disabled:hover { background: var(--md-sys-color-surface); }
+
+/* ---- Text fields ---- */
+.m3-field-wrap { position: relative; display: flex; flex-direction: column; }
+.m3-field {
+  height: 56px; padding: 0 16px; border-radius: var(--md-sys-shape-corner-xs);
+  border: 1px solid var(--md-sys-color-outline); background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface); font: var(--md-type-body-lg); width: 100%;
+  transition: border-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-field::placeholder { color: var(--md-sys-color-on-surface-variant); }
+.m3-field:focus { outline: none; border: 2px solid var(--md-sys-color-primary); padding: 0 15px; }
+
+/* ---- Dialogs ---- */
+.m3-dialog { background: var(--md-sys-color-surface-container-high); border-radius: var(--md-sys-shape-corner-xl); box-shadow: var(--md-sys-elevation-3); }
+
+/* ---- Segmented button (2-option, used for team picks) ---- */
+.m3-segmented {
+  display: flex; border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-full); overflow: hidden; background: var(--md-sys-color-surface);
+}
+.m3-segment {
+  flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 12px; cursor: pointer; background: transparent; color: var(--md-sys-color-on-surface);
+  font: var(--md-type-label-lg); border: none; min-width: 0;
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-segment + .m3-segment { border-left: 1px solid var(--md-sys-color-outline); }
+.m3-segment:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 6%, transparent); }
+.m3-segment.selected { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); font-weight: 700; }
+.m3-segment .check { display: none; }
+.m3-segment.selected .check { display: inline; }
+
+/* ---- List items ---- */
+.m3-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.m3-list-item {
+  display: flex; align-items: center; gap: 16px; padding: 12px 16px; min-height: 56px;
+  border-radius: var(--md-sys-shape-corner-md);
+}
+.m3-list-item .leading { flex-shrink: 0; }
+.m3-list-item .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.m3-list-item .headline { font: var(--md-type-body-lg); color: var(--md-sys-color-on-surface); }
+.m3-list-item .supporting { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); }
+.m3-list-item .trailing { flex-shrink: 0; }
+
+/* ---- Navigation Rail (desktop) ----
+   Light/Dark: a gray container tone (surface-container-low), one step off
+   the page background, so it reads as a distinct panel without tinting it
+   blue. Original theme overrides this below with its own blue tone. */
+.m3-nav-rail {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  width: 88px; padding: 12px 0; background: var(--md-sys-color-surface-container-low); flex-shrink: 0;
+}
+.m3-nav-rail-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  width: 100%; padding: 4px 0; cursor: pointer; background: none; border: none;
+  color: var(--md-sys-color-on-surface-variant); font: var(--md-type-label-md);
+}
+.m3-nav-rail-item .indicator {
+  width: 56px; height: 32px; border-radius: var(--md-sys-shape-corner-full);
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.m3-nav-rail-item.active .indicator { background: var(--md-sys-color-secondary-container); }
+.m3-nav-rail-item.active { color: var(--md-sys-color-on-surface); }
+
+/* ---- Navigation Bar (mobile bottom) ---- */
+.m3-nav-bar {
+  display: flex; align-items: stretch; background: var(--md-sys-color-surface-container-low);
+  box-shadow: var(--md-sys-elevation-2);
+}
+.m3-nav-bar-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 8px 0 10px; cursor: pointer; background: none; border: none;
+  color: var(--md-sys-color-on-surface-variant); font: var(--md-type-label-sm);
+}
+.m3-nav-bar-item .indicator {
+  width: 52px; height: 26px; border-radius: var(--md-sys-shape-corner-full);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.m3-nav-bar-item.active .indicator { background: var(--md-sys-color-secondary-container); }
+.m3-nav-bar-item.active { color: var(--md-sys-color-on-surface); }
+
+/* Bigger than the emoji indicators (56x32 rail / 52x26 bar) — the wrapper
+   itself grows too, so the avatar isn't cropped by the pill's shape. */
+.m3-nav-rail-item .avatar-indicator { width: 48px; height: 48px; }
+.nav-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+.m3-nav-bar-item .avatar-indicator { width: 38px; height: 38px; }
+.m3-nav-bar-item .nav-avatar { width: 34px; height: 34px; }
+
+/* Original theme: nav rail/bar read as a solid blue panel, like v1's
+   week-nav sidebar, instead of gray — its own distinct look (Light/Dark
+   stay neutral gray, above). */
+:root[data-theme="original"] .m3-nav-rail,
+:root[data-theme="original"] .m3-nav-bar {
+  background: var(--md-sys-color-primary-container);
+}
+:root[data-theme="original"] .m3-nav-rail-item,
+:root[data-theme="original"] .m3-nav-bar-item {
+  color: color-mix(in srgb, var(--md-sys-color-on-primary-container) 70%, transparent);
+}
+:root[data-theme="original"] .m3-nav-rail-item.active,
+:root[data-theme="original"] .m3-nav-bar-item.active {
+  color: var(--md-sys-color-on-primary-container);
+}
+
+/* ---- Top app bar ----
+   Light/Dark: a gray container tone, distinct from the page background
+   but not tinted blue. Original theme overrides this below with navy. */
+.m3-top-app-bar {
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+}
+
+/* Original theme: header reads as v1's solid navy bar. */
+:root[data-theme="original"] .m3-top-app-bar {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+:root[data-theme="original"] .m3-top-app-bar .welcome-text {
+  color: var(--md-sys-color-on-primary);
+}
+:root[data-theme="original"] .m3-top-app-bar .m3-icon-btn {
+  color: var(--md-sys-color-on-primary);
+}
+:root[data-theme="original"] .m3-top-app-bar .m3-icon-btn:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 15%, transparent);
+}
+
+.m3-scroll-x { overflow-x: auto; scrollbar-width: none; }
+.m3-scroll-x::-webkit-scrollbar { display: none; }
+
+/* ---- Overlay menu (hamburger trigger + dropdown) ----
+   Anchored to its trigger, overlays page content instead of pushing it —
+   used for all header "more actions" menus app-wide. Text-only items, no
+   emoji icons. */
+.m3-menu-wrap { position: relative; display: inline-flex; }
+
+.hamburger-bars { display: flex; flex-direction: column; gap: 4px; width: 20px; }
+.hamburger-bars span { display: block; height: 2px; border-radius: 1px; background: currentColor; }
+
+.m3-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: var(--md-sys-color-surface-container);
+  border-radius: var(--md-sys-shape-corner-xs);
+  box-shadow: var(--md-sys-elevation-2);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 1000;
+}
+.m3-menu.hidden { display: none; }
+
+.m3-menu-item {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  border: none;
+  background: transparent;
+  border-radius: var(--md-sys-shape-corner-xs);
+  color: var(--md-sys-color-on-surface);
+  font: var(--md-type-body-lg);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-menu-item:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent); }
+.m3-menu-item.danger { color: var(--md-sys-color-error); }
+
+.m3-menu-divider { height: 1px; background: var(--md-sys-color-outline-variant); margin: 4px 4px; }
+
+/* ---- Modal header ---- */
+/* Original theme: modal headers get a solid navy bar spanning the dialog's
+   full width (matching v1's popover header), instead of blending into the
+   body like the Light/Dark M3 dialogs do. The dialog's own overflow:hidden
+   + rounded corners clip this bar's top corners automatically. */
+:root[data-theme="original"] .modal-header {
+  background: var(--md-sys-color-primary);
+  /* A little bottom padding of its own (not the 20px symmetric match to
+     the top, which — stacked with modal-body's own top padding — produced
+     a visibly lopsided gap under the title) so the navy bar doesn't hug
+     the title flush against the white content. */
+  padding: 20px 24px 14px;
+}
+:root[data-theme="original"] .modal-header h2,
+:root[data-theme="original"] .modal-header .close-btn {
+  color: var(--md-sys-color-on-primary);
+}
+:root[data-theme="original"] .modal-header .close-btn:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 15%, transparent);
+}
+
+/* ---- Panel tabs (e.g. This Season / Hall of Fame, Create / Join) ----
+   Shared here (rather than duplicated per-page) so every page that uses
+   this class gets it, including ones that forgot to define it locally. */
+.panel-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.panel-tab {
+  height: 34px; padding: 0 16px; border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface-variant); border-radius: var(--md-sys-shape-corner-xs);
+  cursor: pointer; font: var(--md-type-label-lg);
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+              color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.panel-tab.active {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-color: var(--md-sys-color-primary);
+}

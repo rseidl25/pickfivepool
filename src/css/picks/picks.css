@@ -1,0 +1,460 @@
+/* Desktop: height (not min-height), capped at the viewport rather than just
+   floored at it — the page itself never scrolls; only .left-panel does,
+   internally. Reverted back to normal min-height/scrolling page flow inside
+   the mobile media query below, where matchups stack in one column and
+   need the page to scroll like a regular document. */
+html, body { height: 100%; overflow-x: hidden; overflow-y: hidden; }
+body { background: var(--md-sys-color-surface); }
+
+.app-shell {
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ---- Top app bar ----
+   Grid (not flex) so the week selector centers truly independently of the
+   logo/back-button widths on either side — same 3-column shape v1 used, but
+   the .m3-top-app-bar base class it also carries (m3-tokens.css) is what
+   actually decides the bar's color: neutral gray-container in Light/Dark,
+   solid navy only in Original theme, matching every other page's header. */
+.top-app-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  margin: -12px -12px 12px;
+}
+.site-header-topbar { grid-column: 1; grid-row: 1; justify-self: start; }
+.brand-logo { height: 64px; width: auto; }
+
+#header-home-btn { grid-column: 3; grid-row: 1; justify-self: end; }
+:root[data-theme="original"] #header-home-btn {
+  color: var(--md-sys-color-on-primary);
+  border-color: color-mix(in srgb, var(--md-sys-color-on-primary) 40%, transparent);
+}
+:root[data-theme="original"] #header-home-btn:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 12%, transparent);
+}
+
+/* ---- Week select row ----
+   The "Select Week" pill sits inside the header — its own surface tone in
+   Light/Dark (a step up from the header's gray), swapping to v1's darker
+   navy-on-navy in Original theme (primary-container there is an exact match
+   for v1's old #3f5c77). */
+.week-select-row {
+  grid-column: 2; grid-row: 1; justify-self: center;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--md-sys-shape-corner-sm);
+  background: var(--md-sys-color-surface-container-high);
+  box-shadow: var(--md-sys-elevation-1);
+}
+:root[data-theme="original"] .week-select-row { background: var(--md-sys-color-primary-container); }
+
+.week-label { font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface); white-space: nowrap; }
+:root[data-theme="original"] .week-label { color: var(--md-sys-color-on-primary-container); }
+
+/* Padding so the active chip's outline — which paints outside its box via
+   outline-offset — has room to render in full instead of getting clipped
+   by this row's own scroll overflow (m3-scroll-x). */
+.week-chip-row { min-width: 0; padding: 6px; }
+.week-nav-chips { display: flex; gap: 8px; }
+/* v1's shape/behavior exactly: auto-width padding (not a fixed square),
+   a visible 2px status-colored border, and a hover lift — just with the
+   app's M3 tokens standing in for v1's raw hex so it still themes properly. */
+.week-chip {
+  flex-shrink: 0; height: auto; width: auto; padding: 8px 14px;
+  border-radius: var(--md-sys-shape-corner-xs);
+  border-width: 2px; border-style: solid;
+  font-weight: 700; line-height: 1.4;
+  transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+.week-chip:hover { transform: translateY(-2px); }
+
+/* Not started (no picks yet) / unfinished (picks but no bonus or < 5) /
+   duplicate bonus team used elsewhere / valid & complete. */
+.week-chip.status-grey { background: var(--md-sys-color-surface-container-highest); border-color: var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-surface-variant); }
+.week-chip.status-yellow { background: var(--brand-gold-container); border-color: var(--md-sys-color-tertiary); color: #443800; }
+.week-chip.status-red { background: var(--md-sys-color-error-container); border-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error-container); }
+.week-chip.status-green { background: var(--status-valid-bg); border-color: var(--status-valid-border); color: var(--status-valid-text); }
+/* Outline, not a fill — a fill would replace the status color entirely,
+   hiding whether the week you're currently on is actually valid. The
+   outline sits on top of whatever status color is already there instead. */
+.week-chip.active { outline: 3px solid var(--week-active-outline); outline-offset: 2px; }
+
+/* "Next"/"Submit" — a deliberate green go-action carried over from v1
+   (not a theme color; see --action-go in m3-tokens.css). */
+#submit-btn, #final-submit-btn {
+  background: var(--action-go); color: #fff;
+}
+#submit-btn:hover:not(:disabled), #final-submit-btn:hover { background: var(--action-go-hover); }
+#submit-btn:disabled { opacity: 0.5; cursor: not-allowed; background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface-variant); }
+
+#back-btn { background: var(--action-back); color: #fff; border: none; }
+#back-btn:hover { background: var(--action-back-hover); }
+
+/* ---- Week title + league/player info row ---- */
+.league-player-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; margin: 4px 4px 16px;
+}
+.week-title {
+  margin: 0;
+  font: var(--md-type-headline-lg);
+  color: var(--md-sys-color-on-surface);
+  text-transform: uppercase;
+}
+.player-info-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 0; max-width: 50%; }
+.top-league-name { font: var(--md-type-title-md); color: var(--md-sys-color-on-surface); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.top-user-display { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* ---- Main layout ----
+   flex:1 + min-height:0 lets this fill exactly the space left under the
+   header instead of growing with its content, and (default) align-items:
+   stretch makes both columns that same fixed height — .left-panel scrolls
+   internally within it; .sidebar doesn't need to since its content is
+   short enough to just sit at the top with room to spare. */
+.main-content { display: flex; gap: 20px; flex: 1; min-height: 0; }
+
+/* Left: matchups, in v1's navy container panel (Light/Dark get a neutral
+   container tone instead — the always-navy look is Original-theme-specific,
+   same rule the rest of the app follows). */
+.left-panel {
+  flex: 5; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+  padding: 14px;
+  border-radius: var(--md-sys-shape-corner-md);
+  background: var(--md-sys-color-surface-container-high);
+  box-shadow: var(--md-sys-elevation-1);
+  overflow-y: auto;
+}
+:root[data-theme="original"] .left-panel { background: var(--md-sys-color-primary-container); }
+
+/* .left-panel's own gap only reaches its direct children, and #matchups
+   (a single wrapper div) is its only one — the actual per-day spacing has
+   to live here, one level down, where the weekday-container cards are. */
+.matchups { display: flex; flex-direction: column; gap: 16px; }
+
+.sidebar { flex: 4; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.sidebar-panel {
+  padding: 16px;
+  border-radius: var(--md-sys-shape-corner-md);
+  background: var(--md-sys-color-surface-container-high);
+  box-shadow: var(--md-sys-elevation-1);
+}
+:root[data-theme="original"] .sidebar-panel { background: var(--md-sys-color-primary-container); }
+
+.picks-box, #bonus-tracker {
+  padding: 14px;
+  border-radius: var(--md-sys-shape-corner-sm);
+  background: var(--md-sys-color-surface-container-lowest);
+  box-shadow: var(--md-sys-elevation-1);
+}
+.picks-box h2, #bonus-tracker h2 { font: var(--md-type-title-lg); color: var(--md-sys-color-on-surface); margin: 0 0 8px; }
+
+.picks-progress-track {
+  width: 100%; height: 8px; background: var(--md-sys-color-surface-container-highest);
+  border-radius: var(--md-sys-shape-corner-full); overflow: hidden; margin: 8px 0 14px;
+}
+.picks-progress-fill { height: 100%; width: 0%; background: var(--action-go); transition: width 0.2s ease; }
+
+.picks-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.picks-hint { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin: 8px 0 0; }
+
+.pick-chip {
+  display: inline-flex; align-items: center; gap: 8px; position: relative;
+  padding: 8px 32px 8px 14px; border-radius: var(--md-sys-shape-corner-sm);
+  background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface);
+  cursor: pointer; font: var(--md-type-label-lg);
+  box-shadow: var(--md-sys-elevation-1);
+  transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.pick-chip:hover { box-shadow: var(--md-sys-elevation-2); }
+.pick-chip.bonus { background: var(--bonus-pick-highlight); color: #443800; }
+.pick-chip img { width: 20px; height: 20px; object-fit: contain; }
+.pick-remove {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  border: none; background: transparent; font-size: 15px; line-height: 1; cursor: pointer; color: inherit; opacity: 0.6;
+}
+.pick-remove:hover { opacity: 1; }
+
+/* ---- Bonus tracker ---- */
+.bonus-grid { display: flex; gap: 12px; }
+.bonus-col { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.bonus-row {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px;
+  border-radius: var(--md-sys-shape-corner-sm);
+  background: var(--md-sys-color-surface-container-highest);
+  font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant);
+}
+.bonus-team-logo { width: 16px; height: 16px; object-fit: contain; flex-shrink: 0; }
+.bonus-alert { width: 14px; height: 14px; flex-shrink: 0; }
+.bonus-duplicate { color: var(--md-sys-color-error); font-weight: bold; }
+
+/* ---- Weekday sections ---- */
+.weekday-container {
+  padding: 14px;
+  border-radius: var(--md-sys-shape-corner-sm);
+  background: var(--md-sys-color-surface-container-lowest);
+  box-shadow: var(--md-sys-elevation-1);
+}
+.weekday-header-row { display: flex; align-items: center; justify-content: space-between; }
+.weekday-header { font: var(--md-type-title-md); color: var(--md-sys-color-on-surface); }
+.weekday-chevron { display: none; font-size: 14px; color: var(--md-sys-color-on-surface-variant); transition: transform 0.15s ease; }
+
+/* ---- Matchup row ----
+   A scoreboard-style "away — at — home" row, like v1, instead of a merged
+   two-option toggle: two independently-clickable team boxes with a small
+   circular "at" badge between them. */
+.matchup-row {
+  display: grid;
+  /* minmax(120px, 1fr), not a bare 1fr — a bare 1fr's implicit min-width is
+     its content's max-content size, so the (occupied) time column would end
+     up wider than the (empty) home-note column and the center would drift
+     off-center. The 120px floor keeps the time text from clipping. */
+  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+.game-time { white-space: nowrap; text-align: right; font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface-variant); }
+.center-col { display: flex; justify-content: center; align-items: stretch; gap: 14px; }
+.home-container { display: flex; flex-direction: column; gap: 4px; flex: 1 1 0; min-width: 0; }
+.matchup-note { text-align: center; font: var(--md-type-body-sm); color: var(--md-sys-color-tertiary); }
+
+.at-label {
+  flex-shrink: 0; align-self: center;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+  font: var(--md-type-label-md); text-transform: uppercase;
+}
+
+.team-box {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--md-sys-shape-corner-sm);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+  font: var(--md-type-label-lg);
+  cursor: pointer;
+  box-shadow: var(--md-sys-elevation-1);
+  transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+              border-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+              background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  flex: 1 1 0; min-width: 0;
+}
+.team-box:hover { box-shadow: var(--md-sys-elevation-2); }
+/* A stronger, unmistakable pick state — the same fixed light-blue highlight
+   used for "this is your team" elsewhere (My Week's Most Picked Teams, the
+   Picks tab's team filter), plus a thicker border and bolder text instead
+   of just a faint background tint. */
+.team-box.selected {
+  border-color: var(--md-sys-color-primary);
+  border-width: 3px;
+  background: var(--team-select-highlight);
+  color: #0d3c61;
+  font-weight: 800;
+  box-shadow: var(--md-sys-elevation-2);
+}
+.team-logo { width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; }
+.team-box span { min-width: 0; }
+
+/* ---- Summary screen ---- */
+.summary-screen.hidden,
+.summary-actions.hidden { display: none; }
+
+/* Scrolls internally (same "page itself never scrolls" pattern as
+   .left-panel) so .summary-actions below it can just sit in normal flow,
+   always visible right under the list, instead of stickily floating on
+   top of the cards as you scroll past them. */
+.summary-screen { padding: 20px 0; flex: 1; min-height: 0; overflow-y: auto; }
+
+.summary-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.summary-week {
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-sm);
+  box-shadow: var(--md-sys-elevation-1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.summary-week h3 {
+  margin: 0; padding: 12px 16px; font: var(--md-type-title-sm);
+  background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.summary-week.incomplete h3 { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+.summary-week-flag { font: var(--md-type-label-sm); }
+.summary-week p {
+  margin: 0; padding: 12px 16px; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant);
+  flex: 1; display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.summary-week ul { list-style: none; margin: 0; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+.summary-week li { display: flex; align-items: flex-start; gap: 8px; font: var(--md-type-body-md); font-weight: 600; padding: 8px 10px; border-radius: var(--md-sys-shape-corner-sm); background: var(--md-sys-color-surface-container-high); }
+.summary-week li.summary-bonus { background: var(--bonus-pick-highlight); color: #443800; }
+.summary-pick-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.summary-pick-time { font: var(--md-type-body-sm); font-weight: 400; color: var(--md-sys-color-on-surface-variant); }
+.summary-week li.summary-bonus .summary-pick-time { color: #6b4a00; }
+.summary-week li img { width: 20px; height: 20px; object-fit: contain; }
+
+.summary-actions {
+  display: flex; justify-content: center; align-items: center; gap: 16px;
+  padding: 16px 0; flex-shrink: 0; background: var(--md-sys-color-surface);
+}
+
+/* ---- Bottom sheet (mobile) ---- */
+#picks-bottom-bar, .picks-drawer-backdrop { display: none; }
+
+/* ---- Modals (shared dialog shape — this page has just the one dialog, so
+   these rules are duplicated from dashboard.css/leagues.css rather than
+   pulled into a shared file) ---- */
+.modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.32);
+  display: flex; justify-content: center; align-items: center; z-index: 1000;
+}
+.modal.hidden { display: none; }
+.modal-content { max-width: 440px; width: 90%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
+.modal-header { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+.modal-header h2 { margin: 0; font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); }
+.modal-body { padding: 16px 24px 32px; overflow-y: auto; }
+.modal-subtext { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); margin: 0 0 16px; }
+
+/* ---- Copy Picks modal ---- */
+.copy-picks-league-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.copy-picks-single { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); margin: 0 0 20px; }
+.copy-picks-league-option {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border-radius: var(--md-sys-shape-corner-md);
+  background: var(--md-sys-color-surface-container-highest);
+  font: var(--md-type-body-md); color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+}
+.copy-picks-actions { display: flex; justify-content: flex-end; gap: 12px; }
+
+/* =========================================================
+   Mobile (<= 800px)
+   ========================================================= */
+@media (max-width: 800px) {
+  /* Undo the desktop-only "page never scrolls, .left-panel scrolls
+     internally instead" lock — mobile stacks into one column and needs the
+     page itself to scroll normally, like any other page. */
+  html, body { height: auto; overflow-y: visible; }
+  .app-shell { height: auto; padding: 8px; padding-bottom: 64px; }
+  .main-content { flex: none; min-height: 0; }
+  .left-panel { min-height: 0; overflow-y: visible; }
+  .summary-screen { flex: none; min-height: 0; overflow-y: visible; padding-bottom: 90px; }
+  /* Fixed to the viewport bottom on mobile — the whole page scrolls here
+     (unlike desktop's own internally-scrolling summary area), so without
+     this the buttons would sit at the very end of a long 18-week list,
+     several screens of scrolling away. */
+  .summary-actions {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000;
+    background: var(--md-sys-color-surface-container-high);
+    box-shadow: var(--md-sys-elevation-3);
+    padding: 12px 16px;
+  }
+
+  .top-app-bar { display: flex; flex-direction: column; gap: 8px; padding: 10px 8px; margin: -8px -8px 8px; }
+  .site-header-topbar { display: flex; justify-content: center; align-items: center; width: 100%; }
+  .brand-logo { height: 52px; }
+
+  .week-select-row {
+    width: 100%; box-sizing: border-box; justify-content: center; flex-wrap: wrap;
+  }
+  .week-label { width: 100%; text-align: center; }
+  /* Full row width (not sized to its own scrolling content) so the chips
+     actually wrap within the screen instead of forcing it wider — that
+     overflow was what broke centering and hid the fixed bottom bar. */
+  .week-chip-row { width: 100%; overflow: visible; padding: 4px 0; }
+  .week-nav-chips { flex-wrap: wrap; justify-content: center; gap: 4px; }
+  /* Explicit 9-per-row flex-basis, not just "small enough to naturally wrap
+     at 9" — that depended on the exact device width and could pack more or
+     fewer per row. This always lands 18 weeks as 9 + 9 regardless of width. */
+  .week-chip {
+    flex: 0 0 calc((100% - 32px) / 9);
+    padding: 6px 4px;
+    font-size: 12px;
+    min-width: 0;
+  }
+  #submit-btn { width: 100%; }
+
+  #header-home-btn { width: 100%; justify-content: center; }
+
+  /* Title on its own centered line, league + player name together on one
+     centered line below it — instead of the desktop title-left/info-right
+     split, which has no room to breathe at phone widths. */
+  .league-player-row { flex-direction: column; align-items: center; margin: 4px 4px 12px; gap: 4px; }
+  .week-title { font-size: 24px; text-align: center; }
+  .player-info-stack { flex-direction: row; align-items: baseline; justify-content: center; gap: 6px; max-width: 100%; }
+  .top-league-name, .top-user-display { max-width: none; }
+  .top-user-display::before { content: "•"; margin-right: 6px; color: var(--md-sys-color-on-surface-variant); }
+
+  .main-content { flex-direction: column; }
+  .left-panel { width: 100%; box-sizing: border-box; }
+
+  .weekday-header-row { cursor: pointer; }
+  .weekday-chevron { display: inline-block; }
+  .weekday-container.collapsed .matchup-row { display: none; }
+  .weekday-container.collapsed .weekday-chevron { transform: rotate(-90deg); }
+
+  .matchup-row { display: flex; flex-direction: column; align-items: stretch; gap: 6px; margin: 8px 0 0; }
+  .game-time { text-align: left; font: var(--md-type-body-sm); }
+  .center-col { gap: 8px; }
+  .team-box { padding: 8px 10px; font: var(--md-type-body-sm); }
+  .team-logo { width: 22px; height: 22px; }
+  .at-label { width: 24px; height: 24px; font-size: 10px; }
+
+  #picks-bottom-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000;
+    padding: 12px 16px; background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface);
+    border: none; box-shadow: var(--md-sys-elevation-3);
+    font: var(--md-type-title-sm); font-family: inherit; cursor: pointer;
+  }
+  #picks-bottom-bar .chevron { transition: transform 0.2s ease; }
+  #picks-bottom-bar.open .chevron { transform: rotate(180deg); }
+
+  .picks-drawer-backdrop {
+    display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.32); z-index: 998;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+  }
+  .picks-drawer-backdrop.visible { opacity: 1; pointer-events: auto; }
+
+  .sidebar {
+    position: fixed; top: auto; left: 0; right: 0; bottom: 0; z-index: 999;
+    max-height: 75vh; overflow-y: auto;
+    background: var(--md-sys-color-surface);
+    border-radius: var(--md-sys-shape-corner-xl) var(--md-sys-shape-corner-xl) 0 0;
+    box-shadow: var(--md-sys-elevation-3);
+    padding: 14px; padding-bottom: 70px; box-sizing: border-box;
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+  }
+  .sidebar.open { transform: translateY(0); }
+  .sidebar-panel, .picks-box, #bonus-tracker { box-shadow: none; }
+  .sidebar-panel { padding: 12px; background: var(--md-sys-color-surface-container-low); }
+  :root[data-theme="original"] .sidebar-panel { background: var(--md-sys-color-surface-container-low); }
+
+  /* Bottom-sheet drawer content reads better centered than left-hugging on
+     a narrow, full-width sheet — text-align handles the headings/hint/rows,
+     and the flex containers need their own justify-content since
+     text-align doesn't reach flex-item placement. */
+  .sidebar { text-align: center; }
+  .picks-list { justify-content: center; }
+  .bonus-row { justify-content: center; }
+}

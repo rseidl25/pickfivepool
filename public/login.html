@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - NFL Pick 5</title>
+  <script>(function(){var t=localStorage.getItem("pick5-theme");if(t!=="light"&&t!=="dark"&&t!=="original")t="light";document.documentElement.setAttribute("data-theme",t);})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+
+  <link rel="stylesheet" href="../src/css/m3-tokens.css">
+  <link rel="stylesheet" href="../src/css/auth/auth-form.css">
+</head>
+<body>
+  <div class="hero">
+    <div class="form-card m3-card m3-card-elevated">
+      <img src="icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="form-logo">
+      <h2 class="form-title">Welcome back</h2>
+      <form id="login-form">
+        <div class="m3-field-wrap">
+          <input class="m3-field" type="email" id="login-email" placeholder="Email" required>
+        </div>
+        <div class="m3-field-wrap">
+          <input class="m3-field" type="password" id="login-password" placeholder="Password" required>
+        </div>
+        <button type="submit" class="m3-btn m3-btn-filled form-submit">Log In</button>
+      </form>
+      <a class="form-link" id="auth-link" href="signup.html">Don't have an account? Sign Up</a>
+    </div>
+  </div>
+
+  <script type="module" src="../src/js/auth/auth.js"></script>
+</body>
+</html>

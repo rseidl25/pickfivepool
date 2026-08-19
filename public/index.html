@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFL Pick 5</title>
+  <script>(function(){var t=localStorage.getItem("pick5-theme");if(t!=="light"&&t!=="dark"&&t!=="original")t="light";document.documentElement.setAttribute("data-theme",t);})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+
+  <link rel="stylesheet" href="../src/css/m3-tokens.css">
+  <link rel="stylesheet" href="../src/css/auth/index.css">
+</head>
+<body>
+  <div class="hero">
+    <div class="hero-card m3-card m3-card-elevated">
+      <img src="icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="hero-logo">
+      <div class="hero-actions">
+        <button id="signup-btn" class="m3-btn m3-btn-filled">Sign Up</button>
+        <button onclick="window.location.href='login.html'" class="m3-btn m3-btn-outlined">Log In</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getSeasonConfig } from "../src/js/util/api.js";
+
+    const signupBtn = document.getElementById("signup-btn");
+
+    const season = await getSeasonConfig();
+    if (!season.locked) {
+      signupBtn.onclick = () => window.location.href = "signup.html";
+    } else {
+      signupBtn.classList.add("disabled-btn");
+      signupBtn.textContent = "Sign Up Closed";
+    }
+  </script>
+</body>
+</html>

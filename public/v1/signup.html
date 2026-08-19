@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - NFL Pick 5</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../icons/favicon.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../src/css/v1/auth/signup.css">
+</head>
+<body>
+  <div class="container">
+    <img src="../icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="site-logo">
+    <h2>Create Account</h2>
+    <form id="signup-form">
+      <input type="text" id="signup-name" placeholder="Display Name" required>
+      <input type="email" id="signup-email" placeholder="Email" required>
+      <input type="password" id="signup-password" placeholder="Password" required>
+      <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+      <button type="submit">Sign Up</button>
+    </form>
+    <a href="index.html" class="back-link">Back to Home</a>
+  </div>
+
+  <!-- Auth Guard -->
+  <script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { app } from "../src/js/auth/firebase_init.js";
+    import { getSeasonConfig } from "../src/js/util/api.js";
+
+    const auth = getAuth(app);
+
+    // Checks auth state once, at page load, then stops listening — this
+    // guard is only meant to catch "already had a session and navigated
+    // here directly." A persistent listener would also fire the instant
+    // auth.js's own signup handler creates the account (that's an auth
+    // state change too), redirecting away mid-signup before it finishes
+    // setting the display name.
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      unsubscribe();
+
+      const season = await getSeasonConfig();
+      if (season.locked) {
+        console.warn("🚫 Signup closed, redirecting...");
+        window.location.href = "index.html"; // send them back to home
+        return;
+      }
+
+      // (Optional) If user is already logged in, redirect to dashboard
+      if (user) {
+        console.log("⚠️ Already logged in, redirecting...");
+        window.location.href = "dashboard.html";
+      }
+    });
+  </script>
+
+  <!-- Import your Firebase auth.js -->
+  <script type="module" src="../../src/js/auth/auth.js"></script>
+</body>
+</html>

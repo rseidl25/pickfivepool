@@ -1,0 +1,650 @@
+html, body { height: 100%; }
+
+/* height (not min-height): the shell must be capped at the viewport, not
+   just floored at it, or it grows to fit tall content (e.g. a full week
+   of picks) and the whole page scrolls instead of just dashboard-main. */
+.app-shell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Top app bar ---- */
+.top-app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.header-left { display: flex; align-items: center; gap: 20px; }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--md-sys-color-on-surface);
+}
+.brand-logo { height: 56px; width: auto; }
+
+.league-shortcut { display: flex; align-items: center; }
+.league-select { height: 40px; padding: 0 12px; max-width: 220px; font: var(--md-type-label-lg); }
+
+.user-info { display: flex; align-items: center; gap: 6px; }
+.welcome-text { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); margin-right: 6px; }
+
+/* ---- Body row: nav rail + main column ---- */
+.body-row {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.nav-rail {
+  flex-shrink: 0;
+  /* Own height so the toggle button (last child) can be pinned to the
+     bottom with margin-top: auto, matching the tab rail's full height. */
+  align-self: stretch;
+}
+
+.main-col {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Collapse toggle lives at the bottom of the tab rail (not the week rail
+   itself) so it's always reachable regardless of how tall the week list
+   gets — it controls #week-rail via JS. */
+.week-rail-toggle {
+  margin-top: auto;
+  width: 100%;
+  flex-shrink: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 18px;
+  cursor: pointer;
+}
+.week-rail-toggle:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+}
+:root[data-theme="original"] .week-rail-toggle {
+  color: var(--md-sys-color-on-primary-container);
+}
+:root[data-theme="original"] .week-rail-toggle:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary-container) 12%, transparent);
+}
+
+/* ---- Week select rail ----
+   Desktop: a vertical, collapsible column between the tab rail and the
+   main content — collapsing it all the way to 0 hands its width straight
+   back to .main-col (flex: 1). Its own min-height: 0 is what lets the
+   button list scroll *inside* the rail instead of growing the whole page.
+   Mobile: the classic horizontal scrolling strip (see the mobile block
+   below), full width, no collapse toggle.
+   Light/Dark: one gray step further than the tab rail (surface-container-
+   high), keeping the "different variations of gray" layering going without
+   introducing blue. Original theme overrides this below with its own blend. */
+.week-rail {
+  display: flex;
+  flex-direction: column;
+  width: 124px;
+  flex-shrink: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--md-sys-color-surface-container-high);
+  transition: width var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-standard);
+}
+:root[data-theme="original"] .week-rail {
+  background: color-mix(in srgb, var(--md-sys-color-primary) 55%, var(--md-sys-color-primary-container));
+}
+
+.week-chip-row {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+.week-buttons { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.week-chip { flex-shrink: 0; width: auto; min-width: 96px; justify-content: center; }
+
+.week-rail.collapsed { width: 0; }
+.week-rail.collapsed .week-chip-row { display: none; }
+
+/* ---- Main content ---- */
+.dashboard-main {
+  flex: 1;
+  min-height: 0;
+  padding: 8px 20px 32px;
+  overflow-y: auto;
+}
+
+.tab-section.hidden { display: none; }
+
+.section-title {
+  font: var(--md-type-headline-md);
+  color: var(--md-sys-color-on-surface);
+  margin: 8px 0 20px;
+}
+
+/* ---- Leaderboard podium ----
+   Classic podium shape: 1st is a wide pill on top; 2nd and 3rd sit side by
+   side underneath, each individually as wide as 1st (not half its width)
+   so the bottom row is wider overall and extends past 1st's edges on both
+   sides, meeting in the middle below it — same idea as the reference
+   sketch. Each pill has the same max-width and shrinks together if the
+   viewport can't fit two of them at full size. Ties at any position
+   render as multiple player chips sharing that one pill (wrapping onto
+   extra lines inside it) instead of getting their own pill. */
+.leaderboard-podium {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 0 auto 20px;
+}
+/* No podium rows (no games completed yet this week) — collapse the
+   container's own margin too, instead of leaving a gap where the 1st/2nd/
+   3rd pills would've sat. */
+.leaderboard-podium:empty { display: none; margin: 0; }
+.podium-top-row,
+.podium-bottom-row { display: flex; justify-content: center; gap: 14px; width: 100%; }
+
+.podium-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: var(--md-sys-shape-corner-full);
+  box-shadow: var(--md-sys-elevation-1);
+  padding: 12px 26px;
+  flex: 0 1 620px;
+  min-width: 0;
+}
+.podium-rank-1 { background: #e9dea7; min-height: 116px; padding: 14px 30px; }
+.podium-rank-2 { background: #d6d6d4; min-height: 116px; padding: 14px 26px; }
+.podium-rank-3 { background: #dac3ab; min-height: 116px; padding: 14px 26px; }
+
+/* Fixed dark text, not a theme token — the podium pill colors are fixed
+   light hexes in every theme, so on-surface (light in dark theme) would
+   be unreadable against them. */
+.podium-rank-num {
+  flex-shrink: 0;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1;
+}
+.podium-rank-1 .podium-rank-num { font-size: 34px; }
+.podium-rank-2 .podium-rank-num,
+.podium-rank-3 .podium-rank-num { font-size: 26px; }
+
+.podium-players { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; flex: 1; min-width: 0; }
+.podium-player { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+/* More than 3 tied players: a stadium-radius pill stretched around several
+   wrapped rows reads as a shapeless blob, so switch to a rounded-rect
+   instead and pin the rank number to the top (rather than centering it
+   against a tall block). The row just grows taller to fit everyone —
+   no scrolling. */
+.podium-row-crowded {
+  border-radius: var(--md-sys-shape-corner-xl);
+  align-items: flex-start;
+}
+.podium-row-crowded .podium-rank-num { padding-top: 6px; }
+.podium-row-crowded .podium-players {
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+/* Smaller avatar/text once scrolling — fits more rows per screenful so
+   there's less to scroll through in the first place. */
+.podium-row-crowded .podium-player { gap: 8px; }
+.podium-row-crowded .podium-avatar { width: 34px !important; height: 34px !important; border-width: 2px; }
+.podium-row-crowded .podium-name { font: var(--md-type-body-md); }
+.podium-row-crowded .podium-score { font: var(--md-type-body-sm); font-weight: 700; }
+
+.podium-avatar {
+  border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  border: 3px solid var(--md-sys-color-surface-container-lowest);
+}
+.podium-rank-1 .podium-avatar { width: 84px; height: 84px; }
+.podium-rank-2 .podium-avatar,
+.podium-rank-3 .podium-avatar { width: 66px; height: 66px; }
+
+.podium-info { display: flex; flex-direction: column; min-width: 0; }
+.podium-name {
+  font: var(--md-type-title-md); color: #1a1a1a;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px;
+}
+.podium-score { font: var(--md-type-body-md); font-weight: 700; color: #444444; }
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-md);
+  overflow: hidden;
+  box-shadow: var(--md-sys-elevation-1);
+}
+/* Row dividers live on the <tr> (one border per row) rather than on each
+   <td> (three borders per row that have to line up) — with auto table
+   layout the columns land on fractional pixel widths, and three
+   independently-rounded per-cell borders can render a pixel out of step
+   with each other, showing up as a tiny "broken" seam where columns meet. */
+.leaderboard-table thead tr,
+.leaderboard-table tbody tr {
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+.leaderboard-table th {
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-type-title-sm);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 12px 10px;
+}
+.leaderboard-table td {
+  padding: 12px 10px;
+  font: var(--md-type-title-sm);
+  color: var(--md-sys-color-on-surface);
+  text-align: center;
+}
+
+/* Original theme: navy header row + white rows + black hairlines, like v1's
+   leaderboard table, instead of the neutral M3 gray tones. */
+:root[data-theme="original"] .leaderboard-table {
+  border: 1px solid var(--md-sys-color-outline);
+}
+:root[data-theme="original"] .leaderboard-table thead tr,
+:root[data-theme="original"] .leaderboard-table tbody tr {
+  border-bottom-color: var(--md-sys-color-outline);
+}
+:root[data-theme="original"] .leaderboard-table th {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+:root[data-theme="original"] .leaderboard-table td {
+  background: var(--md-sys-color-surface-container-lowest);
+}
+.leaderboard-player-cell { display: flex; align-items: center; justify-content: flex-start; gap: 10px; text-align: left; }
+.leaderboard-mini-pic { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+/* Zebra striping for contrast between rows. */
+#leaderboard-list tr:nth-child(odd) td { background: var(--md-sys-color-surface-container-lowest); }
+#leaderboard-list tr:nth-child(even) td { background: var(--md-sys-color-surface-container-highest); }
+
+/* ---- My Week ----
+   Modular layout: each card is only as tall as its own content (grid
+   align-items: start, no forced stretch) instead of the old equal-height
+   3-up grid. The profile card is the exception — it's the identity anchor
+   for the tab, so it spans the full height of the row (a single 1fr grid
+   row sized to the section's available viewport height) and centers its
+   contents vertically within that space on desktop. */
+#my-week-section.tab-section:not(.hidden) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.my-week-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr 1fr;
+  grid-template-rows: 1fr;
+  align-items: start;
+  gap: 16px;
+}
+.my-week-col { padding: 18px; }
+.my-week-picks-col,
+.my-week-picked-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.heels-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.my-week-col h3 { font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface); margin: 0 0 10px; }
+
+/* ---- Season Trend chart ---- */
+.my-week-trend-chart { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.trend-svg { width: 100%; height: auto; display: block; }
+.trend-line-points { stroke: var(--trend-points-color); }
+.trend-line-rank { stroke: var(--trend-rank-color); }
+.trend-dot-points { fill: var(--trend-points-color); }
+.trend-dot-rank { fill: var(--trend-rank-color); }
+.trend-axis-label { fill: var(--md-sys-color-on-surface-variant); }
+.trend-legend { display: flex; gap: 16px; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); }
+.trend-legend-item { display: flex; align-items: center; gap: 6px; }
+.trend-swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.trend-swatch-points { background: var(--trend-points-color); }
+.trend-swatch-rank { background: var(--trend-rank-color); }
+.my-week-trend-empty { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); text-align: center; margin: 20px 0; }
+
+/* Original theme: the My Picks and Hate Watch List columns read as the same
+   navy pick-box card used on the Picks tab, not a neutral surface tone —
+   keeps colors consistent between the two places a player's picks show up. */
+:root[data-theme="original"] .my-week-col:not(.my-week-profile) {
+  background: var(--md-sys-color-primary);
+}
+:root[data-theme="original"] .my-week-col:not(.my-week-profile) h3,
+:root[data-theme="original"] .my-week-col:not(.my-week-profile) .pick-box-total,
+:root[data-theme="original"] .my-week-col:not(.my-week-profile) .pick-list li:not(.pick-row),
+:root[data-theme="original"] .my-week-col:not(.my-week-profile) .trend-legend,
+:root[data-theme="original"] .my-week-col:not(.my-week-profile) .my-week-trend-empty {
+  color: var(--md-sys-color-on-primary);
+}
+:root[data-theme="original"] .my-week-col:not(.my-week-profile) .trend-axis-label {
+  fill: var(--md-sys-color-on-primary);
+}
+.my-week-profile {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  gap: 4px;
+  background: none;
+  box-shadow: none;
+}
+.my-week-avatar { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; margin-bottom: 18px; }
+.my-week-name { font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); margin-bottom: 4px; }
+.my-week-total-points { font: var(--md-type-title-md); color: var(--md-sys-color-on-surface-variant); margin-bottom: 26px; }
+.my-week-overall-pos-box,
+.my-week-win-chance-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.my-week-overall-pos-box { margin-bottom: 12px; }
+.my-week-win-chance-box { margin-top: 20px; }
+.my-week-overall-pos-rank,
+.my-week-win-chance-pct { font: var(--md-type-display-md); color: var(--md-sys-color-primary); }
+.my-week-overall-pos-label,
+.my-week-win-chance-label { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); }
+
+/* My Picks / Hate Watch List rows get bigger icons and text than the
+   Picks tab's own pick-row use — that grid packs several narrow cards per
+   row, but these columns only ever hold one, so there's room to spare. */
+.my-week-col .pick-row { padding: 10px 14px; }
+.my-week-col .pick-row .team-logo { width: 26px; height: 26px; }
+.my-week-col .pick-row .team-name { font: var(--md-type-title-sm); }
+.my-week-col .pick-row .team-points { font: var(--md-type-title-sm); }
+
+@media (max-width: 900px) {
+  #my-week-section.tab-section:not(.hidden) { min-height: 0; display: block; }
+  .my-week-grid { flex: none; grid-template-columns: 1fr; grid-template-rows: none; }
+  .my-week-profile { align-self: auto; }
+  .my-week-avatar { width: 96px; height: 96px; }
+}
+
+/* ---- Picks tab ---- */
+.picks-controls {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.picks-select { height: 40px; padding: 0 12px; font: var(--md-type-body-md); }
+:root[data-theme="original"] .picks-select {
+  background: var(--md-sys-color-surface-container-lowest);
+}
+.team-pick-counter { font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface-variant); }
+:root[data-theme="original"] #toggle-scores-btn {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-color: transparent;
+}
+
+.picks-layout { display: flex; gap: 20px; align-items: flex-start; }
+
+.weekly-picks-grid {
+  flex: 3;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.pick-box {
+  padding: 14px;
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-md);
+  box-shadow: var(--md-sys-elevation-1);
+}
+.pick-box.is-me { outline: 2px solid var(--brand-gold); outline-offset: -2px; }
+.player-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: var(--md-sys-color-surface-container-lowest); }
+.player-header h3 { margin: 0; font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface); }
+
+/* Original theme: player cards read as v1's navy boxes, with a slightly
+   bigger profile photo, instead of a neutral surface tone. */
+:root[data-theme="original"] .pick-box {
+  background: var(--md-sys-color-primary);
+}
+:root[data-theme="original"] .profile-pic {
+  width: 42px;
+  height: 42px;
+}
+:root[data-theme="original"] .player-header h3,
+:root[data-theme="original"] .pick-box .pick-box-total {
+  color: var(--md-sys-color-on-primary);
+}
+
+.pick-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.pick-row {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-radius: var(--md-sys-shape-corner-sm);
+  background: var(--md-sys-color-surface-container-lowest);
+  font: var(--md-type-body-sm); font-weight: 600;
+}
+.pick-row.bonus { background: var(--bonus-pick-highlight); }
+/* Fixed dark text — the bonus highlight is a fixed light yellow across all
+   themes, so the ambient (theme-aware) text color goes near-invisible on it
+   in Dark theme. Placed before .win/.loss below so a decided bonus pick
+   still gets colored green/red instead of this neutral brown. */
+.pick-row.bonus .team-name,
+.pick-row.bonus .team-points { color: #443800; }
+.pick-row.highlighted { background: var(--team-select-highlight); outline: 2px solid var(--md-sys-color-primary); outline-offset: -2px; }
+/* Same fixed-text-color fix as .bonus above — the highlight is a fixed
+   light blue in every theme, so it needs fixed dark text too. Placed before
+   .win/.loss so a decided highlighted pick still colors green/red. */
+.pick-row.highlighted .team-name,
+.pick-row.highlighted .team-points { color: #0d3c61; }
+.pick-row .team-logo { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+.pick-row .team-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pick-row .team-name.win { color: #146c2e; }
+.pick-row .team-name.loss { color: var(--md-sys-color-error); }
+.pick-row .team-points { flex-shrink: 0; color: var(--md-sys-color-on-surface-variant); }
+.pick-list li:not(.pick-row) { color: var(--md-sys-color-on-surface-variant); font: var(--md-type-body-md); }
+
+.pick-box-total {
+  margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--md-sys-color-outline-variant);
+  text-align: center; font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface);
+}
+
+.matchups-container { flex: 0 0 300px; padding: 14px; }
+.matchups-container h3 { text-align: center; font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface); margin: 0 0 10px; }
+.matchups-container.hidden { display: none; }
+:root[data-theme="original"] .matchups-container {
+  background: var(--md-sys-color-primary-container);
+  border-color: transparent;
+}
+:root[data-theme="original"] .matchups-container h3 {
+  color: var(--md-sys-color-on-primary-container);
+}
+
+.day-box { margin-bottom: 12px; border-radius: var(--md-sys-shape-corner-sm); background: var(--md-sys-color-surface-container-lowest); overflow: hidden; }
+.day-header { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); font: var(--md-type-label-lg); padding: 8px; text-align: center; }
+:root[data-theme="original"] .day-header {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+.matchup-row {
+  display: grid; grid-template-columns: 1fr 32px 32px 1fr; align-items: center;
+  padding: 8px; border-top: 1px solid var(--md-sys-color-outline-variant);
+  font: var(--md-type-body-sm); font-weight: 600; text-align: center;
+}
+.team-label { display: flex; align-items: center; gap: 4px; }
+.home-label { justify-content: flex-end; }
+.matchup-logo { width: 16px; height: 16px; object-fit: contain; }
+.team-score { font-weight: bold; }
+.winner { color: #146c2e !important; }
+.loser { color: var(--md-sys-color-error) !important; }
+
+/* ---- Navigation Bar (mobile, hidden on desktop) ---- */
+.nav-bar { display: none; }
+
+/* ---- Footer ---- */
+.dashboard-footer {
+  display: flex; justify-content: center; gap: 6px; padding: 10px;
+  background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface-variant);
+  font: var(--md-type-body-sm); flex-shrink: 0;
+}
+:root[data-theme="original"] .dashboard-footer {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+/* =========================================================
+   Modals (shared dialog shape, same pattern as leagues.html)
+   ========================================================= */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.32); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal.hidden { display: none; }
+.modal-content { max-width: 440px; width: 90%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
+.modal-content.wide-dialog,
+.wide-dialog { max-width: 620px; }
+.modal-header { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+.modal-header h2 { margin: 0; font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); }
+.modal-body { padding: 16px 24px 32px; overflow-y: auto; }
+.modal-subtext { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); margin: 0 0 16px; }
+.settings-divider { border: none; border-top: 1px solid var(--md-sys-color-outline-variant); margin: 20px 0; }
+.how-to-play-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); }
+.close-btn {
+  flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--md-sys-shape-corner-full); font-size: 20px; font-weight: bold; line-height: 1;
+  color: var(--md-sys-color-on-surface-variant); cursor: pointer;
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.close-btn:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent); }
+.modal-content form { display: flex; flex-direction: column; gap: 16px; }
+.modal-content label { font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface-variant); }
+.modal-content .m3-btn[type="submit"] { align-self: flex-end; margin-top: 8px; }
+
+.post-body { height: auto; min-height: 90px; padding: 14px 16px; resize: vertical; }
+/* .m3-field:focus resets padding to 0 top/bottom (fine for the single-line
+   inputs it's designed for, which center text via a fixed height instead)
+   — override it here so the textarea's own vertical padding survives focus
+   instead of the text jumping to hug the top edge while typing. */
+.post-body:focus { padding: 13px 15px; }
+.post-body-counter { align-self: flex-end; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin-top: -6px; }
+.post-body-counter.limit-reached { color: var(--md-sys-color-error); font-weight: bold; }
+.posts-list { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; }
+.post-row { padding: 12px; border-radius: var(--md-sys-shape-corner-md); background: var(--md-sys-color-surface-container-highest); }
+.post-meta { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin-bottom: 4px; }
+.post-body-text { white-space: pre-wrap; word-break: break-word; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); }
+.post-delete-btn { margin-top: 8px; height: 28px; padding: 0 12px; background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); border: none; border-radius: var(--md-sys-shape-corner-full); cursor: pointer; font: var(--md-type-label-sm); }
+.no-posts { color: var(--md-sys-color-on-surface-variant); font-style: italic; }
+
+.stats-panel.hidden { display: none; }
+.stats-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.stats-table th, .stats-table td { padding: 8px; border-bottom: 1px solid var(--md-sys-color-outline-variant); text-align: left; }
+.stats-table th { background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface-variant); }
+.stats-table td { color: var(--md-sys-color-on-surface); }
+.inline-field { display: flex; gap: 8px; margin-bottom: 12px; }
+.inline-field select { flex: 1; height: 40px; }
+.hof-awards { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.hof-award-card { background: var(--md-sys-color-surface-container-highest); border-radius: var(--md-sys-shape-corner-md); padding: 10px 14px; }
+.hof-award-label { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin-bottom: 2px; }
+.hof-award-value { font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface); }
+
+/* Original theme: match the "View" button to the blue used by other
+   primary actions (New League FAB, Save/Transfer) instead of gold-tonal. */
+:root[data-theme="original"] #hof-load-btn {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+/* =========================================================
+   Mobile (<= 840px): nav rail -> bottom nav bar
+   ========================================================= */
+@media (max-width: 840px) {
+  /* Page section titles (Overall Leaderboard, My Week, Picks) — left-
+     aligned on desktop, centered on mobile. */
+  .section-title { text-align: center; }
+
+  .nav-rail { display: none; }
+  .nav-bar {
+    display: flex;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
+  }
+  .app-shell { padding-bottom: 62px; }
+
+  /* Header row: logo | league select | hamburger, as three independent
+     grid columns (not two flex groups) so the select can sit truly
+     centered regardless of how wide the logo or hamburger are.
+     .header-left has no box of its own here (display: contents) — its
+     two children become direct grid items alongside .user-info. Last
+     Updated moves out of the footer and into its own row right under the
+     header — reordering the app-shell's flex children rather than moving
+     markup, so the footer keeps its normal desktop position (bottom of
+     the page) there. */
+  /* Logo | league select | hamburger as three grid columns, the outer two
+     sized to their own content (auto — not shrunk below it, so the logo
+     never clips) and the middle one taking whatever's left. The select is
+     centered within that leftover space: since the logo is much wider
+     than the hamburger, that's not dead-center on the full row, but it's
+     as close as this layout gets without either clipping or shrinking
+     the logo. */
+  .top-app-bar {
+    order: 0;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    padding: 10px 16px;
+  }
+  .header-left { display: contents; }
+  .league-shortcut { justify-self: center; }
+  .welcome-text { display: none; }
+
+  /* margin-top: -1px guards against a hairline gap between the header and
+     this row at some zoom levels/DPRs — the header's height is a whole
+     number but this row's is fractional (line-height math), so without
+     the 1px overlap the page background can peek through as a stray
+     line at the seam. */
+  .dashboard-footer { order: 1; margin-bottom: 0; margin-top: -1px; }
+
+  .body-row { order: 2; flex-direction: column; }
+
+  /* The collapsible vertical rail is a desktop-only affordance — on
+     mobile this reverts to the classic full-width horizontal scroll
+     strip, always visible, no toggle. */
+  .week-rail { flex-direction: row; width: 100%; }
+  .week-rail-toggle { display: none; }
+  .week-chip-row { flex: initial; overflow-y: visible; overflow-x: auto; padding: 8px 12px; }
+  .week-buttons { flex-direction: row; gap: 8px; }
+  .week-chip { width: auto; justify-content: center; }
+
+  .dashboard-main { padding: 4px 12px 24px; }
+
+  /* 2nd/3rd stack instead of sitting side by side — too narrow otherwise. */
+  .podium-bottom-row { flex-direction: column; }
+  .podium-row { flex-basis: auto; width: 100%; }
+  .podium-name { max-width: 140px; }
+
+  /* align-items: stretch — the base rule's flex-start (needed for the
+     desktop row layout, so the grid and the matchups panel don't stretch
+     to match each other's height) otherwise shrinks .weekly-picks-grid to
+     its content width instead of filling the column on mobile. */
+  .picks-layout { flex-direction: column; align-items: stretch; }
+  .matchups-container { flex: 1 1 auto; width: 100%; }
+
+  /* Matchups aren't useful in the cramped mobile layout — drop the toggle
+     entirely rather than offer a button to a view that doesn't fit. */
+  #toggle-scores-btn { display: none; }
+
+  .modal-content { max-height: 80vh; }
+}

@@ -1,0 +1,2812 @@
+[
+  {
+    "week": 1,
+    "games": [
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Wednesday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-09-10T00:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "San Francisco 49ers",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:35 PM",
+        "gameTimeISO": "2026-09-11T00:35Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cincinnati Bengals",
+        "homeScore": 0,
+        "awayTeam": "Tampa Bay Buccaneers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-13T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "New Orleans Saints",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-13T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tennessee Titans",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-13T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Indianapolis Colts",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-13T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Pittsburgh Steelers",
+        "homeScore": 0,
+        "awayTeam": "Atlanta Falcons",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-13T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "Chicago Bears",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-13T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Jacksonville Jaguars",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-13T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Houston Texans",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-13T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Las Vegas Raiders",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-13T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Green Bay Packers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-13T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "Washington Commanders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-13T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Chargers",
+        "homeScore": 0,
+        "awayTeam": "Arizona Cardinals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-13T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "Dallas Cowboys",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-09-14T00:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Kansas City Chiefs",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-09-15T00:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "games": [
+      {
+        "homeTeam": "Buffalo Bills",
+        "homeScore": 0,
+        "awayTeam": "Detroit Lions",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-09-18T00:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "Carolina Panthers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-20T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "Minnesota Vikings",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-20T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tennessee Titans",
+        "homeScore": 0,
+        "awayTeam": "Philadelphia Eagles",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-20T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New England Patriots",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-20T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Jets",
+        "homeScore": 0,
+        "awayTeam": "Green Bay Packers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-20T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-20T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Baltimore Ravens",
+        "homeScore": 0,
+        "awayTeam": "New Orleans Saints",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-20T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Houston Texans",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-20T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Denver Broncos",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-09-20T20:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Chargers",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-09-20T20:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "Washington Commanders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-20T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "Seattle Seahawks",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-20T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-20T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Kansas City Chiefs",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-09-21T00:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "New York Giants",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-09-22T00:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "games": [
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Atlanta Falcons",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-09-25T00:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Buffalo Bills",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cleveland Browns",
+        "homeScore": 0,
+        "awayTeam": "Carolina Panthers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Indianapolis Colts",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Miami Dolphins",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Pittsburgh Steelers",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "Seattle Seahawks",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Jacksonville Jaguars",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-09-27T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Arizona Cardinals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-09-27T20:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "Minnesota Vikings",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-09-27T20:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-27T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-09-27T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Denver Broncos",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Rams",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-09-28T00:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "Philadelphia Eagles",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-09-29T00:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "games": [
+      {
+        "homeTeam": "Cleveland Browns",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-02T00:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "9:30 AM",
+        "gameTimeISO": "2026-10-04T13:30Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Buffalo Bills",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-04T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-04T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cincinnati Bengals",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-04T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "Arizona Cardinals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-04T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Rams",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-04T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "Green Bay Packers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-04T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Baltimore Ravens",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-04T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Houston Texans",
+        "homeScore": 0,
+        "awayTeam": "Dallas Cowboys",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-04T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-10-04T20:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Las Vegas Raiders",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-04T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-04T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-04T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "Detroit Lions",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-10-05T00:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Atlanta Falcons",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-06T00:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "games": [
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "Tampa Bay Buccaneers",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-09T00:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Jacksonville Jaguars",
+        "homeScore": 0,
+        "awayTeam": "Philadelphia Eagles",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "9:30 AM",
+        "gameTimeISO": "2026-10-11T13:30Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tennessee Titans",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-11T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Miami Dolphins",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-11T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New England Patriots",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-11T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Minnesota Vikings",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-11T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Jets",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-11T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Pittsburgh Steelers",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-11T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "New York Giants",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-11T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Chargers",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-10-11T20:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Chicago Bears",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-11T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "Detroit Lions",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-11T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "San Francisco 49ers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-11T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-10-12T00:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-13T00:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "games": [
+      {
+        "homeTeam": "Denver Broncos",
+        "homeScore": 0,
+        "awayTeam": "Seattle Seahawks",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-16T00:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Jacksonville Jaguars",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "9:30 AM",
+        "gameTimeISO": "2026-10-18T13:30Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "Chicago Bears",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-18T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cleveland Browns",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-18T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Indianapolis Colts",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-18T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New England Patriots",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-18T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "New Orleans Saints",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-18T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "Carolina Panthers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-18T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-18T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "Arizona Cardinals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-10-18T20:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Kansas City Chiefs",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-18T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Las Vegas Raiders",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-18T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Dallas Cowboys",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-10-19T00:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Washington Commanders",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-20T00:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "games": [
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-23T00:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "9:30 AM",
+        "gameTimeISO": "2026-10-25T13:30Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "San Francisco 49ers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-25T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tennessee Titans",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-25T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-25T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Jets",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-25T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "Tampa Bay Buccaneers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-25T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Baltimore Ravens",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-25T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Houston Texans",
+        "homeScore": 0,
+        "awayTeam": "New York Giants",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-10-25T17:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-10-25T20:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "Green Bay Packers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-25T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Las Vegas Raiders",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Rams",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-10-25T20:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-10-26T00:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "Dallas Cowboys",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-27T00:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "games": [
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Carolina Panthers",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-10-30T00:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Buffalo Bills",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-01T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cincinnati Bengals",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-01T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "Arizona Cardinals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-01T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "Minnesota Vikings",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-01T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Jets",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-01T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Pittsburgh Steelers",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-01T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "Atlanta Falcons",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-01T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Jacksonville Jaguars",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-01T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-11-01T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Denver Broncos",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-01T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Miami Dolphins",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-01T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "Philadelphia Eagles",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-11-02T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "Chicago Bears",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-11-03T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "games": [
+      {
+        "homeTeam": "Baltimore Ravens",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-11-06T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "9:30 AM",
+        "gameTimeISO": "2026-11-08T14:30Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Indianapolis Colts",
+        "homeScore": 0,
+        "awayTeam": "Dallas Cowboys",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-08T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Kansas City Chiefs",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-08T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Miami Dolphins",
+        "homeScore": 0,
+        "awayTeam": "Detroit Lions",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-08T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-08T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "New York Giants",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-08T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Rams",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-08T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-08T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Chargers",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-11-08T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-11-08T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New England Patriots",
+        "homeScore": 0,
+        "awayTeam": "Green Bay Packers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-08T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "Arizona Cardinals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-08T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "Tampa Bay Buccaneers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-11-09T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-11-10T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "games": [
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "Washington Commanders",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-11-13T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "9:30 AM",
+        "gameTimeISO": "2026-11-15T14:30Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-15T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cleveland Browns",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-15T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Minnesota Vikings",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-15T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tennessee Titans",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-15T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Indianapolis Colts",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-15T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Carolina Panthers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-15T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Jets",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-15T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Las Vegas Raiders",
+        "homeScore": 0,
+        "awayTeam": "Seattle Seahawks",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-11-15T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Rams",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-11-15T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "San Francisco 49ers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-15T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cincinnati Bengals",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-11-16T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Baltimore Ravens",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-11-17T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 11,
+    "games": [
+      {
+        "homeTeam": "Houston Texans",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-11-20T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Buffalo Bills",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-22T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "New Orleans Saints",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-22T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-22T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "Tampa Bay Buccaneers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-22T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Kansas City Chiefs",
+        "homeScore": 0,
+        "awayTeam": "Arizona Cardinals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-22T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-22T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-22T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Chargers",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-11-22T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Denver Broncos",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-22T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-22T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Minnesota Vikings",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-11-23T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-11-24T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 12,
+    "games": [
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "Green Bay Packers",
+        "awayScore": 0,
+        "weekday": "Wednesday",
+        "gameTime": "8:00 PM",
+        "gameTimeISO": "2026-11-26T01:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "Chicago Bears",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-26T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "Philadelphia Eagles",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "4:30 PM",
+        "gameTimeISO": "2026-11-26T21:30Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Buffalo Bills",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-11-27T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Pittsburgh Steelers",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Friday",
+        "gameTime": "3:00 PM",
+        "gameTimeISO": "2026-11-27T20:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cincinnati Bengals",
+        "homeScore": 0,
+        "awayTeam": "New Orleans Saints",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-29T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cleveland Browns",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-29T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Indianapolis Colts",
+        "homeScore": 0,
+        "awayTeam": "New York Giants",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-29T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Miami Dolphins",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-29T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Atlanta Falcons",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-29T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Houston Texans",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-11-29T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Jacksonville Jaguars",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-11-29T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "Washington Commanders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-29T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Seattle Seahawks",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-11-29T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Chargers",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-11-30T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "Carolina Panthers",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-01T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 13,
+    "games": [
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-04T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "Detroit Lions",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-06T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-06T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cleveland Browns",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-06T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tennessee Titans",
+        "homeScore": 0,
+        "awayTeam": "Washington Commanders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-06T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Green Bay Packers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-06T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "San Francisco 49ers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-06T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-06T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Denver Broncos",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-12-06T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "Philadelphia Eagles",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-12-06T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Carolina Panthers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-12-06T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New England Patriots",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-12-06T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Pittsburgh Steelers",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-12-07T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "Dallas Cowboys",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-08T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 14,
+    "games": [
+      {
+        "homeTeam": "New England Patriots",
+        "homeScore": 0,
+        "awayTeam": "Minnesota Vikings",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-11T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cleveland Browns",
+        "homeScore": 0,
+        "awayTeam": "Atlanta Falcons",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-13T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-13T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Miami Dolphins",
+        "homeScore": 0,
+        "awayTeam": "Chicago Bears",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-13T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Jets",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-13T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-13T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-13T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "New Orleans Saints",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-13T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Baltimore Ravens",
+        "homeScore": 0,
+        "awayTeam": "Tampa Bay Buccaneers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-13T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Las Vegas Raiders",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-12-13T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cincinnati Bengals",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-12-13T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Rams",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-12-13T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "New York Giants",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-12-13T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-12-14T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Jacksonville Jaguars",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-15T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 15,
+    "games": [
+      {
+        "homeTeam": "Los Angeles Chargers",
+        "homeScore": 0,
+        "awayTeam": "San Francisco 49ers",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-18T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "Seattle Seahawks",
+        "awayScore": 0,
+        "weekday": "Saturday",
+        "gameTime": "5:00 PM",
+        "gameTimeISO": "2026-12-19T22:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Buffalo Bills",
+        "homeScore": 0,
+        "awayTeam": "Chicago Bears",
+        "awayScore": 0,
+        "weekday": "Saturday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-12-20T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-20T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tennessee Titans",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-20T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-20T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Pittsburgh Steelers",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-20T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "New Orleans Saints",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-20T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "Atlanta Falcons",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-20T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-20T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Houston Texans",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-20T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-12-20T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Las Vegas Raiders",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-12-20T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "Dallas Cowboys",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-12-20T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Detroit Lions",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-12-21T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Kansas City Chiefs",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-22T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 16,
+    "games": [
+      {
+        "homeTeam": "Philadelphia Eagles",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-25T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "Green Bay Packers",
+        "awayScore": 0,
+        "weekday": "Friday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-25T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Denver Broncos",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Friday",
+        "gameTime": "4:30 PM",
+        "gameTimeISO": "2026-12-25T21:30Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Seattle Seahawks",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Rams",
+        "awayScore": 0,
+        "weekday": "Friday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-26T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "Tampa Bay Buccaneers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2026-12-27T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Indianapolis Colts",
+        "homeScore": 0,
+        "awayTeam": "Cincinnati Bengals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2026-12-27T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Washington Commanders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2026-12-27T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Pittsburgh Steelers",
+        "homeScore": 0,
+        "awayTeam": "Carolina Panthers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2026-12-27T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Miami Dolphins",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-27T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Arizona Cardinals",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-27T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Jets",
+        "homeScore": 0,
+        "awayTeam": "New England Patriots",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-27T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Baltimore Ravens",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2026-12-27T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Las Vegas Raiders",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2026-12-27T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Kansas City Chiefs",
+        "homeScore": 0,
+        "awayTeam": "San Francisco 49ers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2026-12-27T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2026-12-28T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Detroit Lions",
+        "homeScore": 0,
+        "awayTeam": "New York Giants",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2026-12-29T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 17,
+    "games": [
+      {
+        "homeTeam": "Cincinnati Bengals",
+        "homeScore": 0,
+        "awayTeam": "Baltimore Ravens",
+        "awayScore": 0,
+        "weekday": "Thursday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2027-01-01T01:15Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New England Patriots",
+        "homeScore": 0,
+        "awayTeam": "Denver Broncos",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-03T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Chargers",
+        "homeScore": 0,
+        "awayTeam": "Kansas City Chiefs",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-03T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tampa Bay Buccaneers",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Rams",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-03T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Jacksonville Jaguars",
+        "homeScore": 0,
+        "awayTeam": "Washington Commanders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-03T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Atlanta Falcons",
+        "homeScore": 0,
+        "awayTeam": "New Orleans Saints",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2027-01-03T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cleveland Browns",
+        "homeScore": 0,
+        "awayTeam": "Indianapolis Colts",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2027-01-03T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Dallas Cowboys",
+        "homeScore": 0,
+        "awayTeam": "New York Giants",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2027-01-03T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Tennessee Titans",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2027-01-03T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Miami Dolphins",
+        "homeScore": 0,
+        "awayTeam": "Buffalo Bills",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2027-01-03T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Jets",
+        "homeScore": 0,
+        "awayTeam": "Minnesota Vikings",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2027-01-03T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "Seattle Seahawks",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "1:00 PM",
+        "gameTimeISO": "2027-01-03T18:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:05 PM",
+        "gameTimeISO": "2027-01-03T21:05Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Chicago Bears",
+        "homeScore": 0,
+        "awayTeam": "Detroit Lions",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "4:25 PM",
+        "gameTimeISO": "2027-01-03T21:25Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "San Francisco 49ers",
+        "homeScore": 0,
+        "awayTeam": "Philadelphia Eagles",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "8:20 PM",
+        "gameTimeISO": "2027-01-04T01:20Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Houston Texans",
+        "awayScore": 0,
+        "weekday": "Monday",
+        "gameTime": "8:15 PM",
+        "gameTimeISO": "2027-01-05T01:15Z",
+        "note": "none"
+      }
+    ]
+  },
+  {
+    "week": 18,
+    "games": [
+      {
+        "homeTeam": "Buffalo Bills",
+        "homeScore": 0,
+        "awayTeam": "New York Jets",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Cincinnati Bengals",
+        "homeScore": 0,
+        "awayTeam": "Cleveland Browns",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Denver Broncos",
+        "homeScore": 0,
+        "awayTeam": "Los Angeles Chargers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Green Bay Packers",
+        "homeScore": 0,
+        "awayTeam": "Detroit Lions",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Indianapolis Colts",
+        "homeScore": 0,
+        "awayTeam": "Jacksonville Jaguars",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Kansas City Chiefs",
+        "homeScore": 0,
+        "awayTeam": "Las Vegas Raiders",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Los Angeles Rams",
+        "homeScore": 0,
+        "awayTeam": "Seattle Seahawks",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Minnesota Vikings",
+        "homeScore": 0,
+        "awayTeam": "Chicago Bears",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New England Patriots",
+        "homeScore": 0,
+        "awayTeam": "Miami Dolphins",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New Orleans Saints",
+        "homeScore": 0,
+        "awayTeam": "Tampa Bay Buccaneers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "New York Giants",
+        "homeScore": 0,
+        "awayTeam": "Philadelphia Eagles",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Arizona Cardinals",
+        "homeScore": 0,
+        "awayTeam": "San Francisco 49ers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Washington Commanders",
+        "homeScore": 0,
+        "awayTeam": "Dallas Cowboys",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Carolina Panthers",
+        "homeScore": 0,
+        "awayTeam": "Atlanta Falcons",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Baltimore Ravens",
+        "homeScore": 0,
+        "awayTeam": "Pittsburgh Steelers",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      },
+      {
+        "homeTeam": "Houston Texans",
+        "homeScore": 0,
+        "awayTeam": "Tennessee Titans",
+        "awayScore": 0,
+        "weekday": "Sunday",
+        "gameTime": "12:00 AM",
+        "gameTimeISO": "2027-01-10T05:00Z",
+        "note": "none"
+      }
+    ]
+  }
+]

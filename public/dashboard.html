@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - NFL Pick 5</title>
+  <script>(function(){var t=localStorage.getItem("pick5-theme");if(t!=="light"&&t!=="dark"&&t!=="original")t="light";document.documentElement.setAttribute("data-theme",t);})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+
+  <link rel="stylesheet" href="../src/css/m3-tokens.css">
+  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- Top app bar -->
+    <header class="top-app-bar m3-top-app-bar">
+      <div class="header-left">
+        <a href="leagues.html" class="brand" aria-label="Back to your leagues">
+          <img src="icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="brand-logo">
+        </a>
+
+        <div class="league-shortcut" id="league-shortcut" style="display:none;">
+          <select id="league-select" class="m3-field league-select"></select>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <span class="welcome-text">Hello, <span id="user-name">...</span></span>
+        <div class="m3-menu-wrap">
+          <button id="menu-trigger" type="button" class="m3-icon-btn" aria-label="Menu" aria-haspopup="true" aria-expanded="false" style="display:none;">
+            <span class="hamburger-bars"><span></span><span></span><span></span></span>
+            <span id="menu-trigger-dot" class="unread-dot hidden"></span>
+          </button>
+          <div id="header-menu" class="m3-menu hidden">
+            <button id="how-to-play-btn" type="button" class="m3-menu-item">How to Play</button>
+            <button id="message-board-btn" type="button" class="m3-menu-item">Message Board<span id="message-board-dot" class="unread-dot unread-dot-inline hidden"></span></button>
+            <button id="league-stats-btn" type="button" class="m3-menu-item">League Stats</button>
+            <button id="settings-btn" type="button" class="m3-menu-item">Settings</button>
+            <div class="m3-menu-divider"></div>
+            <a href="leagues.html" id="return-to-menu-btn" class="m3-menu-item">Return to Menu</a>
+            <button id="logout-btn" type="button" class="m3-menu-item danger">Log Out</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body-row">
+      <!-- Navigation Rail (desktop) -->
+      <nav class="m3-nav-rail nav-rail">
+        <button class="m3-nav-rail-item" data-tab="my-week">
+          <span class="indicator avatar-indicator"><img class="nav-avatar" src="icons/default_avatar.png" alt=""></span><span>My Week</span>
+        </button>
+        <button class="m3-nav-rail-item active" data-tab="leaderboard">
+          <span class="indicator">🏆</span><span>Leaderboard</span>
+        </button>
+        <button class="m3-nav-rail-item" data-tab="picks">
+          <span class="indicator">🏈</span><span>Picks</span>
+        </button>
+        <button id="week-rail-toggle" type="button" class="week-rail-toggle" aria-label="Collapse week selector" aria-expanded="true">
+          <span id="week-rail-toggle-arrow">‹</span>
+        </button>
+      </nav>
+
+      <!-- Week select rail (desktop: vertical, collapsible via the arrow
+           at the bottom of the tab rail; mobile: the horizontal scrolling
+           strip it's always been). -->
+      <aside class="week-rail" id="week-rail">
+        <div class="week-chip-row m3-scroll-x">
+          <div id="week-buttons" class="week-buttons"></div>
+        </div>
+      </aside>
+
+      <div class="main-col">
+        <main class="dashboard-main">
+
+          <!-- Leaderboard -->
+          <section id="leaderboard-section" class="tab-section">
+            <h2 id="leaderboard-title" class="section-title">OVERALL LEADERBOARD</h2>
+            <div id="leaderboard-podium" class="leaderboard-podium"></div>
+            <table class="leaderboard-table">
+              <thead><tr><th>Pos</th><th>Player</th><th>Points</th></tr></thead>
+              <tbody id="leaderboard-list"></tbody>
+            </table>
+          </section>
+
+          <!-- My Week / Dashboard -->
+          <section id="my-week-section" class="tab-section hidden">
+            <h2 id="my-week-title" class="section-title">MY WEEK #</h2>
+            <div class="my-week-grid">
+              <div class="m3-card m3-card-elevated my-week-col my-week-profile">
+                <img id="my-week-profile-pic" src="icons/default_avatar.png" alt="Your profile picture" class="my-week-avatar">
+                <div id="my-week-name" class="my-week-name">Name</div>
+                <div id="my-week-total-points" class="my-week-total-points">-- pts</div>
+                <div id="my-week-overall-pos" class="my-week-overall-pos-box"></div>
+                <div id="my-week-win-chance" class="my-week-win-chance-box"></div>
+              </div>
+
+              <div class="my-week-picks-col">
+                <div class="m3-card m3-card-elevated my-week-col">
+                  <h3>My Picks</h3>
+                  <ul id="my-week-picks-list" class="pick-list"></ul>
+                  <div id="my-week-picks-total" class="pick-box-total"></div>
+                </div>
+
+                <div class="m3-card m3-card-elevated my-week-col">
+                  <h3>Players Close Behind</h3>
+                  <ul id="my-week-on-your-heels" class="pick-list"></ul>
+                </div>
+              </div>
+
+              <div class="my-week-picked-col">
+                <div class="m3-card m3-card-elevated my-week-col">
+                  <h3>Most Picked Teams</h3>
+                  <ul id="my-week-most-picked" class="pick-list"></ul>
+                </div>
+
+                <div class="m3-card m3-card-elevated my-week-col">
+                  <h3>Season Trend</h3>
+                  <div id="my-week-trend-chart" class="my-week-trend-chart"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Picks -->
+          <section id="picks-section" class="tab-section hidden">
+            <h2 id="picks-title" class="section-title">WEEK # PICKS</h2>
+
+            <div class="picks-controls">
+              <select id="select-player" class="m3-field picks-select"></select>
+              <select id="select-team" class="m3-field picks-select"></select>
+              <span id="team-pick-counter" class="team-pick-counter" style="display:none;"></span>
+              <button id="toggle-scores-btn" type="button" class="m3-chip">Show Matchups</button>
+            </div>
+
+            <div class="picks-layout">
+              <div id="weekly-picks-grid" class="weekly-picks-grid"></div>
+              <aside id="matchups-container" class="matchups-container m3-card m3-card-outlined hidden">
+                <h3>This Week's Matchups</h3>
+                <div id="matchups-list"></div>
+              </aside>
+            </div>
+          </section>
+
+        </main>
+      </div>
+    </div>
+
+    <!-- Navigation Bar (mobile bottom) -->
+    <nav class="m3-nav-bar nav-bar">
+      <button class="m3-nav-bar-item" data-tab="my-week">
+        <span class="indicator avatar-indicator"><img class="nav-avatar" src="icons/default_avatar.png" alt=""></span><span>My Week</span>
+      </button>
+      <button class="m3-nav-bar-item active" data-tab="leaderboard">
+        <span class="indicator">🏆</span><span>Leaderboard</span>
+      </button>
+      <button class="m3-nav-bar-item" data-tab="picks">
+        <span class="indicator">🏈</span><span>Picks</span>
+      </button>
+    </nav>
+
+    <footer class="dashboard-footer">
+      <span>Last Updated:</span>
+      <span id="last-updated-time">[TIME]</span>
+    </footer>
+  </div>
+
+  <!-- How to Play -->
+  <div id="how-to-play-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <h2>How to Play</h2>
+        <span class="close-btn" id="close-how-to-play">&times;</span>
+      </div>
+      <div class="modal-body">
+        <ul class="how-to-play-list">
+          <li>Each week, pick the winner of <strong>5 games</strong> from that week's matchups.</li>
+          <li>Choose one of your 5 picks as your <strong>Bonus Pick</strong>.</li>
+          <li>A correct pick earns <strong>10 points</strong>. A correct bonus pick earns <strong>10 points + that team's final score</strong>.</li>
+          <li>An incorrect pick, or a tied game, earns <strong>0 points</strong>.</li>
+          <li>Your bonus team must be different every week.</li>
+          <li>You must submit all 18 weeks before the season begins. Once submitted, picks can't be changed.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Board -->
+  <div id="message-board-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <h2>Message Board</h2>
+        <span class="close-btn" id="close-message-board">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="post-form">
+          <textarea id="post-body" class="m3-field post-body" placeholder="Say something to the league..." maxlength="250" required></textarea>
+          <span id="post-body-counter" class="post-body-counter">0/250</span>
+          <button type="submit" class="m3-btn m3-btn-filled">Post</button>
+        </form>
+        <ul id="posts-list" class="posts-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- League Stats -->
+  <div id="league-stats-modal" class="modal hidden">
+    <div class="modal-content m3-dialog wide-dialog">
+      <div class="modal-header">
+        <h2 id="league-stats-title">League Stats</h2>
+        <span class="close-btn" id="close-league-stats">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="panel-tabs">
+          <button id="stats-tab-season" type="button" class="panel-tab active">This Season</button>
+          <button id="stats-tab-hof" type="button" class="panel-tab">Hall of Fame</button>
+        </div>
+
+        <div id="stats-season-panel" class="stats-panel">
+          <table class="stats-table">
+            <thead><tr><th>Player</th><th>Highest Week</th><th>Weeks Won</th><th>Win %</th><th>Streak</th></tr></thead>
+            <tbody id="stats-season-body"></tbody>
+          </table>
+        </div>
+
+        <div id="stats-hof-panel" class="stats-panel hidden">
+          <div class="inline-field">
+            <select id="hof-year-select" class="m3-field"></select>
+            <button id="hof-load-btn" type="button" class="m3-btn m3-btn-tonal">View</button>
+          </div>
+          <div id="hof-awards" class="hof-awards"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings (per-league profile) -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <span class="close-btn" id="close-settings">&times;</span>
+      </div>
+      <div class="modal-body">
+        <h3>Theme</h3>
+        <div class="m3-segmented" id="theme-segmented" role="group" aria-label="Theme">
+          <button type="button" class="m3-segment" data-theme-option="original">Original</button>
+          <button type="button" class="m3-segment" data-theme-option="light">Light</button>
+          <button type="button" class="m3-segment" data-theme-option="dark">Dark</button>
+        </div>
+
+        <hr class="settings-divider">
+
+        <h3>Profile (this league)</h3>
+        <p class="modal-subtext">Change how you appear in this league. Your global identity is edited from the Leagues menu.</p>
+        <form id="settings-form">
+          <label for="display-name">Display Name:</label>
+          <input class="m3-field" type="text" id="display-name" placeholder="Enter new name" maxlength="30">
+          <label for="profile-url">Profile Picture URL:</label>
+          <input class="m3-field" type="url" id="profile-url" placeholder="Paste image url here">
+          <button type="submit" class="m3-btn m3-btn-filled">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../src/js/dashboard/dashboard.js"></script>
+</body>
+</html>

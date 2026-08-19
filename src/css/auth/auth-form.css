@@ -1,0 +1,58 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--md-sys-color-primary-container) 55%, transparent), transparent 45%),
+    radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--brand-gold-container) 55%, transparent), transparent 45%),
+    var(--md-sys-color-surface);
+}
+
+.form-card {
+  width: min(92vw, 420px);
+  padding: clamp(28px, 5vw, 40px) clamp(24px, 5vw, 36px);
+  text-align: center;
+}
+
+.form-logo {
+  height: clamp(64px, 13vw, 84px);
+  width: auto;
+  margin-bottom: 16px;
+}
+
+.form-title {
+  font: var(--md-type-headline-md);
+  color: var(--md-sys-color-on-surface);
+  margin: 0 0 24px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.m3-field {
+  font-size: 16px; /* iOS Safari zooms in on focus for inputs under 16px */
+  text-align: left;
+}
+
+.form-submit {
+  width: 100%;
+  height: 48px;
+  margin-top: 6px;
+}
+
+.form-link {
+  display: block;
+  margin-top: 20px;
+  font: var(--md-type-body-md);
+  color: var(--md-sys-color-primary);
+  text-decoration: none;
+}
+
+.form-link:hover {
+  text-decoration: underline;
+}

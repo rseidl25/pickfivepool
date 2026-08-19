@@ -1,0 +1,40 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--md-sys-color-primary-container) 55%, transparent), transparent 45%),
+    radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--brand-gold-container) 55%, transparent), transparent 45%),
+    var(--md-sys-color-surface);
+}
+
+.hero-card {
+  width: min(92vw, 460px);
+  padding: clamp(32px, 6vw, 56px) clamp(28px, 6vw, 44px);
+  text-align: center;
+}
+
+.hero-logo {
+  height: clamp(84px, 16vw, 112px);
+  width: auto;
+  margin-bottom: 20px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-actions .m3-btn {
+  width: 100%;
+  height: 48px;
+}
+
+.disabled-btn {
+  opacity: 0.38;
+  pointer-events: none;
+  cursor: not-allowed;
+}

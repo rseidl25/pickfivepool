@@ -1,0 +1,21 @@
+{
+  "name": "pick5",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "src/server/index.js",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "build-schedule": "node src/js/util/fetch_game_data.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "firebase-admin": "^13.5.0"
+  }
+}
