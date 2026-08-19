@@ -5,7 +5,7 @@
 // token blocks in m3-tokens.css key off of.
 const STORAGE_KEY = "pick5-theme";
 const THEMES = ["original", "light", "dark"];
-const DEFAULT_THEME = "light";
+const DEFAULT_THEME = "original";
 
 export function getStoredTheme() {
   const saved = localStorage.getItem(STORAGE_KEY);
