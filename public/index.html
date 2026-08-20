@@ -36,17 +36,27 @@
       hero.style.display = "flex";
     }
 
-    // A returning, already-logged-in visitor skips the landing page entirely
-    // — straight into their league if they only have one, otherwise to the
-    // league picker. Guests (and anyone whose leagues fail to load) fall
-    // through to the normal Sign Up / Log In hero below.
+    // A returning, already-logged-in visitor skips the landing page entirely.
+    // Before the season locks, leagues are still being set up/picks are
+    // still in flux, so always send them to the league picker regardless of
+    // league count. Only once the season is locked does the single-league
+    // fast path (straight to that league's dashboard) kick in — otherwise
+    // still the league picker for 0 or 2+ leagues. Guests (and anyone whose
+    // leagues fail to load) fall through to the normal Sign Up / Log In
+    // hero below.
     const auth = getAuth(app);
+    const seasonPromise = getSeasonConfig();
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         showHero();
         return;
       }
       try {
+        const season = await seasonPromise;
+        if (!season.locked) {
+          window.location.href = "leagues.html";
+          return;
+        }
         const leagues = await authedFetch("/api/leagues/mine");
         if (leagues.length === 1) {
           localStorage.setItem("pick5_currentLeagueId", leagues[0].id);
@@ -62,7 +72,7 @@
 
     const signupBtn = document.getElementById("signup-btn");
 
-    const season = await getSeasonConfig();
+    const season = await seasonPromise;
     if (!season.locked) {
       signupBtn.onclick = () => window.location.href = "signup.html";
     } else {
