@@ -133,3 +133,23 @@ form {
 .forgot-password-success-text {
   margin-top: 12px;
 }
+
+@media (max-width: 800px) {
+  /* Plain 100vh is the *largest* possible mobile viewport (browser chrome
+     collapsed) — on load, with the address bar still visible, the real
+     visible area is shorter than that, so centered content could sit
+     lower than viewport-center and the page would scroll to reach it.
+     100dvh tracks the actual visible viewport; overflow:hidden backs it
+     up so nothing scrolls even if content briefly runs long. Applies to
+     both the base login/signup page and the Forgot Password modal (which
+     also uses a full-viewport fixed overlay). */
+  html, body { height: 100%; overflow: hidden; }
+  .hero {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    padding: 16px;
+  }
+  .modal-content { max-height: 85vh; max-height: 85dvh; }
+}
