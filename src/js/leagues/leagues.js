@@ -82,11 +82,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Leagues list
   // =========================
   async function loadLeagues() {
-    let leagues = [];
+    let leagues;
     try {
       leagues = await authedFetch("/api/leagues/mine");
     } catch (err) {
       console.error("❌ Error loading leagues:", err);
+      // Distinct from the real "you have zero leagues" state below — showing
+      // "create or join one" here would be actively misleading to someone
+      // who actually has leagues but just hit a failed/timed-out request.
+      leaguesList.innerHTML = "<li class='no-leagues'>Trouble loading your leagues. Please refresh the page.</li>";
+      return;
     }
 
     leaguesList.innerHTML = "";

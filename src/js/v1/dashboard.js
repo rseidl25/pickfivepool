@@ -287,7 +287,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       myLeagues = await fetchMyLeagues();
     } catch (err) {
       console.error("❌ Error loading leagues:", err);
-      myLeagues = [];
+      // Distinct from the real "you have zero leagues" case below — that
+      // one correctly redirects to leagues.html, but a failed/timed-out
+      // request isn't the same thing and shouldn't yank someone off their
+      // dashboard just because of a network hiccup.
+      showToast("Trouble loading your leagues. Please refresh the page.", "error");
+      return;
     }
 
     if (myLeagues.length === 0) {
