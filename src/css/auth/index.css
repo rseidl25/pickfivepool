@@ -10,6 +10,23 @@
     var(--md-sys-color-surface);
 }
 
+@media (max-width: 800px) {
+  /* Plain 100vh is the *largest* possible mobile viewport (browser chrome
+     collapsed) — on load, with the address bar still visible, the real
+     visible area is shorter than that, so centered content could sit
+     lower than viewport-center and the page would scroll to reach it.
+     100dvh tracks the actual visible viewport; overflow:hidden backs it
+     up so nothing scrolls even if content briefly runs long. */
+  html, body { height: 100%; overflow: hidden; }
+  .hero {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    padding: 16px;
+  }
+}
+
 .hero-card {
   width: min(92vw, 460px);
   padding: clamp(32px, 6vw, 56px) clamp(28px, 6vw, 44px);

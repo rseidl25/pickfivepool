@@ -10,6 +10,23 @@ body {
   background-color: #1d2d44;
 }
 
+@media (max-width: 800px) {
+  /* Plain 100vh is the *largest* possible mobile viewport (browser chrome
+     collapsed) — on load, with the address bar still visible, the real
+     visible area is shorter than that, so centered content could sit
+     lower than viewport-center and the page would scroll to reach it.
+     100dvh tracks the actual visible viewport; overflow:hidden backs it
+     up so nothing scrolls even if content briefly runs long. */
+  html { height: 100%; overflow: hidden; }
+  body {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    padding: 16px;
+  }
+}
+
 .container {
   text-align: center;
   background: #fff;
