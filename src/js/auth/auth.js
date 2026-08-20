@@ -53,8 +53,23 @@ onAuthStateChanged(auth, async (user) => {
 // =======================
 const signupForm = document.getElementById("signup-form");
 if (signupForm) {
+  const signupSubmitBtn = signupForm.querySelector('button[type="submit"]');
+  const signupSubmitBtnText = signupSubmitBtn.textContent;
+  // A plain JS flag, not just the button's disabled state — a fast-enough
+  // double-click can win a race against the DOM's disabled-attribute
+  // actionability check, but a synchronous variable check can't be raced.
+  let signupSubmitting = false;
+
   signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    // Real incident: a user got no visual feedback on click, assumed the
+    // button wasn't working, and mashed it — each click fired a *real*
+    // signInWithEmailAndPassword/createUser call, enough to trip Firebase's
+    // project-wide (not per-user) auth quota and break login for everyone.
+    // Disabling + relabeling the button the instant it's clicked, and
+    // guarding against a stray extra submit event, closes that off.
+    if (signupSubmitting) return;
+    signupSubmitting = true;
 
     const season = await getSeasonConfig();
     if (season.locked) {
@@ -70,8 +85,12 @@ if (signupForm) {
 
     if (password !== confirmPassword) {
       showToast("Passwords do not match. Please try again.", "error");
+      signupSubmitting = false;
       return;
     }
+
+    signupSubmitBtn.disabled = true;
+    signupSubmitBtn.textContent = "Creating account...";
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -88,6 +107,9 @@ if (signupForm) {
       setTimeout(() => (window.location.href = "leagues.html"), 800);
     } catch (error) {
       console.error("Signup error:", error.message);
+      signupSubmitBtn.disabled = false;
+      signupSubmitBtn.textContent = signupSubmitBtnText;
+      signupSubmitting = false;
 
       if (error.code === "auth/email-already-in-use") {
         showToast("This email is already registered. Redirecting to login...", "error");
@@ -104,11 +126,29 @@ if (signupForm) {
 // =======================
 const loginForm = document.getElementById("login-form");
 if (loginForm) {
+  const loginSubmitBtn = loginForm.querySelector('button[type="submit"]');
+  const loginSubmitBtnText = loginSubmitBtn.textContent;
+  // A plain JS flag, not just the button's disabled state — a fast-enough
+  // double-click can win a race against the DOM's disabled-attribute
+  // actionability check, but a synchronous variable check can't be raced.
+  let loginSubmitting = false;
+
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    // Real incident: a user got no visual feedback on click, assumed the
+    // button wasn't working, and mashed it — each click fired a *real*
+    // signInWithEmailAndPassword call, enough to trip Firebase's
+    // project-wide (not per-user) auth quota and break login for everyone.
+    // Disabling + relabeling the button the instant it's clicked, and
+    // guarding against a stray extra submit event, closes that off.
+    if (loginSubmitting) return;
+    loginSubmitting = true;
 
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
+
+    loginSubmitBtn.disabled = true;
+    loginSubmitBtn.textContent = "Logging in...";
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -117,6 +157,9 @@ if (loginForm) {
     } catch (error) {
       console.error("Login error:", error.message);
       showToast("Error: " + error.message, "error");
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtn.textContent = loginSubmitBtnText;
+      loginSubmitting = false;
     }
   });
 }
@@ -161,10 +204,19 @@ if (forgotPasswordLink && forgotPasswordModal) {
     if (e.target === forgotPasswordModal) closeForgotPasswordModal();
   });
 
+  const forgotSubmitBtn = form.querySelector('button[type="submit"]');
+  const forgotSubmitBtnText = forgotSubmitBtn.textContent;
+  let forgotSubmitting = false;
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (forgotSubmitting) return;
+    forgotSubmitting = true;
+
     const email = emailInput.value.trim();
     errorEl.classList.add("hidden");
+    forgotSubmitBtn.disabled = true;
+    forgotSubmitBtn.textContent = "Sending...";
 
     try {
       await sendPasswordResetEmail(auth, email);
@@ -175,6 +227,10 @@ if (forgotPasswordLink && forgotPasswordModal) {
       console.error("Password reset error:", error.message);
       errorEl.textContent = "Error: " + error.message;
       errorEl.classList.remove("hidden");
+    } finally {
+      forgotSubmitBtn.disabled = false;
+      forgotSubmitBtn.textContent = forgotSubmitBtnText;
+      forgotSubmitting = false;
     }
   });
 }
