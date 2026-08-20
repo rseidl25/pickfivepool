@@ -1,6 +1,8 @@
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { app } from "../auth/firebase_init.js";
 import { authedFetch } from "../util/api.js";
+import { showToast } from "../util/toast.js";
+import { showConfirm } from "../util/confirm-dialog.js";
 
 const auth = getAuth(app);
 // Absolute (not relative) so this resolves correctly regardless of how
@@ -75,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     leaguesList.innerHTML = "";
     if (leagues.length === 0) {
-      leaguesList.innerHTML = "<li class='no-leagues'>You're not in any leagues yet — create or join one below.</li>";
+      leaguesList.innerHTML = "<li class='no-leagues'>You are not in any leagues yet. Create or join one below.</li>";
       return;
     }
 
@@ -175,12 +177,12 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         body: JSON.stringify({ name: nameInput.value.trim() }),
       });
-      alert(`✅ League "${league.name}" created! Invite code: ${league.inviteCode}`);
+      showToast(`League "${league.name}" created! Invite code: ${league.inviteCode}`, "success", 7000);
       nameInput.value = "";
       newLeaguePanel.classList.add("hidden");
       await loadLeagues();
     } catch (err) {
-      alert("Error creating league: " + err.message);
+      showToast("Error creating league: " + err.message, "error");
     }
   });
 
@@ -192,12 +194,12 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         body: JSON.stringify({ inviteCode: codeInput.value.trim() }),
       });
-      alert(`✅ Joined "${league.name}"!`);
+      showToast(`Joined "${league.name}"!`, "success");
       codeInput.value = "";
       newLeaguePanel.classList.add("hidden");
       await loadLeagues();
     } catch (err) {
-      alert("Error joining league: " + err.message);
+      showToast("Error joining league: " + err.message, "error");
     }
   });
 
@@ -225,10 +227,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (globalDisplayNameInput.value) update.displayName = globalDisplayNameInput.value;
       if (globalPhotoUrlInput.value) update.photoURL = globalPhotoUrlInput.value;
       await authedFetch("/api/profile", { method: "PATCH", body: JSON.stringify(update) });
-      alert("✅ Profile updated!");
-      window.location.reload();
+      showToast("Profile updated!", "success");
+      setTimeout(() => window.location.reload(), 800);
     } catch (err) {
-      alert("Error updating profile: " + err.message);
+      showToast("Error updating profile: " + err.message, "error");
     }
   });
 
@@ -276,12 +278,13 @@ document.addEventListener("DOMContentLoaded", () => {
           kickBtn.textContent = "Kick";
           kickBtn.className = "kick-btn";
           kickBtn.onclick = async () => {
-            if (!confirm(`Remove ${member.displayName} from this league?`)) return;
+            const ok = await showConfirm(`Remove ${member.displayName} from this league?`, { confirmText: "Remove", danger: true });
+            if (!ok) return;
             try {
               await authedFetch(`/api/leagues/${leagueId}/members/${member.uid}`, { method: "DELETE" });
               await openManageLeague(leagueId);
             } catch (err) {
-              alert("Error kicking member: " + err.message);
+              showToast("Error kicking member: " + err.message, "error");
             }
           };
           li.appendChild(kickBtn);
@@ -325,16 +328,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }),
       });
       await loadLeagues();
-      alert("✅ League updated!");
+      showToast("League updated!", "success");
     } catch (err) {
-      alert("Error updating league: " + err.message);
+      showToast("Error updating league: " + err.message, "error");
     }
   };
 
   transferOwnerBtn.onclick = async () => {
     const newOwnerUid = transferOwnerSelect.value;
     if (!newOwnerUid) return;
-    if (!confirm("Transfer ownership? You will no longer have owner permissions for this league.")) return;
+    const ok = await showConfirm("Transfer ownership? You will no longer have owner permissions for this league.", { confirmText: "Transfer", danger: true });
+    if (!ok) return;
     try {
       await authedFetch(`/api/leagues/${currentManagedLeagueId}/transfer-owner`, {
         method: "POST",
@@ -342,21 +346,22 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       manageLeagueModal.classList.add("hidden");
       await loadLeagues();
-      alert("✅ Ownership transferred!");
+      showToast("Ownership transferred!", "success");
     } catch (err) {
-      alert("Error transferring ownership: " + err.message);
+      showToast("Error transferring ownership: " + err.message, "error");
     }
   };
 
   archiveLeagueBtn.onclick = async () => {
-    if (!confirm("Archive this league? It will disappear from everyone's league list, but no data is deleted.")) return;
+    const ok = await showConfirm("Archive this league? It will disappear from everyone's league list, but no data is deleted.", { confirmText: "Archive", danger: true });
+    if (!ok) return;
     try {
       await authedFetch(`/api/leagues/${currentManagedLeagueId}`, { method: "DELETE" });
       manageLeagueModal.classList.add("hidden");
       await loadLeagues();
-      alert("✅ League archived.");
+      showToast("League archived.", "success");
     } catch (err) {
-      alert("Error archiving league: " + err.message);
+      showToast("Error archiving league: " + err.message, "error");
     }
   };
 

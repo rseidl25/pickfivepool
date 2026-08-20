@@ -83,3 +83,105 @@ button:hover {
 .link:hover {
   text-decoration: underline;
 }
+
+.link-forgot {
+  align-self: flex-end;
+  margin-top: -2px;
+  font-size: 13px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.link-forgot:hover {
+  text-decoration: underline;
+}
+
+/* Forgot Password modal (shared shape with dashboard.css/leagues.css's
+   .modal, duplicated here since login.html doesn't load either) */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 8px;
+  max-width: 420px;
+  width: 90%;
+  max-height: 85vh;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.modal-header {
+  background: #1d2d44;
+  color: #fff;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-subtext {
+  font-size: 13px;
+  color: #555;
+  margin: 0 0 14px;
+}
+
+.close-btn {
+  flex-shrink: 0;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+  color: #fff;
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  opacity: 1;
+}
+
+.form-error {
+  font-size: 13px;
+  color: #c0392b;
+  margin: -4px 0 4px;
+}
+
+#forgot-password-form-view.hidden,
+#forgot-password-success-view.hidden,
+.form-error.hidden {
+  display: none;
+}
+
+.forgot-password-success-text {
+  margin-top: 12px;
+}

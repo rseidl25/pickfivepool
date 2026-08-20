@@ -4,6 +4,7 @@
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { app } from "../auth/firebase_init.js";
 import { authedFetch, publicFetch } from "../util/api.js";
+import { showToast } from "../util/toast.js";
 
 const auth = getAuth(app);
 
@@ -384,7 +385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               await authedFetch(`/api/leagues/${currentLeagueId}/posts/${post.id}`, { method: "DELETE" });
               await loadPosts();
             } catch (err) {
-              alert("Error deleting post: " + err.message);
+              showToast("Error deleting post: " + err.message, "error");
             }
           };
           li.appendChild(deleteBtn);
@@ -409,7 +410,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       postBodyCounter.classList.remove("limit-reached");
       await loadPosts();
     } catch (err) {
-      alert("Error posting: " + err.message);
+      showToast("Error posting: " + err.message, "error");
     }
   });
 
@@ -544,7 +545,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   settingsForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!auth.currentUser) return alert("You must be logged in.");
+    if (!auth.currentUser) return showToast("You must be logged in.", "error");
 
     try {
       const update = {};
@@ -556,11 +557,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         body: JSON.stringify(update),
       });
 
-      alert("✅ Profile updated for this league!");
-      window.location.reload();
+      showToast("Profile updated for this league!", "success");
+      setTimeout(() => window.location.reload(), 800);
     } catch (err) {
       console.error("❌ Error updating profile:", err);
-      alert("Error updating profile: " + err.message);
+      showToast("Error updating profile: " + err.message, "error");
     }
   });
 
@@ -593,7 +594,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function getLogoPath(team) {
     const mascot = team.split(" ").pop();
-    return `logos/${teamLogoMap[mascot] || "default.png"}`;
+    return `/logos/${teamLogoMap[mascot] || "default.png"}`;
   }
 
   // =========================

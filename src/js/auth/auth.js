@@ -4,6 +4,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   onAuthStateChanged,
   updateProfile,
@@ -12,6 +13,7 @@ import {
 // Firebase init
 import { app } from "./firebase_init.js";
 import { authedFetch, getSeasonConfig } from "../util/api.js";
+import { showToast } from "../util/toast.js";
 const auth = getAuth(app);
 
 // =======================
@@ -56,8 +58,8 @@ if (signupForm) {
 
     const season = await getSeasonConfig();
     if (season.locked) {
-      alert("🚫 Signup is closed for this season.");
-      window.location.href = "dashboard.html";
+      showToast("Signup is closed for this season.", "error");
+      setTimeout(() => (window.location.href = "dashboard.html"), 1200);
       return;
     }
 
@@ -67,7 +69,7 @@ if (signupForm) {
     const confirmPassword = document.getElementById("confirm-password").value;
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match. Please try again.");
+      showToast("Passwords do not match. Please try again.", "error");
       return;
     }
 
@@ -82,16 +84,16 @@ if (signupForm) {
       });
 
       console.log("✅ User signed up:", user.uid);
-      alert("Account created successfully!");
-      window.location.href = "leagues.html";
+      showToast("Account created successfully!", "success");
+      setTimeout(() => (window.location.href = "leagues.html"), 800);
     } catch (error) {
       console.error("Signup error:", error.message);
 
       if (error.code === "auth/email-already-in-use") {
-        alert("⚠️ This email is already registered. Redirecting to login...");
-        window.location.href = "login.html";
+        showToast("This email is already registered. Redirecting to login...", "error");
+        setTimeout(() => (window.location.href = "login.html"), 1200);
       } else {
-        alert("Error: " + error.message);
+        showToast("Error: " + error.message, "error");
       }
     }
   });
@@ -114,7 +116,65 @@ if (loginForm) {
       window.location.href = "leagues.html";
     } catch (error) {
       console.error("Login error:", error.message);
-      alert("Error: " + error.message);
+      showToast("Error: " + error.message, "error");
+    }
+  });
+}
+
+// =======================
+// Forgot Password
+// =======================
+const forgotPasswordLink = document.getElementById("forgot-password-link");
+const forgotPasswordModal = document.getElementById("forgot-password-modal");
+if (forgotPasswordLink && forgotPasswordModal) {
+  const formView = document.getElementById("forgot-password-form-view");
+  const successView = document.getElementById("forgot-password-success-view");
+  const form = document.getElementById("forgot-password-form");
+  const emailInput = document.getElementById("forgot-password-email");
+  const errorEl = document.getElementById("forgot-password-error");
+  const sentEmailEl = document.getElementById("forgot-password-sent-email");
+  const closeBtn = document.getElementById("close-forgot-password");
+  const doneBtn = document.getElementById("forgot-password-done-btn");
+
+  function closeForgotPasswordModal() {
+    forgotPasswordModal.classList.add("hidden");
+  }
+
+  function openForgotPasswordModal() {
+    formView.classList.remove("hidden");
+    successView.classList.add("hidden");
+    errorEl.classList.add("hidden");
+    errorEl.textContent = "";
+    const loginEmail = document.getElementById("login-email");
+    emailInput.value = loginEmail?.value.trim() || "";
+    forgotPasswordModal.classList.remove("hidden");
+  }
+
+  forgotPasswordLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    openForgotPasswordModal();
+  });
+
+  closeBtn?.addEventListener("click", closeForgotPasswordModal);
+  doneBtn?.addEventListener("click", closeForgotPasswordModal);
+  forgotPasswordModal.addEventListener("click", (e) => {
+    if (e.target === forgotPasswordModal) closeForgotPasswordModal();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    errorEl.classList.add("hidden");
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      sentEmailEl.textContent = email;
+      formView.classList.add("hidden");
+      successView.classList.remove("hidden");
+    } catch (error) {
+      console.error("Password reset error:", error.message);
+      errorEl.textContent = "Error: " + error.message;
+      errorEl.classList.remove("hidden");
     }
   });
 }
@@ -127,7 +187,7 @@ export async function logoutUser() {
     await signOut(auth);
     window.location.href = "index.html";
   } catch (error) {
-    alert(error.message);
+    showToast(error.message, "error");
   }
 }
 

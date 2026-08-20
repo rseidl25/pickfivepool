@@ -250,6 +250,12 @@ body { background: var(--md-sys-color-surface); }
               border-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
               background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
   flex: 1 1 0; min-width: 0;
+  /* Safety net: the team name's font-size is set in px by JS to fit at
+     render time (shrinkFontToFit in picks.js). If the rendered text ever
+     ends up larger than that computed size (e.g. a WebKit mobile
+     text-inflation quirk), this guarantees it's clipped to the box's
+     rounded shape instead of visually spilling outside it. */
+  overflow: hidden;
 }
 .team-box:hover { box-shadow: var(--md-sys-elevation-2); }
 /* A stronger, unmistakable pick state — the same fixed light-blue highlight
@@ -375,6 +381,7 @@ body { background: var(--md-sys-color-surface); }
 
   .week-select-row {
     width: 100%; box-sizing: border-box; justify-content: center; flex-wrap: wrap;
+    order: 2;
   }
   .week-label { width: 100%; text-align: center; }
   /* Full row width (not sized to its own scrolling content) so the chips
@@ -393,7 +400,11 @@ body { background: var(--md-sys-color-surface); }
   }
   #submit-btn { width: 100%; }
 
-  #header-home-btn { width: 100%; justify-content: center; }
+  /* Above the week select on mobile, not below it (DOM order has it last,
+     after week-select-row, for desktop's grid placement) — logo stays
+     first (default order: 0), this moves ahead of week-select-row's
+     order: 2 below. */
+  #header-home-btn { width: 100%; justify-content: center; order: 1; }
 
   /* Title on its own centered line, league + player name together on one
      centered line below it — instead of the desktop title-left/info-right

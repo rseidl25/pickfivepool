@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - NFL Pick 5</title>
+  <title>Login</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
   <link rel="icon" type="image/png" href="../icons/favicon.png">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="../../src/css/v1/auth/login.css">
+  <link rel="stylesheet" href="../../src/css/v1/auth/login.css?v=2">
 </head>
 <body>
   <div class="container">
@@ -23,9 +23,34 @@
     <form id="login-form">
       <input type="email" id="login-email" placeholder="Email" required>
       <input type="password" id="login-password" placeholder="Password" required>
+      <a href="#" id="forgot-password-link" class="link-forgot">Forgot password?</a>
       <button type="submit">Login</button>
     </form>
     <a class="link" id="auth-link" href="signup.html">Don’t have an account? Sign Up</a>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-password-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Reset Password</h2>
+        <span class="close-btn" id="close-forgot-password">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="forgot-password-form-view">
+          <p class="modal-subtext">Enter your account email and we'll send you a link to reset your password.</p>
+          <form id="forgot-password-form">
+            <input type="email" id="forgot-password-email" placeholder="Email" required>
+            <p id="forgot-password-error" class="form-error hidden"></p>
+            <button type="submit">Send Reset Link</button>
+          </form>
+        </div>
+        <div id="forgot-password-success-view" class="hidden">
+          <p class="modal-subtext forgot-password-success-text">Check your inbox. We've sent a password reset link to <strong id="forgot-password-sent-email"></strong>.</p>
+          <button type="button" id="forgot-password-done-btn">Done</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Load Firebase auth handling -->

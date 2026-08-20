@@ -13,6 +13,13 @@ body {
   min-height: 100vh;
 }
 
+/* Disables WebKit's automatic mobile text-inflation heuristic — separate
+   from real pinch/OS zoom, this can silently render text larger than the
+   CSS/JS-computed font-size (e.g. this page's per-team-name shrink-to-fit
+   math), pushing it past its container with nothing to contain it. Real
+   accessibility zoom (OS-level or pinch) is unaffected by this. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
 .container {
   width: 100%;
   min-height: 100vh;
@@ -433,6 +440,12 @@ body {
   flex: 1 1 0;
   min-width: 160px;
   max-width: 320px;
+  /* Safety net: the team name's font-size is set in px by JS to fit at
+     render time (shrinkFontToFit in picks.js). If the rendered text ever
+     ends up larger than that computed size (e.g. a WebKit mobile
+     text-inflation quirk), this guarantees it's clipped to the box instead
+     of visually spilling outside it. */
+  overflow: hidden;
 }
 .team-box span {
   user-select: none;   /* prevent highlight inside label */

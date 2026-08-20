@@ -117,6 +117,8 @@ function formatDate(yyyymmdd) {
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getMyPicks, autosaveWeekPicks, submitPicks } from "./picks_firebase.js";
 import { authedFetch } from "../util/api.js";
+import { showToast } from "../util/toast.js";
+import { showConfirm } from "../util/confirm-dialog.js";
 
 const auth = getAuth();
 
@@ -380,7 +382,7 @@ function toggleTeam(team, opponent, element, matchupKey) {
   }
 
   if (picks.length >= 5) {
-    alert("You already picked 5 teams!");
+    showToast("You already picked 5 teams!", "error");
     return;
   }
 
@@ -621,19 +623,20 @@ backBtn.addEventListener("click", () => {
 });
 
 finalSubmitBtn.addEventListener("click", async () => {
-  const confirmSubmit = confirm(
-    "Are you sure you want to submit?\n\n⚠️ Once you submit, you will NOT be able to change your picks for the entire season."
+  const confirmSubmit = await showConfirm(
+    "Are you sure you want to submit?\n\nOnce you submit, you will NOT be able to change your picks for the entire season.",
+    { confirmText: "Submit", danger: true }
   );
   if (!confirmSubmit) return;
 
   try {
     await flushPendingAutosaves();
     await submitPicks(currentLeagueId);
-    alert("✅ Your picks have been submitted and locked for the season!");
-    window.location.href = "dashboard.html";
+    showToast("Your picks have been submitted and locked for the season!", "success");
+    setTimeout(() => (window.location.href = "dashboard.html"), 1000);
   } catch (err) {
     console.error("Error submitting:", err);
-    alert("Error while submitting: " + err.message);
+    showToast("Error while submitting: " + err.message, "error");
   }
 });
 
@@ -723,7 +726,7 @@ function showCopyPicksModal(sourceLeagues) {
       await loadGameData();
     } catch (err) {
       console.error("Error copying picks:", err);
-      alert("Error copying picks: " + err.message);
+      showToast("Error copying picks: " + err.message, "error");
       copyPicksConfirmBtn.disabled = false;
       copyPicksConfirmBtn.textContent = "Copy Picks";
     }

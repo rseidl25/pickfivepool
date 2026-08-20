@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../src/css/auth/index.css">
 </head>
 <body>
-  <div class="hero">
+  <div class="hero" id="hero" style="display:none">
     <div class="hero-card m3-card m3-card-elevated">
       <img src="icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="hero-logo">
       <div class="hero-actions">
@@ -27,7 +27,38 @@
   </div>
 
   <script type="module">
-    import { getSeasonConfig } from "../src/js/util/api.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { app } from "../src/js/auth/firebase_init.js";
+    import { authedFetch, getSeasonConfig } from "../src/js/util/api.js";
+
+    const hero = document.getElementById("hero");
+    function showHero() {
+      hero.style.display = "flex";
+    }
+
+    // A returning, already-logged-in visitor skips the landing page entirely
+    // — straight into their league if they only have one, otherwise to the
+    // league picker. Guests (and anyone whose leagues fail to load) fall
+    // through to the normal Sign Up / Log In hero below.
+    const auth = getAuth(app);
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        showHero();
+        return;
+      }
+      try {
+        const leagues = await authedFetch("/api/leagues/mine");
+        if (leagues.length === 1) {
+          localStorage.setItem("pick5_currentLeagueId", leagues[0].id);
+          window.location.href = "dashboard.html";
+        } else {
+          window.location.href = "leagues.html";
+        }
+      } catch (err) {
+        console.error("Error loading leagues:", err);
+        showHero();
+      }
+    });
 
     const signupBtn = document.getElementById("signup-btn");
 

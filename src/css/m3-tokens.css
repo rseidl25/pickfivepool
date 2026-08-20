@@ -231,6 +231,13 @@
 * { box-sizing: border-box; }
 body { margin: 0; font-family: var(--md-type-font); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
 
+/* Disables WebKit's automatic mobile text-inflation heuristic — separate
+   from real pinch/OS zoom, this can silently render text larger than the
+   CSS/JS-computed font-size (e.g. picks.html's per-team-name shrink-to-fit
+   math), pushing it past its container with nothing to contain it. Real
+   accessibility zoom (OS-level or pinch) is unaffected by this. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
 /* ---- Buttons ---- */
 .m3-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
