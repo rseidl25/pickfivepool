@@ -47,10 +47,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentManagedLeagueId = null;
 
+  // Safety net: if onAuthStateChanged itself never fires (seen in the wild
+  // during a Firebase Auth outage/rate-limit), the page would otherwise
+  // hang forever on the static "..." placeholder with no feedback at all.
+  // Give it a few seconds, then tell the user something's wrong instead of
+  // silently doing nothing.
+  let authResolved = false;
+  const authTimeoutId = setTimeout(() => {
+    if (authResolved) return;
+    userName.textContent = "—";
+    leaguesList.innerHTML = "<li class='no-leagues'>Trouble connecting. Please refresh the page.</li>";
+  }, 8000);
+
   // This page never itself signs anyone in (no login/signup form here), so a
   // persistent listener — unlike signup.html's — is correct: if the session
   // ever ends while on this page, kicking back to login is the right call.
   onAuthStateChanged(auth, async (user) => {
+    authResolved = true;
+    clearTimeout(authTimeoutId);
     if (!user) {
       window.location.href = "login.html";
       return;

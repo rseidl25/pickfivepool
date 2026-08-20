@@ -176,6 +176,11 @@ function toWeekStatuses(serverPicks) {
 }
 
 async function loadGameData() {
+  // Split into two independent try/catches — the schedule (public, no auth
+  // needed) and the user's picks (authenticated) fail for very different
+  // reasons. Lumping them together meant any picks/auth hiccup showed
+  // "Could not load game data" even when the schedule loaded fine, which
+  // was both misleading and needlessly blocked the whole page.
   try {
     const [gamesRes, timesRes, datesRes] = await Promise.all([
       fetch("/api/games"),
@@ -186,17 +191,24 @@ async function loadGameData() {
     gameData = await gamesRes.json();
     gameTimes = await timesRes.json();
     gameDates = await datesRes.json();
+  } catch (err) {
+    console.error("Error loading game schedule:", err);
+    matchupsDiv.innerHTML = "<p>⚠️ Could not load game data. Try refreshing the page.</p>";
+    return;
+  }
 
+  try {
     const serverPicks = await getMyPicks(currentLeagueId);
     weekStatuses = toWeekStatuses(serverPicks);
-
-    renderWeek(currentWeek);
-    renderWeekNav();
-    updateSubmitButton();
   } catch (err) {
-    console.error("Error loading game data:", err);
-    matchupsDiv.innerHTML = "<p>⚠️ Could not load game data.</p>";
+    console.error("Error loading your picks:", err);
+    showToast("Couldn't load your saved picks — try refreshing the page.", "error");
+    weekStatuses = {};
   }
+
+  renderWeek(currentWeek);
+  renderWeekNav();
+  updateSubmitButton();
 }
 
 // =========================

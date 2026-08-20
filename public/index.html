@@ -35,6 +35,14 @@
     function showHero() {
       hero.style.display = "flex";
     }
+    // Safety net: if anything hangs instead of erroring — a stalled fetch,
+    // or even onAuthStateChanged itself never firing (seen in the wild
+    // during a Firebase Auth outage) — show the normal landing page after
+    // a few seconds rather than leaving the visitor staring at a blank
+    // page forever. A late-resolving check below may still redirect after
+    // this fires; a brief flash is a lot better than an indefinite blank
+    // screen.
+    setTimeout(showHero, 6000);
 
     // A returning, already-logged-in visitor skips the landing page entirely.
     // Before the season locks, leagues are still being set up/picks are
