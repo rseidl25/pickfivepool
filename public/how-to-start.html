@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Start</title>
+  <script>(function(){var t=localStorage.getItem("pick5-theme");if(t!=="light"&&t!=="dark"&&t!=="original")t="original";document.documentElement.setAttribute("data-theme",t);})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+
+  <link rel="stylesheet" href="../src/css/m3-tokens.css">
+  <link rel="stylesheet" href="../src/css/tutorial/how-to-start.css">
+</head>
+<body>
+
+  <header class="tutorial-header">
+    <a href="index.html" aria-label="Back to home">
+      <img src="icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="brand-logo">
+    </a>
+    <a href="index.html" class="m3-btn m3-btn-outlined">Back to Home</a>
+  </header>
+
+  <div class="tutorial-wrap">
+
+    <div class="tutorial-intro">
+      <h1>How to Start</h1>
+      <p>Everything you need to get set up and your picks locked in for the season.</p>
+    </div>
+
+    <div class="tutorial-step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <h2>Go to the site</h2>
+        <p>Head to <strong>pickfivepool.com</strong>.</p>
+        <figure class="shot-single">
+          <img src="tutorial/01-landing.jpg" alt="Pick 5 landing page with Sign Up and Log In buttons">
+        </figure>
+      </div>
+    </div>
+
+    <div class="tutorial-step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <p>If you are a new player, click <strong>Sign Up</strong> and enter your information on the sign up page. For your name, put whatever you want your leaguemates to see. You can change how you appear in a specific league later on from the menu once you're set up.</p>
+        <p>If you're a returning player, click <strong>Log In</strong> and enter your credentials from last year.</p>
+        <div class="shot-group">
+          <figure>
+            <img src="tutorial/02a-signup.jpg" alt="Sign up form filled in with name, email, and password">
+            <figcaption>New player</figcaption>
+          </figure>
+          <figure>
+            <img src="tutorial/02b-login.jpg" alt="Log in form filled in with email and password">
+            <figcaption>Returning player</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <div class="tutorial-step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <p>Signing up / logging in takes you to <strong>Your Leagues</strong>. To join a league, click <strong>New League</strong> in the bottom right, then click <strong>Join</strong>, and enter the 6-digit invite code your league organizer gave you.</p>
+        <figure class="shot-single">
+          <img src="tutorial/03a-join-league.png" alt="New League dialog with the Join tab open and an invite code typed in">
+        </figure>
+        <p>If you'd like to start your own league instead, click <strong>New League</strong>, then click <strong>Create</strong>, and enter your desired league name. Once it's created, you'll get a 6-digit invite code to share with the players you want to join your league.</p>
+        <figure class="shot-single">
+          <img src="tutorial/03b-create-league.png" alt="New League dialog with the Create tab open and a league name typed in">
+        </figure>
+      </div>
+    </div>
+
+    <div class="tutorial-step">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <p>Select your league and you'll land on the <strong>Picks</strong> page. Select the week you want to make picks for from the navigation bar at the top of the page. After selecting a week, scroll through the matchups list and select 5 teams to make your picks for that week. These teams will pop up in the <strong>Your Picks</strong> section of the screen.</p>
+        <div class="shot-group">
+          <figure>
+            <img src="tutorial/04a-picks-page.png" alt="Picks page before any teams are selected">
+          </figure>
+          <figure>
+            <img src="tutorial/04b-picks-in-progress.png" alt="Picks page with two teams selected">
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <div class="tutorial-step">
+      <div class="step-number">5</div>
+      <div class="step-content">
+        <p>Select one of the teams in the <strong>Your Picks</strong> section to make it your bonus team. It will become highlighted and show up in the <strong>Bonus Tracker</strong> section of the screen. Do this for each of the 18 weeks of the season.</p>
+        <div class="shot-group">
+          <figure>
+            <img src="tutorial/05a-five-picks.png" alt="All 5 picks made for the week, no bonus pick chosen yet">
+          </figure>
+          <figure>
+            <img src="tutorial/05b-bonus-pick-set.png" alt="Bonus pick selected and highlighted, showing in the Bonus Tracker">
+          </figure>
+        </div>
+        <div class="callout warning">
+          <span class="callout-label">Remember</span>
+          You must pick a <em>different</em> bonus team for each week!
+        </div>
+      </div>
+    </div>
+
+    <div class="tutorial-step">
+      <div class="step-number">6</div>
+      <div class="step-content">
+        <p>The week navigation bar on the Picks page is color coded:</p>
+        <div class="status-legend">
+          <div class="status-legend-item">
+            <div class="status-swatch grey"></div>
+            <div><span class="lt">Grey</span><span class="ld">You haven't started that week yet</span></div>
+          </div>
+          <div class="status-legend-item">
+            <div class="status-swatch yellow"></div>
+            <div><span class="lt">Yellow</span><span class="ld">Unfinished — fewer than 5 picks, or no bonus team yet</span></div>
+          </div>
+          <div class="status-legend-item">
+            <div class="status-swatch red"></div>
+            <div><span class="lt">Red</span><span class="ld">Bonus team already used in another week</span></div>
+          </div>
+          <div class="status-legend-item">
+            <div class="status-swatch green"></div>
+            <div><span class="lt">Green</span><span class="ld">That week is done</span></div>
+          </div>
+        </div>
+        <p>See a red week? Check the <strong>Bonus Tracker</strong> to see which weeks are conflicting, and go fix them.</p>
+        <figure class="shot-single">
+          <img src="tutorial/06-color-coded-weeks.png" alt="Week navigation bar showing grey, yellow, red, and green weeks">
+        </figure>
+      </div>
+    </div>
+
+    <div class="tutorial-step">
+      <div class="step-number">7</div>
+      <div class="step-content">
+        <p>Once every week is green, click the <strong>Next</strong> button to go to the Summary page, showing every pick you made, week by week. Scroll through and confirm everything looks correct. Once you're happy, click <strong>Submit</strong>, and you'll get a confirmation popup asking if you're sure.</p>
+        <figure class="shot-single">
+          <img src="tutorial/07a-summary-screen.png" alt="Summary of Picks screen showing all weeks with bonus picks highlighted">
+        </figure>
+        <figure class="shot-single">
+          <img src="tutorial/07b-submit-confirmation.png" alt="Confirmation popup asking Are you sure you want to submit">
+        </figure>
+        <div class="callout warning">
+          <span class="callout-label">This is final</span>
+          Once you confirm, your picks are locked for the entire season. You will <strong>not</strong> be able to go back and change them. Make sure everything's right before you submit!
+        </div>
+        <figure class="shot-single">
+          <img src="tutorial/07c-submitted.png" alt="Confirmation banner reading your picks have been submitted and locked for the season">
+        </figure>
+      </div>
+    </div>
+
+    <div class="tutorial-signoff">
+      <p>If you have any issues or questions with the app, reach out to whoever set up your league.</p>
+      <p>Remember: leagues automatically lock and you're no longer allowed to make picks once the NFL season kicks off. Good luck making your picks and have fun this year!</p>
+    </div>
+
+  </div>
+
+</body>
+</html>

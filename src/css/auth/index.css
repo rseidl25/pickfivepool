@@ -55,3 +55,14 @@
   pointer-events: none;
   cursor: not-allowed;
 }
+
+.hero-how-to-link {
+  display: block;
+  margin-top: 18px;
+  font: var(--md-type-body-md);
+  color: var(--md-sys-color-primary);
+  text-decoration: none;
+}
+.hero-how-to-link:hover {
+  text-decoration: underline;
+}
