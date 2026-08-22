@@ -158,11 +158,38 @@
     </div>
 
     <div class="tutorial-signoff">
-      <p>If you have any issues or questions with the app, reach out to whoever set up your league.</p>
-      <p>Remember: leagues automatically lock and you're no longer allowed to make picks once the NFL season kicks off. Good luck making your picks and have fun this year!</p>
+      <p>If you have any issues or questions with the app, reach out to Ryan.</p>
+      <p>Remember: leagues automatically lock and you're no longer allowed to make picks once the NFL season kicks off.</p>
     </div>
 
   </div>
+
+  <div id="lightbox" class="lightbox hidden">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <script>
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+
+    document.querySelectorAll(".step-content img").forEach((img) => {
+      img.classList.add("zoomable");
+      img.addEventListener("click", () => {
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        lightbox.classList.remove("hidden");
+      });
+    });
+
+    function closeLightbox() {
+      lightbox.classList.add("hidden");
+      lightboxImg.src = "";
+    }
+    lightbox.addEventListener("click", closeLightbox);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+  </script>
 
 </body>
 </html>
