@@ -57,6 +57,8 @@ const copyPicksModal = document.getElementById("copy-picks-modal");
 const copyPicksLeagueList = document.getElementById("copy-picks-league-list");
 const copyPicksSkipBtn = document.getElementById("copy-picks-skip-btn");
 const copyPicksConfirmBtn = document.getElementById("copy-picks-confirm-btn");
+const importPicksMenuBtn = document.getElementById("import-picks-menu-btn");
+const clearPicksMenuBtn = document.getElementById("clear-picks-menu-btn");
 
 const picksBottomBar = document.getElementById("picks-bottom-bar");
 const picksBottomSummary = document.getElementById("picks-bottom-summary");
@@ -119,6 +121,9 @@ import { getMyPicks, autosaveWeekPicks, submitPicks } from "./picks_firebase.js"
 import { authedFetch } from "../util/api.js";
 import { showToast } from "../util/toast.js";
 import { showConfirm } from "../util/confirm-dialog.js";
+import { initHeaderMenu } from "../util/header-menu.js";
+
+initHeaderMenu();
 
 const auth = getAuth();
 
@@ -161,7 +166,7 @@ async function loadGameData() {
     weekStatuses = toWeekStatuses(serverPicks);
   } catch (err) {
     console.error("Error loading your picks:", err);
-    showToast("Couldn't load your saved picks — try refreshing the page.", "error");
+    showToast("Couldn't load your saved picks. Try refreshing the page.", "error");
     weekStatuses = {};
   }
 
@@ -180,7 +185,13 @@ function renderWeek(weekNumber) {
   picks = weekStatuses[weekNumber].picks.map((p) => ({ team: p.team, matchup: p.matchup || `week${weekNumber}` }));
   bonusPick = weekStatuses[weekNumber].bonus;
 
-  renderPicks();
+  // Just displaying already-known state, not a real change — autosaving here
+  // would write a stray empty week doc the instant a never-touched week is
+  // first viewed, which is exactly what made "hasNoPicksYet" (the copy-picks
+  // prompt's trigger) silently go false after nothing more than opening the
+  // page once. Real mutations (toggleTeam, the bonus click, removePick) all
+  // call renderPicks() directly and still autosave normally.
+  renderPicks(false);
 
   const weekObj = gameData.find((w) => w.week === weekNumber);
   if (!weekObj) {
@@ -408,7 +419,7 @@ function toggleTeam(team, opponent, element, matchupKey) {
 // =========================
 // Render Picks (sidebar chips)
 // =========================
-function renderPicks() {
+function renderPicks(shouldAutosave = true) {
   picksList.innerHTML = "";
 
   picks.forEach((p) => {
@@ -453,7 +464,7 @@ function renderPicks() {
   renderBonusTracker();
   updateSubmitButton();
 
-  if (auth.currentUser && currentLeagueId) {
+  if (shouldAutosave && auth.currentUser && currentLeagueId) {
     scheduleAutosave(currentLeagueId, currentWeek, weekStatuses[currentWeek]);
   }
 }
@@ -652,20 +663,64 @@ finalSubmitBtn.addEventListener("click", async () => {
   }
 });
 
+clearPicksMenuBtn.addEventListener("click", async () => {
+  const ok = await showConfirm(
+    "Clear all your picks for every week in this league? This cannot be undone.",
+    { confirmText: "Clear All Picks", danger: true }
+  );
+  if (!ok) return;
+
+  clearPicksMenuBtn.disabled = true;
+  try {
+    await Promise.all(
+      Array.from({ length: 18 }, (_, i) => i + 1).map((week) =>
+        authedFetch(`/api/leagues/${currentLeagueId}/picks/${week}`, {
+          method: "PUT",
+          body: JSON.stringify({ picks: [], bonus: null }),
+        })
+      )
+    );
+    weekStatuses = {};
+    renderWeek(currentWeek);
+    renderWeekNav();
+    updateSubmitButton();
+    showToast("All picks cleared.", "success");
+  } catch (err) {
+    console.error("Error clearing picks:", err);
+    showToast("Error clearing picks: " + err.message, "error");
+  } finally {
+    clearPicksMenuBtn.disabled = false;
+  }
+});
+
 // =========================
 // Init with Auth Listener
 // =========================
+// Safety net: if onAuthStateChanged itself never fires (seen in the wild
+// during a Firebase Auth outage/rate-limit), the page would otherwise sit
+// on the loading overlay forever with no explanation.
+let authResolved = false;
+const authTimeoutId = setTimeout(() => {
+  if (authResolved) return;
+  document.getElementById("page-loading-overlay")?.classList.add("hidden");
+  showToast("This is taking longer than usual. Hang tight, or refresh if nothing loads soon.", "error");
+}, 8000);
+
 onAuthStateChanged(auth, async (user) => {
+  authResolved = true;
+  clearTimeout(authTimeoutId);
   if (!user) return;
 
   currentLeagueId = localStorage.getItem("pick5_currentLeagueId");
   if (!currentLeagueId) {
     matchupsDiv.innerHTML = "<p>⚠️ No league selected. Head back to the dashboard and pick a league first.</p>";
+    document.getElementById("page-loading-overlay")?.classList.add("hidden");
     return;
   }
 
   loadLeagueHeaderInfo(user.uid);
   await initPicksEntry();
+  document.getElementById("page-loading-overlay")?.classList.add("hidden");
 });
 
 // Decides between three outcomes before rendering week 1: already submitted
@@ -687,6 +742,24 @@ async function initPicksEntry() {
 
     const hasNoPicksYet = Object.keys(serverPicks).length === 0;
     const submittedElsewhere = myLeagues.filter((l) => l.id !== currentLeagueId && l.submitted);
+
+    // On-demand menu item, shown whenever there's somewhere to import from —
+    // not just on a first-ever visit, so it's still there later if someone
+    // skipped the auto-prompt or started picking before checking. Always
+    // confirms before running, since by click time (as opposed to page-load
+    // time) there's no reliable way to know whether picks made this session
+    // would get overwritten.
+    if (submittedElsewhere.length > 0) {
+      importPicksMenuBtn.style.display = "";
+      importPicksMenuBtn.onclick = async () => {
+        const ok = await showConfirm(
+          "Import picks from another league? This will overwrite any picks you've already made in this league for weeks that exist in the source league.",
+          { confirmText: "Import Picks" }
+        );
+        if (!ok) return;
+        showCopyPicksModal(submittedElsewhere);
+      };
+    }
 
     if (hasNoPicksYet && submittedElsewhere.length > 0) {
       showCopyPicksModal(submittedElsewhere);

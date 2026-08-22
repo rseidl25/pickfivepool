@@ -212,7 +212,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   // Auth
   // =========================
+  // Safety net: if onAuthStateChanged itself never fires (seen in the wild
+  // during a Firebase Auth outage/rate-limit), the page would otherwise sit
+  // on the loading overlay forever with no explanation.
+  let authResolved = false;
+  const authTimeoutId = setTimeout(() => {
+    if (authResolved) return;
+    document.getElementById("page-loading-overlay")?.classList.add("hidden");
+    showToast("This is taking longer than usual. Hang tight, or refresh if nothing loads soon.", "error");
+  }, 8000);
+
   onAuthStateChanged(auth, async (user) => {
+    authResolved = true;
+    clearTimeout(authTimeoutId);
     if (!user) {
       window.location.href = "login.html";
       return;
@@ -239,6 +251,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     await loadMyLeagues();
+    document.getElementById("page-loading-overlay")?.classList.add("hidden");
   });
 
   async function loadMyLeagues() {

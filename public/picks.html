@@ -16,6 +16,10 @@
   <link rel="stylesheet" href="../src/css/picks/picks.css">
 </head>
 <body>
+  <div id="page-loading-overlay" class="page-loading-overlay">
+    <div class="page-loading-spinner"></div>
+  </div>
+
   <div class="app-shell">
 
     <header class="top-app-bar m3-top-app-bar">
@@ -31,7 +35,17 @@
         <button id="submit-btn" class="m3-btn m3-btn-filled" disabled>Next</button>
       </div>
 
-      <a href="leagues.html" id="header-home-btn" class="m3-btn m3-btn-outlined">← Back to Leagues</a>
+      <div class="m3-menu-wrap" id="picks-menu-wrap">
+        <button id="menu-trigger" type="button" class="m3-icon-btn" aria-label="Menu" aria-haspopup="true" aria-expanded="false">
+          <span class="hamburger-bars"><span></span><span></span><span></span></span>
+        </button>
+        <div id="header-menu" class="m3-menu hidden">
+          <button id="import-picks-menu-btn" type="button" class="m3-menu-item" style="display:none;">Import Picks</button>
+          <button id="clear-picks-menu-btn" type="button" class="m3-menu-item">Clear All Picks</button>
+          <div class="m3-menu-divider"></div>
+          <a href="leagues.html" class="m3-menu-item">Back to Leagues</a>
+        </div>
+      </div>
     </header>
 
     <div id="league-player-row" class="league-player-row">

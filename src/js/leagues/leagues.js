@@ -52,11 +52,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // hang forever on the static "..." placeholder with no feedback at all.
   // Give it a few seconds, then tell the user something's wrong instead of
   // silently doing nothing.
+  // Shown by default in the page's own HTML (so it's visible the instant the
+  // page itself has loaded, no JS required) and hidden once there's actually
+  // something to look at — covers the "page sits blank/grey while auth and
+  // the leagues list load over a slow connection" gap. Optional chaining
+  // since /v1/leagues.html (shares this same script) has no such element.
+  const pageLoadingOverlay = document.getElementById("page-loading-overlay");
+  function hideLoadingOverlay() {
+    pageLoadingOverlay?.classList.add("hidden");
+  }
+
   let authResolved = false;
   const authTimeoutId = setTimeout(() => {
     if (authResolved) return;
     userName.textContent = "—";
-    leaguesList.innerHTML = "<li class='no-leagues'>Trouble connecting. Please refresh the page.</li>";
+    leaguesList.innerHTML = "<li class='no-leagues'>This is taking longer than usual. Hang tight, it may still finish loading, or refresh if nothing shows up soon.</li>";
+    hideLoadingOverlay();
   }, 8000);
 
   // This page never itself signs anyone in (no login/signup form here), so a
@@ -71,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     userName.textContent = user.displayName || user.email || "User";
     await loadLeagues();
+    hideLoadingOverlay();
   });
 
   logoutBtn.onclick = async () => {
