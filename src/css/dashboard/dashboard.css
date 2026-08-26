@@ -583,8 +583,14 @@ html, body { height: 100%; }
   .nav-bar {
     display: flex;
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
+    /* iOS home-screen ("Add to Home Screen") launches have no browser
+       chrome, so the strip iOS reserves for the home-indicator gesture
+       area is otherwise left blank below this bar instead of covered by
+       it — extend the bar's own background down into that space. Needs
+       viewport-fit=cover on the viewport meta tag or this is always 0. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  .app-shell { padding-bottom: 50px; }
+  .app-shell { padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px)); }
 
   /* Smaller bottom tab bar — less vertical space given up to it, so the
      scrollable content above gets more room. */
