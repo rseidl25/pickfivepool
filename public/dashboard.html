@@ -12,8 +12,8 @@
 
   <link rel="icon" type="image/png" href="icons/favicon.png">
 
-  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=1">
-  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=1">
+  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=3">
+  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=5">
 </head>
 <body>
   <div id="page-loading-overlay" class="page-loading-overlay">
@@ -101,8 +101,10 @@
                 <img id="my-week-profile-pic" src="icons/default_avatar.png" alt="Your profile picture" class="my-week-avatar">
                 <div id="my-week-name" class="my-week-name">Name</div>
                 <div id="my-week-total-points" class="my-week-total-points">-- pts</div>
-                <div id="my-week-overall-pos" class="my-week-overall-pos-box"></div>
-                <div id="my-week-win-chance" class="my-week-win-chance-box"></div>
+                <div class="my-week-stats-row">
+                  <div id="my-week-overall-pos" class="my-week-overall-pos-box"></div>
+                  <div id="my-week-win-chance" class="my-week-win-chance-box"></div>
+                </div>
               </div>
 
               <div class="my-week-picks-col">
@@ -171,7 +173,7 @@
 
     <footer class="dashboard-footer">
       <span>Last Updated:</span>
-      <span id="last-updated-time">[TIME]</span>
+      <span class="last-updated-time">[TIME]</span>
     </footer>
   </div>
 
@@ -274,6 +276,6 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/dashboard/dashboard.js?v=1"></script>
+  <script type="module" src="../src/js/dashboard/dashboard.js?v=5"></script>
 </body>
 </html>

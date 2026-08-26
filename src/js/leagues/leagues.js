@@ -10,6 +10,17 @@ const auth = getAuth(app);
 // /v1/leagues.html both need this to mean the same public/icons/ file).
 const DEFAULT_AVATAR = "/icons/default_avatar.png";
 
+function ordinal(n) {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const userName = document.getElementById("user-name");
   const logoutBtn = document.getElementById("logout-btn");
@@ -123,10 +134,26 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const scores = await authedFetch(`/api/leagues/${league.id}/scores`);
           const myIndex = scores.findIndex((s) => s.uid === myUid);
+
+          // Competition ranking (1224): tied players share the rank they're
+          // tied for, and the next distinct score skips past the tied spots
+          // rather than counting them individually.
+          let myRank = null, myRankTied = false;
+          if (myIndex >= 0) {
+            let currentRank = 0, prevOverall = null;
+            for (let i = 0; i <= myIndex; i++) {
+              if (scores[i].overall !== prevOverall) currentRank = i + 1;
+              prevOverall = scores[i].overall;
+            }
+            myRank = currentRank;
+            myRankTied = scores.filter((s) => s.overall === scores[myIndex].overall).length > 1;
+          }
+
           return {
             ...league,
             myDisplayName: myIndex >= 0 ? scores[myIndex].displayName : null,
-            myRank: myIndex >= 0 ? myIndex + 1 : null,
+            myRank,
+            myRankTied,
             totalMembers: scores.length,
           };
         } catch (err) {
@@ -159,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
       info.innerHTML = `
         <div class="league-name">${league.name}</div>
         <div class="league-my-name">${league.myDisplayName || "Unknown"}</div>
-        <div class="league-my-position">${league.myRank && league.totalMembers ? `${league.myRank} of ${league.totalMembers}` : "—"}</div>
+        <div class="league-my-position">${league.myRank && league.totalMembers ? `${league.myRankTied ? "T-" : ""}${ordinal(league.myRank)} (${league.totalMembers} players)` : "—"}</div>
       `;
       enterBtn.appendChild(info);
 

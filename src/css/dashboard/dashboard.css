@@ -356,6 +356,9 @@ html, body { height: 100%; }
 .my-week-avatar { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; margin-bottom: 18px; }
 .my-week-name { font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); margin-bottom: 4px; }
 .my-week-total-points { font: var(--md-type-title-md); color: var(--md-sys-color-on-surface-variant); margin-bottom: 26px; }
+/* No box of its own on desktop — the two stat boxes just stack in normal
+   flow alongside their siblings, same as before this wrapper existed. */
+.my-week-stats-row { display: contents; }
 .my-week-overall-pos-box,
 .my-week-win-chance-box {
   display: flex;
@@ -508,7 +511,6 @@ html, body { height: 100%; }
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
 }
-
 /* =========================================================
    Modals (shared dialog shape, same pattern as leagues.html)
    ========================================================= */
@@ -572,43 +574,43 @@ html, body { height: 100%; }
    Mobile (<= 840px): nav rail -> bottom nav bar
    ========================================================= */
 @media (max-width: 840px) {
-  /* Page section titles (Overall Leaderboard, My Week, Picks) — left-
-     aligned on desktop, centered on mobile. */
-  .section-title { text-align: center; }
+  /* Section titles (Overall Leaderboard, My Week, Picks) just repeat the
+     tab the user already tapped — drop them on mobile to give the content
+     below that much more vertical room. */
+  .section-title { display: none; }
 
   .nav-rail { display: none; }
   .nav-bar {
     display: flex;
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
   }
-  .app-shell { padding-bottom: 62px; }
+  .app-shell { padding-bottom: 50px; }
+
+  /* Smaller bottom tab bar — less vertical space given up to it, so the
+     scrollable content above gets more room. */
+  .nav-bar .m3-nav-bar-item { padding: 4px 0 6px; font-size: 10px; }
+  .nav-bar .m3-nav-bar-item .indicator { width: 44px; height: 22px; font-size: 15px; }
+  .nav-bar .m3-nav-bar-item .avatar-indicator { width: 32px; height: 32px; }
+  .nav-bar .m3-nav-bar-item .nav-avatar { width: 28px; height: 28px; }
 
   /* Header row: logo | league select | hamburger, as three independent
      grid columns (not two flex groups) so the select can sit truly
      centered regardless of how wide the logo or hamburger are.
      .header-left has no box of its own here (display: contents) — its
-     two children become direct grid items alongside .user-info. Last
-     Updated moves out of the footer and into its own row right under the
-     header — reordering the app-shell's flex children rather than moving
-     markup, so the footer keeps its normal desktop position (bottom of
-     the page) there. */
-  /* Logo | league select | hamburger as three grid columns, the outer two
-     sized to their own content (auto — not shrunk below it, so the logo
-     never clips) and the middle one taking whatever's left. The select is
-     centered within that leftover space: since the logo is much wider
-     than the hamburger, that's not dead-center on the full row, but it's
-     as close as this layout gets without either clipping or shrinking
-     the logo. */
+     two children become direct grid items alongside .user-info. */
   .top-app-bar {
     order: 0;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    padding: 10px 16px;
+    padding: 12px 14px 6px;
   }
   .header-left { display: contents; }
   .league-shortcut { justify-self: center; }
   .welcome-text { display: none; }
+  .brand-logo { height: 38px; }
+  .league-select { height: 32px; padding: 0 10px; max-width: 160px; font-size: 13px; }
+  .top-app-bar .m3-icon-btn { width: 32px; height: 32px; }
 
   /* margin-top: -1px guards against a hairline gap between the header and
      this row at some zoom levels/DPRs — the header's height is a whole
@@ -628,12 +630,21 @@ html, body { height: 100%; }
   .week-buttons { flex-direction: row; gap: 8px; }
   .week-chip { width: auto; justify-content: center; }
 
-  .dashboard-main { padding: 4px 12px 24px; }
+  /* Extra top padding beyond the desktop value — without it the leaderboard
+     table / filter dropdowns crowd right up against the week-select row. */
+  .dashboard-main { padding: 20px 12px 24px; }
 
   /* 2nd/3rd stack instead of sitting side by side — too narrow otherwise. */
   .podium-bottom-row { flex-direction: column; }
   .podium-row { flex-basis: auto; width: 100%; }
   .podium-name { max-width: 140px; }
+
+  /* Place + win% side by side instead of stacked — align-items: stretch
+     (the flex default, stated explicitly here) is what keeps both boxes
+     the same height regardless of which one's text wraps to more lines. */
+  .my-week-stats-row { display: flex; flex-direction: row; align-items: stretch; gap: 20px; width: 100%; margin-top: 12px; }
+  .my-week-overall-pos-box,
+  .my-week-win-chance-box { flex: 1; margin: 0; justify-content: center; }
 
   /* align-items: stretch — the base rule's flex-start (needed for the
      desktop row layout, so the grid and the matchups panel don't stretch

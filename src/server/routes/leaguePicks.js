@@ -180,7 +180,7 @@ router.get("/my-week", requireAuth, requireLeagueMember, (req, res) => {
     }
   }
 
-  const winChancePct = simulateWinChance(league.seasonPicks, gamesForWeek, weekKey, req.uid);
+  const winChancePct = simulateWinChance(submittedSeasonPicks(league), gamesForWeek, weekKey, req.uid);
 
   // How many players (league-wide) picked each team this week, for the top-5
   // "Most Picked Teams" list. Gated the same way as everywhere else that

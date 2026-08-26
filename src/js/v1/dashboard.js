@@ -8,6 +8,17 @@ import { showToast } from "../util/toast.js";
 
 const auth = getAuth(app);
 
+function ordinal(n) {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
+  }
+}
+
 // ============================
 // Fetch helpers
 // ============================
@@ -830,8 +841,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ranked = Object.entries(scoresData)
       .map(([uid, p]) => ({ uid, overall: p.overall_score }))
       .sort((a, b) => b.overall - a.overall);
-    const myRank = ranked.findIndex((p) => p.uid === myUid) + 1;
-    myWeekOverallPos.textContent = myRank ? `Overall: #${myRank} of ${ranked.length}` : "Overall: --";
+    const myRankIndex = ranked.findIndex((p) => p.uid === myUid);
+
+    // Competition ranking (1224), matching the leagues list — tied players
+    // share the rank they're tied for, marked with a "T-" prefix.
+    let myRank = null, myRankTied = false;
+    if (myRankIndex >= 0) {
+      let currentRank = 0, prevOverall = null;
+      for (let i = 0; i <= myRankIndex; i++) {
+        if (ranked[i].overall !== prevOverall) currentRank = i + 1;
+        prevOverall = ranked[i].overall;
+      }
+      myRank = currentRank;
+      myRankTied = ranked.filter((p) => p.overall === ranked[myRankIndex].overall).length > 1;
+    }
+
+    myWeekOverallPos.textContent = myRank
+      ? `Overall: ${myRankTied ? "T-" : ""}${ordinal(myRank)} of ${ranked.length}`
+      : "Overall: --";
 
     myWeekBonus.innerHTML = "Loading...";
     myWeekTeamsToWatch.innerHTML = "";
@@ -888,10 +915,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Players Dropdown
   // =========================
   function loadPlayers() {
-    allPlayers = Object.entries(scoresData).map(([uid, player]) => ({
-      uid,
-      name: player.name,
-    }));
+    // Members who haven't submitted their season picks yet have no weeks
+    // in scoresData at all (see submittedSeasonPicks server-side) — leave
+    // them out of the picks tab entirely rather than showing an empty card.
+    allPlayers = Object.entries(scoresData)
+      .filter(([, player]) => Object.keys(player.weeks || {}).length > 0)
+      .map(([uid, player]) => ({
+        uid,
+        name: player.name,
+      }));
     playerSelect.innerHTML = "";
     const allOpt = document.createElement("option");
     allOpt.value = "all";

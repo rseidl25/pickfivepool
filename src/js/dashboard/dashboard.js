@@ -10,6 +10,17 @@ import { showToast } from "../util/toast.js";
 const auth = getAuth(app);
 const DEFAULT_AVATAR = "/icons/default_avatar.png";
 
+function ordinal(n) {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
+  }
+}
+
 // Visit dashboard.html?demo=leaderboard to preview the podium with fake
 // standings (including ties) instead of the real league's scores — doesn't
 // touch Firestore, just swaps what loadLeaderboard() renders from.
@@ -119,7 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const leaderboardTitle = document.getElementById("leaderboard-title");
   const picksTitle = document.getElementById("picks-title");
   const myWeekTitle = document.getElementById("my-week-title");
-  const lastUpdatedTime = document.getElementById("last-updated-time");
+  const lastUpdatedTimeEls = document.querySelectorAll(".last-updated-time");
   const playerSelect = document.getElementById("select-player");
   const teamSelect = document.getElementById("select-team");
   const weeklyGrid = document.getElementById("weekly-picks-grid");
@@ -801,9 +812,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const ranked = Object.entries(scoresData).map(([uid, p]) => ({ uid, overall: p.overall_score })).sort((a, b) => b.overall - a.overall);
     const myRankIndex = ranked.findIndex((p) => p.uid === myUid);
-    const myRank = myRankIndex + 1;
+
+    // Competition ranking (1224), matching the leagues list — tied players
+    // share the rank they're tied for, marked with a "T-" prefix.
+    let myRank = null, myRankTied = false;
+    if (myRankIndex >= 0) {
+      let currentRank = 0, prevOverall = null;
+      for (let i = 0; i <= myRankIndex; i++) {
+        if (ranked[i].overall !== prevOverall) currentRank = i + 1;
+        prevOverall = ranked[i].overall;
+      }
+      myRank = currentRank;
+      myRankTied = ranked.filter((p) => p.overall === ranked[myRankIndex].overall).length > 1;
+    }
+
     myWeekOverallPos.innerHTML = myRank
-      ? `<span class="my-week-overall-pos-rank">#${myRank}</span><span class="my-week-overall-pos-label">of ${ranked.length} players</span>`
+      ? `<span class="my-week-overall-pos-rank">${myRankTied ? "T-" : ""}${ordinal(myRank)}</span><span class="my-week-overall-pos-label">of ${ranked.length} players</span>`
       : `<span class="my-week-overall-pos-label">Overall: --</span>`;
 
     // Closest trailing players — sorted descending, so the entries right
@@ -996,7 +1020,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Players / Teams dropdowns
   // =========================
   function loadPlayers() {
-    allPlayers = Object.entries(scoresData).map(([uid, player]) => ({ uid, name: player.name }));
+    // Members who haven't submitted their season picks yet have no weeks
+    // in scoresData at all (see submittedSeasonPicks server-side) — leave
+    // them out of the picks tab entirely rather than showing an empty card.
+    allPlayers = Object.entries(scoresData)
+      .filter(([, player]) => Object.keys(player.weeks || {}).length > 0)
+      .map(([uid, player]) => ({ uid, name: player.name }));
     playerSelect.innerHTML = "";
     const allOpt = document.createElement("option");
     allOpt.value = "all";
@@ -1211,9 +1240,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   try {
     const lastUpdatedData = await fetchLastUpdated();
-    lastUpdatedTime.textContent = lastUpdatedData.last_updated ? formatLocalTime(lastUpdatedData.last_updated) : "[Unknown]";
+    const text = lastUpdatedData.last_updated ? formatLocalTime(lastUpdatedData.last_updated) : "[Unknown]";
+    lastUpdatedTimeEls.forEach((el) => { el.textContent = text; });
   } catch {
-    lastUpdatedTime.textContent = "[Error]";
+    lastUpdatedTimeEls.forEach((el) => { el.textContent = "[Error]"; });
   }
 
   toggleScoresBtn.addEventListener("click", async () => {
