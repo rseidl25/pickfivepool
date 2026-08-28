@@ -8,6 +8,11 @@ function ensureStyles() {
   if (stylesInjected) return;
   stylesInjected = true;
   const style = document.createElement("style");
+  // Colors read from the M3 token set (m3-tokens.css) so this matches
+  // whatever theme — light/dark/original — the page is currently in, same
+  // as every other dialog in the app. The literal fallback after each var()
+  // is what v1 legacy pages get, since they never load m3-tokens.css and
+  // so never define these custom properties at all.
   style.textContent = `
     .pick5-confirm-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.45);
@@ -15,12 +20,14 @@ function ensureStyles() {
       z-index: 3100; padding: 20px;
     }
     .pick5-confirm-box {
-      background: #fff; border-radius: 12px; max-width: 400px; width: 100%;
-      padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      background: var(--md-sys-color-surface-container-high, #fff);
+      border-radius: var(--md-sys-shape-corner-xl, 12px); max-width: 400px; width: 100%;
+      padding: 24px; box-shadow: var(--md-sys-elevation-3, 0 8px 30px rgba(0,0,0,0.4));
       font-family: Montserrat, Arial, sans-serif;
     }
     .pick5-confirm-message {
-      margin: 0 0 20px; font-size: 15px; line-height: 1.5; color: #1a1a1a;
+      margin: 0 0 20px; font-size: 15px; line-height: 1.5;
+      color: var(--md-sys-color-on-surface, #1a1a1a);
       white-space: pre-line;
     }
     .pick5-confirm-actions { display: flex; justify-content: flex-end; gap: 10px; }
@@ -29,12 +36,21 @@ function ensureStyles() {
       font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit;
       transition: background-color .15s ease;
     }
-    .pick5-confirm-cancel { background: #eee; color: #333; }
-    .pick5-confirm-cancel:hover { background: #ddd; }
-    .pick5-confirm-ok { background: #1d2d44; color: #fff; }
-    .pick5-confirm-ok:hover { background: #16233a; }
-    .pick5-confirm-ok.pick5-confirm-danger { background: #dc2626; }
-    .pick5-confirm-ok.pick5-confirm-danger:hover { background: #b91c1c; }
+    .pick5-confirm-cancel {
+      background: var(--md-sys-color-secondary-container, #eee);
+      color: var(--md-sys-color-on-secondary-container, #333);
+    }
+    .pick5-confirm-cancel:hover { filter: brightness(0.95); }
+    .pick5-confirm-ok {
+      background: var(--md-sys-color-primary, #1d2d44);
+      color: var(--md-sys-color-on-primary, #fff);
+    }
+    .pick5-confirm-ok:hover { filter: brightness(0.9); }
+    .pick5-confirm-ok.pick5-confirm-danger {
+      background: var(--md-sys-color-error, #dc2626);
+      color: var(--md-sys-color-on-error, #fff);
+    }
+    .pick5-confirm-ok.pick5-confirm-danger:hover { filter: brightness(0.9); }
   `;
   document.head.appendChild(style);
 }

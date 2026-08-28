@@ -215,7 +215,7 @@ html, body { height: 100%; }
 .podium-row-crowded .podium-score { font: var(--md-type-body-sm); font-weight: 700; }
 
 .podium-avatar {
-  border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  border-radius: 50%; object-fit: cover; flex-shrink: 0; cursor: zoom-in;
   border: 3px solid var(--md-sys-color-surface-container-lowest);
 }
 .podium-rank-1 .podium-avatar { width: 84px; height: 84px; }
@@ -278,7 +278,7 @@ html, body { height: 100%; }
   background: var(--md-sys-color-surface-container-lowest);
 }
 .leaderboard-player-cell { display: flex; align-items: center; justify-content: flex-start; gap: 10px; text-align: left; }
-.leaderboard-mini-pic { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.leaderboard-mini-pic { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; flex-shrink: 0; cursor: zoom-in; }
 
 /* Zebra striping for contrast between rows. */
 #leaderboard-list tr:nth-child(odd) td { background: var(--md-sys-color-surface-container-lowest); }
@@ -420,7 +420,7 @@ html, body { height: 100%; }
 }
 .pick-box.is-me { outline: 2px solid var(--brand-gold); outline-offset: -2px; }
 .player-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: var(--md-sys-color-surface-container-lowest); }
+.profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: var(--md-sys-color-surface-container-lowest); cursor: zoom-in; }
 .player-header h3 { margin: 0; font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface); }
 
 /* Original theme: player cards read as v1's navy boxes, with a slightly
@@ -523,7 +523,6 @@ html, body { height: 100%; }
 .modal-header h2 { margin: 0; font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); }
 .modal-body { padding: 16px 24px 32px; overflow-y: auto; }
 .modal-subtext { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); margin: 0 0 16px; }
-.settings-divider { border: none; border-top: 1px solid var(--md-sys-color-outline-variant); margin: 20px 0; }
 .how-to-play-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); }
 .close-btn {
   flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;

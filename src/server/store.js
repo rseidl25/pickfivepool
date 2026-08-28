@@ -198,6 +198,19 @@ export function getLeaguesForUser(uid) {
   return result;
 }
 
+// Every per-league photo override the user currently has set, across every
+// league they're in — used to surface "photos you're already using
+// somewhere" as quick-pick options in the profile photo picker.
+export function getMemberPhotoURLsForUser(uid) {
+  const urls = [];
+  for (const league of leagues.values()) {
+    if (league.archived) continue;
+    const photoURL = league.members.get(uid)?.photoURL;
+    if (photoURL) urls.push(photoURL);
+  }
+  return urls;
+}
+
 export function getLeagueIdByInviteCode(code) {
   return inviteCodeIndex.get(code);
 }

@@ -36,10 +36,12 @@ export async function authedFetch(path, opts = {}) {
     throw new Error("Not signed in");
   }
   const token = await withTimeout(user.getIdToken(), REQUEST_TIMEOUT_MS, TIMEOUT_MESSAGE);
-  const res = await fetchWithTimeout(path, {
-    ...opts,
-    headers: { ...opts.headers, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-  });
+  // FormData (file uploads) needs the browser to set its own multipart
+  // Content-Type with the right boundary — setting it ourselves breaks it.
+  const isFormData = opts.body instanceof FormData;
+  const headers = { ...opts.headers, Authorization: `Bearer ${token}` };
+  if (!isFormData) headers["Content-Type"] = "application/json";
+  const res = await fetchWithTimeout(path, { ...opts, headers });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Request failed (${res.status})`);

@@ -3,6 +3,7 @@ import { app } from "../auth/firebase_init.js";
 import { authedFetch } from "../util/api.js";
 import { showToast } from "../util/toast.js";
 import { showConfirm } from "../util/confirm-dialog.js";
+import { initPhotoPicker } from "../util/photo-picker.js";
 
 const auth = getAuth(app);
 // Absolute (not relative) so this resolves correctly regardless of how
@@ -42,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const editProfileForm = document.getElementById("edit-profile-form");
   const globalDisplayNameInput = document.getElementById("global-display-name");
   const globalPhotoUrlInput = document.getElementById("global-photo-url");
+  const globalPhotoPicker = document.getElementById("global-photo-picker");
 
   const manageLeagueModal = document.getElementById("manage-league-modal");
   const closeManageLeague = document.getElementById("close-manage-league");
@@ -275,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
     globalDisplayNameInput.value = user?.displayName || "";
     globalPhotoUrlInput.value = "";
     editProfileModal.classList.remove("hidden");
+    initPhotoPicker(globalPhotoPicker, { onSelect: (url) => { globalPhotoUrlInput.value = url; } });
   };
   closeEditProfile.onclick = () => editProfileModal.classList.add("hidden");
 

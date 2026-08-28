@@ -43,6 +43,11 @@ export function mapEspnWeekToGames(espnResponse, weekNumber) {
       weekday: formatWeekday(event.date),
       gameTime: status === "Scheduled" ? formatGameTime(event.date) : null,
       status,
+      // Only meaningful mid-game — used by winProbability.js to weight a
+      // live game's simulated outcome by its current score/clock instead
+      // of a flat coin flip. period: 1-4 regulation, 5+ overtime.
+      period: competition?.status?.period ?? null,
+      clockSeconds: typeof competition?.status?.clock === "number" ? competition.status.clock : null,
     };
   });
 

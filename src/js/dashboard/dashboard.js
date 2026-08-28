@@ -6,6 +6,8 @@ import { authedFetch, publicFetch } from "../util/api.js";
 import { initHeaderMenu } from "../util/header-menu.js";
 import { initThemeSwitcher } from "../util/theme.js";
 import { showToast } from "../util/toast.js";
+import { initPhotoPicker } from "../util/photo-picker.js";
+import { openLightbox } from "../util/lightbox.js";
 
 const auth = getAuth(app);
 const DEFAULT_AVATAR = "/icons/default_avatar.png";
@@ -193,6 +195,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const settingsForm = document.getElementById("settings-form");
   const displayNameInput = document.getElementById("display-name");
   const profileUrlInput = document.getElementById("profile-url");
+  const leaguePhotoPicker = document.getElementById("league-photo-picker");
+
+  const themeBtn = document.getElementById("theme-btn");
+  const themeModal = document.getElementById("theme-modal");
+  const closeTheme = document.getElementById("close-theme");
 
   let currentTab = "leaderboard";
   let currentWeek = null;
@@ -207,7 +214,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Modals — centered M3 dialogs (not anchored popovers); only one open
   // at a time, click-outside or the X closes it.
   // =========================
-  const allModals = [howToPlayModal, messageBoardModal, leagueStatsModal, settingsModal];
+  const allModals = [howToPlayModal, messageBoardModal, leagueStatsModal, settingsModal, themeModal];
   function closeAllModals() {
     allModals.forEach((m) => m.classList.add("hidden"));
   }
@@ -218,6 +225,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   window.addEventListener("click", (e) => {
     if (e.target.classList.contains("modal")) closeAllModals();
+  });
+
+  // Delegated (not wired per-render) since these images live in the
+  // leaderboard table, the podium, and the picks grid — all rebuilt from
+  // scratch on every render — so one listener here covers every profile
+  // pic that ever exists rather than re-attaching handlers each time.
+  document.addEventListener("click", (e) => {
+    const img = e.target.closest(".leaderboard-mini-pic, .podium-avatar, .profile-pic");
+    if (img) openLightbox(img.src, img.alt);
   });
 
   // =========================
@@ -534,6 +550,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     openModal(settingsModal, async () => {
       displayNameInput.value = "";
       profileUrlInput.value = "";
+      initPhotoPicker(leaguePhotoPicker, { onSelect: (url) => { profileUrlInput.value = url; } });
       try {
         const league = await fetchLeagueDetail(currentLeagueId);
         const me = league.members.find((m) => m.uid === auth.currentUser?.uid);
@@ -543,6 +560,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   closeSettings.onclick = () => closeAllModals();
+
+  themeBtn.onclick = () => openModal(themeModal);
+  closeTheme.onclick = () => closeAllModals();
 
   settingsForm.addEventListener("submit", async (e) => {
     e.preventDefault();

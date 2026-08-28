@@ -1,3 +1,4 @@
 serviceAccountKey.json
 node_modules
 src/server/data
+public/uploads

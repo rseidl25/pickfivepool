@@ -114,7 +114,12 @@
           <input class="m3-field" type="text" id="global-display-name" placeholder="Enter new name" maxlength="30">
 
           <label for="global-photo-url">Profile Picture URL:</label>
-          <input class="m3-field" type="url" id="global-photo-url" placeholder="Paste image URL here">
+          <!-- type="text", not "url" — an uploaded photo's path (/uploads/...)
+               is relative, and type="url" only accepts an absolute URL. -->
+          <input class="m3-field" type="text" id="global-photo-url" placeholder="Paste image URL here">
+
+          <label>Your Photos:</label>
+          <div id="global-photo-picker"></div>
 
           <button type="submit" class="m3-btn m3-btn-filled">Save Changes</button>
         </form>
@@ -181,7 +186,7 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/leagues/leagues.js?v=3"></script>
+  <script type="module" src="../src/js/leagues/leagues.js?v=4"></script>
 
   <!-- leagues.js toggles #new-league-panel's "hidden" class (it predates
        this panel being a real full-screen modal overlay), but doesn't wire
