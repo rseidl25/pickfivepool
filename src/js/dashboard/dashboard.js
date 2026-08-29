@@ -1093,14 +1093,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const playersToShow = selectedPlayer === "all" ? allPlayers.slice() : allPlayers.filter((p) => p.uid === selectedPlayer);
 
-    const playerCards = playersToShow.map((player) => {
+    let playerCards = playersToShow.map((player) => {
       const weekData = scoresData[player.uid].weeks?.[`week${weekNumber}`] || { teams: {}, total: 0 };
       return { ...player, weekData, correctedTotal: weekData.total || 0 };
     });
 
-    playerCards.sort((a, b) => (b.correctedTotal !== a.correctedTotal ? b.correctedTotal - a.correctedTotal : a.name.localeCompare(b.name)));
+    // A team filter narrows the grid down to just the players who actually
+    // picked that team, rather than showing everyone and highlighting the
+    // one row — much faster to scan when a team has a handful of takers
+    // out of a large field.
+    if (selectedTeam !== "all") {
+      playerCards = playerCards.filter((player) => selectedTeam in (player.weekData.teams || {}));
+    }
 
-    let countPicked = 0;
+    playerCards.sort((a, b) => (b.correctedTotal !== a.correctedTotal ? b.correctedTotal - a.correctedTotal : a.name.localeCompare(b.name)));
 
     playerCards.forEach((player) => {
       const weekData = player.weekData;
@@ -1135,7 +1141,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const orderedTeams = [];
         if (bonusTeam) orderedTeams.push(bonusTeam);
         orderedTeams.push(...otherTeams);
-        let pickedThisTeam = false;
 
         for (const [team, info] of orderedTeams) {
           const li = document.createElement("li");
@@ -1143,7 +1148,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (info.bonus) li.classList.add("bonus");
           if (selectedTeam !== "all" && team === selectedTeam) {
             li.classList.add("highlighted");
-            pickedThisTeam = true;
           }
 
           const game = gamesForWeek.find((g) => g.homeTeam === team || g.awayTeam === team);
@@ -1168,7 +1172,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
           ul.appendChild(li);
         }
-        if (pickedThisTeam) countPicked++;
       }
       card.appendChild(ul);
 
@@ -1180,8 +1183,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       weeklyGrid.appendChild(card);
     });
 
+    if (playerCards.length === 0) {
+      weeklyGrid.innerHTML = `<p class="no-picks-message">No one picked ${selectedTeam} this week.</p>`;
+    }
+
     counterEl.style.display = selectedTeam !== "all" ? "inline" : "none";
-    if (selectedTeam !== "all") counterEl.textContent = `${countPicked}/${allPlayers.length} player(s)`;
+    if (selectedTeam !== "all") counterEl.textContent = `${playerCards.length}/${allPlayers.length} player(s)`;
 
     if (!matchupsContainer.classList.contains("hidden")) renderMatchups(gamesForWeek);
   }

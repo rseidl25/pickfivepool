@@ -549,6 +549,7 @@ html, body { height: 100%; }
 .post-body-text { white-space: pre-wrap; word-break: break-word; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); }
 .post-delete-btn { margin-top: 8px; height: 28px; padding: 0 12px; background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); border: none; border-radius: var(--md-sys-shape-corner-full); cursor: pointer; font: var(--md-type-label-sm); }
 .no-posts { color: var(--md-sys-color-on-surface-variant); font-style: italic; }
+.no-picks-message { grid-column: 1 / -1; color: var(--md-sys-color-on-surface-variant); font-style: italic; text-align: center; padding: 24px 0; }
 
 .stats-panel.hidden { display: none; }
 .stats-table { width: 100%; border-collapse: collapse; font-size: 13px; }
