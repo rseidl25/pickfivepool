@@ -72,7 +72,19 @@ router.patch("/", requireAuth, async (req, res) => {
   if (displayName !== undefined) update.displayName = displayName;
   if (photoURL !== undefined) update.photoURL = photoURL;
 
-  await auth.updateUser(req.uid, update);
+  // Firebase Auth's own photoURL field rejects anything that isn't a real
+  // absolute URL (throws auth/invalid-photo-url) — an uploaded photo's path
+  // is relative (/uploads/...), which this app now saves as photoURL all
+  // the time. Firestore is what every read path in this app actually uses
+  // for display, so Auth's copy is just cosmetic — skip mirroring it there
+  // rather than 500ing the whole request over a field nothing reads.
+  const authUpdate = { ...update };
+  if (authUpdate.photoURL !== undefined && !/^https?:\/\//i.test(authUpdate.photoURL || "")) {
+    delete authUpdate.photoURL;
+  }
+  if (Object.keys(authUpdate).length > 0) {
+    await auth.updateUser(req.uid, authUpdate);
+  }
   await db.collection("users").doc(req.uid).set({ ...update, updatedAt: new Date() }, { merge: true });
 
   res.json({ ok: true });
