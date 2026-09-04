@@ -540,6 +540,9 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 :root[data-theme="original"] .modal-header .close-btn {
   color: var(--md-sys-color-on-primary);
 }
+:root[data-theme="original"] .modal-header-subtitle {
+  color: color-mix(in srgb, var(--md-sys-color-on-primary) 75%, transparent);
+}
 :root[data-theme="original"] .modal-header .close-btn:hover {
   background: color-mix(in srgb, var(--md-sys-color-on-primary) 15%, transparent);
 }

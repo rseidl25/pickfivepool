@@ -122,6 +122,7 @@ import { authedFetch } from "../util/api.js";
 import { showToast } from "../util/toast.js";
 import { showConfirm } from "../util/confirm-dialog.js";
 import { initHeaderMenu } from "../util/header-menu.js";
+import { attemptAuthStallRecovery, clearAuthStallRecoveryFlag } from "../util/auth-recovery.js";
 
 initHeaderMenu();
 
@@ -702,13 +703,19 @@ clearPicksMenuBtn.addEventListener("click", async () => {
 let authResolved = false;
 const authTimeoutId = setTimeout(() => {
   if (authResolved) return;
+  // See auth-recovery.js — a stuck IndexedDB read (known Safari bug) is
+  // the usual cause of this timer ever firing. First time in this browser
+  // session, try to clear it and reload automatically; only fall back to
+  // the manual message if that already happened and we're stuck again.
+  if (attemptAuthStallRecovery()) return;
   document.getElementById("page-loading-overlay")?.classList.add("hidden");
-  showToast("This is taking longer than usual. Hang tight, or refresh if nothing loads soon.", "error");
-}, 8000);
+  showToast("Your browser's storage got stuck — a known Safari/iOS bug that a refresh can't fix. Please fully close this tab or app and reopen it.", "error", 10000);
+}, 5000);
 
 onAuthStateChanged(auth, async (user) => {
   authResolved = true;
   clearTimeout(authTimeoutId);
+  clearAuthStallRecoveryFlag();
   if (!user) return;
 
   currentLeagueId = localStorage.getItem("pick5_currentLeagueId");

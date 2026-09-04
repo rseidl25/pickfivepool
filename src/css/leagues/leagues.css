@@ -159,6 +159,7 @@
   flex-shrink: 0;
 }
 .modal-header h2 { margin: 0; font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); }
+.modal-header-subtitle { margin: 2px 0 0; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); }
 
 .modal-body { padding: 16px 24px 32px; overflow-y: auto; }
 
@@ -169,6 +170,8 @@
   display: flex; flex-direction: column; gap: 10px;
   font: var(--md-type-body-md); color: var(--md-sys-color-on-surface);
 }
+
+.how-to-play-tutorial-link { width: 100%; margin-top: 20px; }
 
 .close-btn {
   flex-shrink: 0; width: 32px; height: 32px;
@@ -188,40 +191,56 @@
 .panel-form.hidden { display: none; }
 .panel-form .m3-btn { align-self: flex-end; }
 
-.manage-league-identity-box {
-  display: flex; flex-direction: column; gap: 10px;
-  background: var(--md-sys-color-surface-container-highest);
-  border-radius: var(--md-sys-shape-corner-md);
-  padding: 16px; margin-bottom: 16px;
-}
-.manage-league-invite-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.manage-league-invite-row span { color: var(--md-sys-color-on-surface); font: var(--md-type-body-md); }
-.manage-league-photo-row { display: flex; align-items: center; gap: 12px; }
-.manage-league-photo-preview {
-  width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
-  border: 1px solid var(--md-sys-color-outline-variant);
-}
-.manage-league-photo-field { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-.manage-league-photo-upload-btn { align-self: flex-start; margin-top: 4px; height: 34px; padding: 0 16px; font: var(--md-type-label-md); }
+/* Flat, form-like layout — same shape as the Edit Profile modal (plain
+   surface, no nested colored panel) rather than the old dark "identity box"
+   treatment, which needed its own per-theme text-color overrides to stay
+   readable and still missed the upload button (invisible text on Original
+   theme, since the box and .m3-btn-outlined text both resolved to
+   --md-sys-color-primary). Standard tokens throughout means every theme
+   just works without special-casing. */
+.manage-league-form { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+.manage-league-field { display: flex; flex-direction: column; gap: 4px; }
 
-/* Original theme: the league identity box and its action buttons read as
-   v1's navy panel with the same blue used by the New League FAB, instead
-   of the neutral surface tone + gold-tonal buttons used elsewhere. */
-:root[data-theme="original"] .manage-league-identity-box {
-  background: var(--md-sys-color-primary);
+/* Click-the-avatar-to-change-it, the same pattern real apps use for a
+   profile photo — replaces the old separate "Upload Photo" button, so
+   there's one obvious place to click instead of a preview + button that
+   weren't visually tied together. */
+.manage-league-photo-hero { display: flex; justify-content: center; }
+.manage-league-photo-avatar-btn {
+  position: relative; width: 96px; height: 96px; padding: 0; border: none;
+  background: none; cursor: pointer; border-radius: 50%;
 }
-:root[data-theme="original"] .manage-league-identity-box label,
-:root[data-theme="original"] .manage-league-invite-row span {
-  color: var(--md-sys-color-on-primary);
+.manage-league-photo-avatar-btn img {
+  display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  transition: filter var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 }
-:root[data-theme="original"] #save-league-name-btn,
-:root[data-theme="original"] #transfer-owner-btn {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
+.manage-league-photo-avatar-btn:hover img { filter: brightness(0.85); }
+.manage-league-photo-edit-badge {
+  position: absolute; bottom: 0; right: 0; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+  border: 2px solid var(--md-sys-color-surface-container-high);
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
 }
+
+.manage-league-invite-chip {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--md-sys-color-surface-container-highest);
+  border-radius: var(--md-sys-shape-corner-full);
+  padding: 10px 18px;
+}
+.manage-league-invite-label { font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface-variant); }
+.manage-league-invite-chip strong { font: var(--md-type-title-md); color: var(--md-sys-color-on-surface); letter-spacing: 0.05em; }
+
+.manage-league-divider { border: none; border-top: 1px solid var(--md-sys-color-outline-variant); margin: 4px 0 20px; }
 
 .inline-field { display: flex; gap: 8px; margin-bottom: 12px; }
 .inline-field select { flex: 1; }
+
+/* Transfer Ownership — stacked full-width to match the League Name /
+   Photo URL fields above, instead of the old cramped side-by-side row. */
+.stacked-field { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.stacked-field .m3-btn { width: 100%; }
 
 .members-list {
   list-style: none; padding: 0; margin: 0 0 16px;
@@ -235,6 +254,32 @@
 }
 .member-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
 .member-row span { flex: 1; color: var(--md-sys-color-on-surface); font: var(--md-type-body-md); }
+
+/* Submission-status pill in the League Players modal — reuses the app's
+   fixed "valid/complete" green (same one the picks-page week chips use)
+   rather than the theme's secondary color, which isn't green in every
+   theme. */
+.member-row .submission-badge {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: var(--md-sys-shape-corner-full);
+  font: var(--md-type-label-sm);
+  white-space: nowrap;
+}
+.submission-badge.submitted {
+  background: var(--status-valid-bg); color: var(--status-valid-text);
+  border: 1px solid var(--status-valid-border);
+}
+.submission-badge.not-submitted {
+  background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant);
+}
+
+/* League Players list can run long in a big league — give the dialog real
+   height instead of the default modal's shrink-to-fit, so more players are
+   visible at once instead of scrolling a cramped 200px strip. */
+#league-players-modal .modal-content { height: 75vh; }
+#league-players-modal .modal-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#league-players-list { flex: 1; max-height: none; }
 .kick-btn {
   height: 28px; padding: 0 12px; background: var(--md-sys-color-error-container);
   color: var(--md-sys-color-on-error-container); border: none; border-radius: var(--md-sys-shape-corner-full);

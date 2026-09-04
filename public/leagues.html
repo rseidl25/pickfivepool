@@ -12,8 +12,8 @@
 
   <link rel="icon" type="image/png" href="icons/favicon.png">
 
-  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=3">
-  <link rel="stylesheet" href="../src/css/leagues/leagues.css?v=2">
+  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=4">
+  <link rel="stylesheet" href="../src/css/leagues/leagues.css?v=8">
 </head>
 <body>
   <div id="page-loading-overlay" class="page-loading-overlay">
@@ -96,6 +96,7 @@
           <li>Your bonus team must be different every week.</li>
           <li>You must submit all 18 weeks before the season begins. Once submitted, picks can't be changed.</li>
         </ul>
+        <a href="how-to-start.html" class="m3-btn m3-btn-tonal how-to-play-tutorial-link">View Full Walkthrough</a>
       </div>
     </div>
   </div>
@@ -153,36 +154,54 @@
         <span class="close-btn" id="close-manage-league">&times;</span>
       </div>
       <div class="modal-body">
-        <div class="manage-league-identity-box">
-          <label for="manage-league-name">League Name:</label>
-          <input class="m3-field" type="text" id="manage-league-name" maxlength="30">
-
-          <div class="manage-league-photo-row">
-            <img id="manage-league-photo-preview" src="icons/default_avatar.png" alt="League photo" class="manage-league-photo-preview">
-            <div class="manage-league-photo-field">
-              <label for="manage-league-photo">League Photo URL:</label>
-              <!-- type="text", not "url" — an uploaded photo's path (/uploads/...)
-                   is relative, and type="url" only accepts an absolute URL. -->
-              <input class="m3-field" type="text" id="manage-league-photo" placeholder="Paste image URL here">
-              <input type="file" id="manage-league-photo-file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
-              <button type="button" id="manage-league-photo-upload-btn" class="m3-btn m3-btn-outlined manage-league-photo-upload-btn">Upload Photo</button>
-            </div>
+        <div class="manage-league-form">
+          <div class="manage-league-photo-hero">
+            <button type="button" id="manage-league-photo-upload-btn" class="manage-league-photo-avatar-btn" aria-label="Upload league photo">
+              <img id="manage-league-photo-preview" src="icons/default_avatar.png" alt="League photo">
+              <span class="manage-league-photo-edit-badge">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                </svg>
+              </span>
+            </button>
+            <input type="file" id="manage-league-photo-file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
           </div>
 
-          <div class="manage-league-invite-row">
-            <span>Invite code: <strong id="manage-league-invite-code">------</strong></span>
-            <button id="save-league-name-btn" type="button" class="m3-btn m3-btn-tonal">Save</button>
+          <div class="manage-league-field">
+            <label for="manage-league-name">League Name:</label>
+            <input class="m3-field" type="text" id="manage-league-name" maxlength="30">
           </div>
+
+          <div class="manage-league-field">
+            <label for="manage-league-photo">League Photo URL:</label>
+            <!-- type="text", not "url" — an uploaded photo's path (/uploads/...)
+                 is relative, and type="url" only accepts an absolute URL. -->
+            <input class="m3-field" type="text" id="manage-league-photo" placeholder="Paste image URL here">
+          </div>
+
+          <div class="manage-league-invite-chip">
+            <span class="manage-league-invite-label">Invite Code</span>
+            <strong id="manage-league-invite-code">------</strong>
+          </div>
+
+          <button id="save-league-name-btn" type="button" class="m3-btn m3-btn-filled">Save Changes</button>
         </div>
+
+        <hr class="manage-league-divider">
 
         <h3>Members</h3>
         <ul id="manage-league-members" class="members-list"></ul>
 
+        <hr class="manage-league-divider">
+
         <h3>Transfer Ownership</h3>
-        <div class="inline-field">
+        <div class="stacked-field">
           <select id="transfer-owner-select" class="m3-field"></select>
-          <button id="transfer-owner-btn" type="button" class="m3-btn m3-btn-tonal">Transfer</button>
+          <button id="transfer-owner-btn" type="button" class="m3-btn m3-btn-filled">Transfer</button>
         </div>
+
+        <hr class="manage-league-divider">
 
         <h3>Danger Zone</h3>
         <button id="archive-league-btn" type="button" class="m3-btn m3-btn-danger">Archive League</button>
@@ -190,7 +209,24 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/leagues/leagues.js?v=5"></script>
+  <!-- League Players Modal — open to every member (not just the owner), shows
+       who's in the league and whether they've submitted their picks yet. -->
+  <div id="league-players-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 id="league-players-title">League</h2>
+          <p class="modal-header-subtitle">Player List</p>
+        </div>
+        <span class="close-btn" id="close-league-players">&times;</span>
+      </div>
+      <div class="modal-body">
+        <ul id="league-players-list" class="members-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../src/js/leagues/leagues.js?v=9"></script>
 
   <!-- leagues.js toggles #new-league-panel's "hidden" class (it predates
        this panel being a real full-screen modal overlay), but doesn't wire

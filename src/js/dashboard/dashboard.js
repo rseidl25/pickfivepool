@@ -8,6 +8,7 @@ import { initThemeSwitcher } from "../util/theme.js";
 import { showToast } from "../util/toast.js";
 import { initPhotoPicker } from "../util/photo-picker.js";
 import { openLightbox } from "../util/lightbox.js";
+import { attemptAuthStallRecovery, clearAuthStallRecoveryFlag } from "../util/auth-recovery.js";
 
 const auth = getAuth(app);
 const DEFAULT_AVATAR = "/icons/default_avatar.png";
@@ -245,13 +246,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   let authResolved = false;
   const authTimeoutId = setTimeout(() => {
     if (authResolved) return;
+    // See auth-recovery.js — a stuck IndexedDB read (known Safari bug) is
+    // the usual cause of this timer ever firing. First time in this browser
+    // session, try to clear it and reload automatically; only fall back to
+    // the manual message if that already happened and we're stuck again.
+    if (attemptAuthStallRecovery()) return;
     document.getElementById("page-loading-overlay")?.classList.add("hidden");
-    showToast("This is taking longer than usual. Hang tight, or refresh if nothing loads soon.", "error");
-  }, 8000);
+    showToast("Your browser's storage got stuck — a known Safari/iOS bug that a refresh can't fix. Please fully close this tab or app and reopen it.", "error", 10000);
+  }, 5000);
 
   onAuthStateChanged(auth, async (user) => {
     authResolved = true;
     clearTimeout(authTimeoutId);
+    clearAuthStallRecoveryFlag();
     if (!user) {
       window.location.href = "login.html";
       return;
@@ -550,14 +557,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     openModal(settingsModal, async () => {
       displayNameInput.value = "";
       profileUrlInput.value = "";
-      initPhotoPicker(leaguePhotoPicker, { onSelect: (url) => { profileUrlInput.value = url; } });
+      let currentPhotoURL = null;
       try {
         const league = await fetchLeagueDetail(currentLeagueId);
         const me = league.members.find((m) => m.uid === auth.currentUser?.uid);
         displayNameInput.value = me?.displayName || "";
+        currentPhotoURL = me?.photoURL || null;
       } catch (err) {
         console.error("Error loading league member profile:", err);
       }
+      initPhotoPicker(leaguePhotoPicker, { onSelect: (url) => { profileUrlInput.value = url; }, currentPhotoURL });
     });
   closeSettings.onclick = () => closeAllModals();
 
@@ -590,6 +599,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentWeek = tab === "leaderboard" ? null : await getCurrentWeek();
 
     sections.forEach((section) => section.classList.toggle("hidden", section.id !== `${tab}-section`));
+    // .dashboard-main is the scroll container (overflow-y: auto), not the
+    // window — switching tabs doesn't reset it on its own, so a section
+    // scrolled down before switching would leave the newly-shown tab
+    // starting mid-page instead of at the top.
+    document.querySelector(".dashboard-main")?.scrollTo(0, 0);
     navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.tab === tab));
 
     renderWeekButtons();

@@ -27,6 +27,7 @@ function ensureStyles() {
     }
     .photo-picker-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .photo-picker-tile:hover { border-color: var(--md-sys-color-primary, #1976d2); }
+    .photo-picker-tile.current { border-color: var(--brand-gold, #e9c400); }
     .photo-picker-remove {
       position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 50%;
       background: rgba(0,0,0,0.6); color: #fff; font-size: 12px; line-height: 18px; text-align: center;
@@ -51,8 +52,11 @@ function ensureStyles() {
  * @param container element to render the gallery into (replaces its content)
  * @param onSelect  called with a photo's URL when the user picks one from
  *                  the gallery, or right after a successful upload
+ * @param currentPhotoURL the photo currently in use in this context (global
+ *                  profile or a specific league override) — its tile gets a
+ *                  highlighted border so it's clear which one is active
  */
-export async function initPhotoPicker(container, { onSelect }) {
+export async function initPhotoPicker(container, { onSelect, currentPhotoURL }) {
   ensureStyles();
   container.innerHTML = `<p class="photo-picker-hint">Loading your photos...</p>`;
 
@@ -76,7 +80,7 @@ export async function initPhotoPicker(container, { onSelect }) {
     photos.forEach((photo) => {
       const tile = document.createElement("button");
       tile.type = "button";
-      tile.className = "photo-picker-tile";
+      tile.className = "photo-picker-tile" + (photo.url === currentPhotoURL ? " current" : "");
       tile.innerHTML = `<img src="${photo.url}" alt="Uploaded photo"><span class="photo-picker-remove" title="Remove">&times;</span>`;
       tile.onclick = (e) => {
         if (e.target.closest(".photo-picker-remove")) return;
@@ -111,7 +115,7 @@ export async function initPhotoPicker(container, { onSelect }) {
     linkedPhotos.forEach((photo) => {
       const tile = document.createElement("button");
       tile.type = "button";
-      tile.className = "photo-picker-tile";
+      tile.className = "photo-picker-tile" + (photo.url === currentPhotoURL ? " current" : "");
       tile.title = "Linked photo currently in use";
       tile.innerHTML = `<img src="${photo.url}" alt="Linked photo"><span class="photo-picker-linked-badge" title="Linked, not uploaded">&#128279;</span>`;
       tile.onclick = async () => {

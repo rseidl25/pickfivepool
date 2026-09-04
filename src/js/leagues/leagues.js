@@ -4,6 +4,7 @@ import { authedFetch } from "../util/api.js";
 import { showToast } from "../util/toast.js";
 import { showConfirm } from "../util/confirm-dialog.js";
 import { initPhotoPicker } from "../util/photo-picker.js";
+import { attemptAuthStallRecovery, clearAuthStallRecoveryFlag } from "../util/auth-recovery.js";
 
 const auth = getAuth(app);
 // Absolute (not relative) so this resolves correctly regardless of how
@@ -45,6 +46,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const globalPhotoUrlInput = document.getElementById("global-photo-url");
   const globalPhotoPicker = document.getElementById("global-photo-picker");
 
+  const leaguePlayersModal = document.getElementById("league-players-modal");
+  const closeLeaguePlayers = document.getElementById("close-league-players");
+  const leaguePlayersTitle = document.getElementById("league-players-title");
+  const leaguePlayersList = document.getElementById("league-players-list");
+
   const manageLeagueModal = document.getElementById("manage-league-modal");
   const closeManageLeague = document.getElementById("close-manage-league");
   const manageLeagueTitle = document.getElementById("manage-league-title");
@@ -80,10 +86,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let authResolved = false;
   const authTimeoutId = setTimeout(() => {
     if (authResolved) return;
+    // See auth-recovery.js — a stuck IndexedDB read (known Safari bug) is
+    // the usual cause of this timer ever firing. First time in this browser
+    // session, try to clear it and reload automatically; only fall back to
+    // the manual message if that already happened and we're stuck again.
+    if (attemptAuthStallRecovery()) return;
     userName.textContent = "—";
-    leaguesList.innerHTML = "<li class='no-leagues'>This is taking longer than usual. Hang tight, it may still finish loading, or refresh if nothing shows up soon.</li>";
+    leaguesList.innerHTML = "<li class='no-leagues'>Your browser's storage got stuck — a known Safari/iOS bug that a refresh can't fix. Please fully close this tab or app and reopen it.</li>";
     hideLoadingOverlay();
-  }, 8000);
+  }, 5000);
 
   // This page never itself signs anyone in (no login/signup form here), so a
   // persistent listener — unlike signup.html's — is correct: if the session
@@ -91,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, async (user) => {
     authResolved = true;
     clearTimeout(authTimeoutId);
+    clearAuthStallRecoveryFlag();
     if (!user) {
       window.location.href = "login.html";
       return;
@@ -196,6 +208,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       li.appendChild(enterBtn);
 
+      // league-players-modal only exists on the current leagues.html — see
+      // guard note by closeLeaguePlayers below.
+      if (leaguePlayersModal) {
+        const playersBtn = document.createElement("button");
+        playersBtn.type = "button";
+        playersBtn.className = "league-gear-btn";
+        playersBtn.textContent = "👥";
+        playersBtn.setAttribute("aria-label", `View players in ${league.name}`);
+        playersBtn.onclick = (e) => {
+          e.stopPropagation();
+          openLeaguePlayers(league.id, league.name);
+        };
+        li.appendChild(playersBtn);
+      }
+
       if (league.role === "owner") {
         const gearBtn = document.createElement("button");
         gearBtn.type = "button";
@@ -274,12 +301,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // Global edit profile
   // =========================
-  editProfileBtn.onclick = () => {
+  editProfileBtn.onclick = async () => {
     const user = auth.currentUser;
     globalDisplayNameInput.value = user?.displayName || "";
     globalPhotoUrlInput.value = "";
     editProfileModal.classList.remove("hidden");
-    initPhotoPicker(globalPhotoPicker, { onSelect: (url) => { globalPhotoUrlInput.value = url; } });
+    // Auth's own photoURL can be stale/blank for an uploaded (relative-path)
+    // photo — see the PATCH /api/profile note about skipping that mirror —
+    // so read the real current photo from Firestore to know which gallery
+    // tile to highlight.
+    let currentPhotoURL = null;
+    try {
+      const profile = await authedFetch("/api/profile/me");
+      currentPhotoURL = profile.photoURL || null;
+    } catch (err) {
+      console.error("Error loading current profile photo:", err);
+    }
+    initPhotoPicker(globalPhotoPicker, { onSelect: (url) => { globalPhotoUrlInput.value = url; }, currentPhotoURL });
   };
   closeEditProfile.onclick = () => editProfileModal.classList.add("hidden");
 
@@ -374,6 +412,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   closeManageLeague.onclick = () => manageLeagueModal.classList.add("hidden");
 
+  // =========================
+  // League players (submission status) — open to every member
+  // =========================
+  async function openLeaguePlayers(leagueId, leagueName) {
+    leaguePlayersTitle.textContent = leagueName;
+    leaguePlayersList.innerHTML = "<li>Loading...</li>";
+    leaguePlayersModal.classList.remove("hidden");
+
+    try {
+      const league = await authedFetch(`/api/leagues/${leagueId}`);
+      leaguePlayersList.innerHTML = "";
+      const sortedMembers = [...league.members].sort((a, b) =>
+        (a.displayName || "Unknown").localeCompare(b.displayName || "Unknown")
+      );
+      sortedMembers.forEach((member) => {
+        const li = document.createElement("li");
+        li.className = "member-row";
+
+        const img = document.createElement("img");
+        img.src = member.photoURL || DEFAULT_AVATAR;
+        img.alt = member.displayName || "Member";
+        img.className = "member-avatar";
+        li.appendChild(img);
+
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = `${member.displayName || "Unknown"}${member.role === "owner" ? " (owner)" : ""}`;
+        li.appendChild(nameSpan);
+
+        const badge = document.createElement("span");
+        badge.className = `submission-badge ${member.submitted ? "submitted" : "not-submitted"}`;
+        badge.textContent = member.submitted ? "Submitted" : "Not Submitted";
+        li.appendChild(badge);
+
+        leaguePlayersList.appendChild(li);
+      });
+    } catch (err) {
+      leaguePlayersList.innerHTML = `<li>Error loading players: ${err.message}</li>`;
+    }
+  }
+
+  // league-players-modal only exists on the current leagues.html — /v1/leagues.html
+  // (which also loads this module) predates this feature, so guard rather than assume.
+  if (closeLeaguePlayers) {
+    closeLeaguePlayers.onclick = () => leaguePlayersModal.classList.add("hidden");
+  }
+
   manageLeaguePhotoInput.addEventListener("input", () => {
     manageLeaguePhotoPreview.src = manageLeaguePhotoInput.value.trim() || DEFAULT_AVATAR;
   });
@@ -460,5 +544,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === howToPlayModal) howToPlayModal.classList.add("hidden");
     if (e.target === editProfileModal) editProfileModal.classList.add("hidden");
     if (e.target === manageLeagueModal) manageLeagueModal.classList.add("hidden");
+    if (e.target === leaguePlayersModal) leaguePlayersModal.classList.add("hidden");
   });
 });

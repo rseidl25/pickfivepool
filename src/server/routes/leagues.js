@@ -132,6 +132,7 @@ router.get("/:id", requireAuth, requireLeagueMember, (req, res) => {
       photoURL: m.photoURL,
       joinedAt: m.joinedAt,
       role: uid === league.ownerUid ? "owner" : "member",
+      submitted: !!league.submissions.get(uid)?.submitted,
     })),
   });
 });
