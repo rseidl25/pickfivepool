@@ -1,39 +1,16 @@
 import { Router } from "express";
-import multer from "multer";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { fileURLToPath } from "url";
 import { requireAuth } from "../middleware/auth.js";
 import { auth, db } from "../firebaseAdmin.js";
 import * as store from "../store.js";
+import { makeImageUpload, UPLOADS_ROOT } from "../uploads.js";
 
 const router = Router();
 
-// Uploaded profile photos live on local disk (not Firestore/Storage — this
-// app is self-hosted on a single Pi, no object storage in the stack) under
-// public/uploads/{uid}/, which express.static already serves for free at
-// /uploads/{uid}/{filename} with zero extra routing.
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_ROOT = path.join(__dirname, "..", "..", "..", "public", "uploads");
 const MAX_PHOTOS = 3;
-const MIME_EXT = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif" };
-
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      const dir = path.join(UPLOADS_ROOT, req.uid);
-      fs.mkdirSync(dir, { recursive: true });
-      cb(null, dir);
-    },
-    filename: (req, file, cb) => cb(null, `${crypto.randomUUID()}${MIME_EXT[file.mimetype]}`),
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter: (req, file, cb) => {
-    if (!MIME_EXT[file.mimetype]) return cb(new Error("Only JPEG, PNG, WEBP, or GIF images are allowed"));
-    cb(null, true);
-  },
-});
+const upload = makeImageUpload((req) => path.join(UPLOADS_ROOT, req.uid));
 
 // GET /api/profile/me
 router.get("/me", requireAuth, async (req, res) => {

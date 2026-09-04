@@ -1,10 +1,15 @@
 import { Router } from "express";
+import fs from "fs";
+import path from "path";
 import { requireAuth } from "../middleware/auth.js";
 import { requireOpenSeason } from "../middleware/seasonLock.js";
 import { db } from "../firebaseAdmin.js";
 import * as store from "../store.js";
+import { makeImageUpload, UPLOADS_ROOT } from "../uploads.js";
 
 const router = Router();
+
+const leaguePhotoUpload = makeImageUpload((req) => path.join(UPLOADS_ROOT, "leagues", req.params.id));
 
 function requireLeagueMember(req, res, next) {
   const league = store.getLeague(req.params.id);
@@ -149,6 +154,34 @@ router.patch("/:id", requireAuth, requireLeagueOwner, async (req, res) => {
   store.setLeagueInMemory(req.params.id, updates);
 
   res.json({ ok: true });
+});
+
+// POST /api/leagues/:id/photo — owner-only image upload, multipart, field
+// name "photo". One photo at a time, not a gallery like profile photos —
+// uploading a new one replaces (and deletes on disk) whatever was
+// previously uploaded, rather than accumulating.
+router.post("/:id/photo", requireAuth, requireLeagueOwner, (req, res, next) => {
+  leaguePhotoUpload.single("photo")(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No photo uploaded" });
+  }
+
+  const leagueId = req.params.id;
+  const leagueDir = path.join(UPLOADS_ROOT, "leagues", leagueId);
+  const oldPhotoURL = req.league.photoURL;
+  if (oldPhotoURL && oldPhotoURL.startsWith(`/uploads/leagues/${leagueId}/`)) {
+    fs.unlink(path.join(leagueDir, oldPhotoURL.split("/").pop()), () => {}); // best-effort
+  }
+
+  const photoURL = `/uploads/leagues/${leagueId}/${req.file.filename}`;
+  await db.collection("leagues").doc(leagueId).set({ photoURL }, { merge: true });
+  store.setLeagueInMemory(leagueId, { photoURL });
+
+  res.json({ photoURL });
 });
 
 // PATCH /api/leagues/:id/members/me — self-service per-league display name/photo

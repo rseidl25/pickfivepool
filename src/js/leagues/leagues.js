@@ -51,6 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const manageLeagueNameInput = document.getElementById("manage-league-name");
   const manageLeaguePhotoInput = document.getElementById("manage-league-photo");
   const manageLeaguePhotoPreview = document.getElementById("manage-league-photo-preview");
+  const manageLeaguePhotoFile = document.getElementById("manage-league-photo-file");
+  const manageLeaguePhotoUploadBtn = document.getElementById("manage-league-photo-upload-btn");
   const saveLeagueNameBtn = document.getElementById("save-league-name-btn");
   const manageLeagueInviteCode = document.getElementById("manage-league-invite-code");
   const manageLeagueMembers = document.getElementById("manage-league-members");
@@ -378,6 +380,34 @@ document.addEventListener("DOMContentLoaded", () => {
   manageLeaguePhotoPreview.onerror = () => {
     manageLeaguePhotoPreview.src = DEFAULT_AVATAR;
   };
+
+  // manage-league-photo-file/-upload-btn only exist on the current leagues.html
+  // — this module is also loaded by /v1/leagues.html, whose legacy manage-league
+  // modal never got the upload button, so guard rather than assume they exist.
+  const MAX_LEAGUE_PHOTO_BYTES = 5 * 1024 * 1024;
+  if (manageLeaguePhotoUploadBtn && manageLeaguePhotoFile) {
+    manageLeaguePhotoUploadBtn.onclick = () => manageLeaguePhotoFile.click();
+    manageLeaguePhotoFile.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      e.target.value = "";
+      if (!file) return;
+      if (file.size > MAX_LEAGUE_PHOTO_BYTES) {
+        showToast("That photo is too large — 5MB max.", "error");
+        return;
+      }
+      try {
+        const formData = new FormData();
+        formData.append("photo", file);
+        const data = await authedFetch(`/api/leagues/${currentManagedLeagueId}/photo`, { method: "POST", body: formData });
+        manageLeaguePhotoInput.value = data.photoURL;
+        manageLeaguePhotoPreview.src = data.photoURL;
+        await loadLeagues();
+        showToast("League photo uploaded!", "success");
+      } catch (err) {
+        showToast("Error uploading league photo: " + err.message, "error");
+      }
+    });
+  }
 
   saveLeagueNameBtn.onclick = async () => {
     try {

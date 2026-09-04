@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" href="icons/favicon.png">
 
   <link rel="stylesheet" href="../src/css/m3-tokens.css?v=3">
-  <link rel="stylesheet" href="../src/css/leagues/leagues.css?v=1">
+  <link rel="stylesheet" href="../src/css/leagues/leagues.css?v=2">
 </head>
 <body>
   <div id="page-loading-overlay" class="page-loading-overlay">
@@ -161,7 +161,11 @@
             <img id="manage-league-photo-preview" src="icons/default_avatar.png" alt="League photo" class="manage-league-photo-preview">
             <div class="manage-league-photo-field">
               <label for="manage-league-photo">League Photo URL:</label>
-              <input class="m3-field" type="url" id="manage-league-photo" placeholder="Paste image URL here">
+              <!-- type="text", not "url" — an uploaded photo's path (/uploads/...)
+                   is relative, and type="url" only accepts an absolute URL. -->
+              <input class="m3-field" type="text" id="manage-league-photo" placeholder="Paste image URL here">
+              <input type="file" id="manage-league-photo-file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+              <button type="button" id="manage-league-photo-upload-btn" class="m3-btn m3-btn-outlined manage-league-photo-upload-btn">Upload Photo</button>
             </div>
           </div>
 
@@ -186,7 +190,7 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/leagues/leagues.js?v=4"></script>
+  <script type="module" src="../src/js/leagues/leagues.js?v=5"></script>
 
   <!-- leagues.js toggles #new-league-panel's "hidden" class (it predates
        this panel being a real full-screen modal overlay), but doesn't wire
