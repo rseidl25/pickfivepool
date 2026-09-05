@@ -37,6 +37,13 @@ html, body { height: 100%; }
 .user-info { display: flex; align-items: center; gap: 6px; }
 .welcome-text { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); margin-right: 6px; }
 
+/* Reddit-style identity chip (avatar + name), matching leagues.html — the
+   avatar reuses the .nav-avatar class so the same per-league photo-refresh
+   logic that already updates every nav-avatar element (see the scores
+   loader) keeps this one in sync too, with no extra JS needed. */
+.header-identity { display: flex; align-items: center; gap: 8px; }
+.header-identity .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
 /* ---- Body row: nav rail + main column ---- */
 .body-row {
   flex: 1;
@@ -50,6 +57,12 @@ html, body { height: 100%; }
      bottom with margin-top: auto, matching the tab rail's full height. */
   align-self: stretch;
 }
+
+/* Custom Leaderboard/Picks icons (replacing 🏆/🏈) — sized to match the
+   emoji they replace, and using currentColor so they follow the same
+   active/inactive tint the text label already gets, unlike a flat emoji. */
+.m3-nav-rail-item .indicator svg { width: 27px; height: 27px; display: block; }
+.m3-nav-bar-item .indicator svg { width: 21px; height: 21px; display: block; }
 
 .main-col {
   flex: 1;
@@ -521,6 +534,7 @@ html, body { height: 100%; }
 .wide-dialog { max-width: 620px; }
 .modal-header { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0; }
 .modal-header h2 { margin: 0; font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); }
+.modal-header-subtitle { margin: 2px 0 0; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); }
 .modal-body { padding: 16px 24px 32px; overflow-y: auto; }
 .modal-subtext { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); margin: 0 0 16px; }
 .how-to-play-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); }
@@ -558,10 +572,59 @@ html, body { height: 100%; }
 .stats-table td { color: var(--md-sys-color-on-surface); }
 .inline-field { display: flex; gap: 8px; margin-bottom: 12px; }
 .inline-field select { flex: 1; height: 40px; }
-.hof-awards { display: grid; grid-template-columns: 1fr; gap: 10px; }
-.hof-award-card { background: var(--md-sys-color-surface-container-highest); border-radius: var(--md-sys-shape-corner-md); padding: 10px 14px; }
-.hof-award-label { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin-bottom: 2px; }
-.hof-award-value { font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface); }
+/* Hall of Fame "trophy case" — one consistent look drawn from the theme's
+   own palette (primary/secondary-container, same tonal pairing the rest of
+   the app already uses for selected pills and tonal buttons) rather than a
+   different hardcoded hue per card, so it stays on-brand across Original/
+   Light/Dark instead of looking like an unrelated rainbow of colors. */
+.hof-awards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.hof-card {
+  position: relative;
+  background: var(--md-sys-color-surface-container-highest);
+  border-radius: var(--md-sys-shape-corner-lg);
+  padding: 16px;
+}
+.hof-card.hof-champion {
+  grid-column: 1 / -1;
+  background: var(--md-sys-color-secondary-container);
+}
+.hof-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.hof-icon-badge {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.hof-champion .hof-icon-badge {
+  width: 48px; height: 48px;
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-primary);
+}
+.hof-icon-badge svg { width: 21px; height: 21px; }
+.hof-champion .hof-icon-badge svg { width: 27px; height: 27px; }
+/* on-surface, not on-surface-variant — against this card's surface-container-
+   highest background, on-surface-variant measures under 4.5:1 in Light theme
+   (borderline-failing AA), so the title uses the full-contrast text color
+   instead of the muted one it'd normally get as a "supporting" label. */
+.hof-card-title { font: var(--md-type-label-lg); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--md-sys-color-on-surface); }
+.hof-champion .hof-card-title { font-size: 15px; color: var(--md-sys-color-on-secondary-container); }
+.hof-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 0; }
+.hof-line + .hof-line { border-top: 1px solid var(--md-sys-color-outline-variant); }
+.hof-name-wrap { display: flex; flex-direction: column; min-width: 0; }
+.hof-name { font: var(--md-type-title-sm); font-weight: 700; color: var(--md-sys-color-on-surface); }
+.hof-champion .hof-name { font-size: 19px; color: var(--md-sys-color-on-secondary-container); }
+/* Same under-4.5:1-in-Light-theme problem as the title above — blended 70/30
+   toward on-surface so it stays visibly quieter than .hof-name while still
+   clearing AA contrast against the card background in every theme. */
+.hof-sub { font: var(--md-type-body-sm); color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 70%, var(--md-sys-color-on-surface) 30%); margin-top: 1px; }
+.hof-chip {
+  flex-shrink: 0; font: var(--md-type-label-md); font-weight: 800; text-transform: uppercase;
+  padding: 5px 11px; border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  white-space: nowrap;
+}
+.hof-empty { font: var(--md-type-body-md); color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 70%, var(--md-sys-color-on-surface) 30%); font-style: italic; margin: 0; }
 
 /* Original theme: match the "View" button to the blue used by other
    primary actions (New League FAB, Save/Transfer) instead of gold-tonal. */
@@ -590,14 +653,14 @@ html, body { height: 100%; }
        viewport-fit=cover on the viewport meta tag or this is always 0. */
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  .app-shell { padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px)); }
+  .app-shell { padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px)); }
 
-  /* Smaller bottom tab bar — less vertical space given up to it, so the
-     scrollable content above gets more room. */
-  .nav-bar .m3-nav-bar-item { padding: 4px 0 6px; font-size: 10px; }
-  .nav-bar .m3-nav-bar-item .indicator { width: 44px; height: 22px; font-size: 15px; }
-  .nav-bar .m3-nav-bar-item .avatar-indicator { width: 32px; height: 32px; }
-  .nav-bar .m3-nav-bar-item .nav-avatar { width: 28px; height: 28px; }
+  /* A little more room than the tightest possible bar, so the bigger icons
+     (see the indicator svg size above) have breathing space instead of
+     feeling cramped against the tab's edges. */
+  .nav-bar .m3-nav-bar-item { padding: 7px 0 9px; font-size: 10px; }
+  .nav-bar .m3-nav-bar-item .indicator { width: 56px; height: 34px; font-size: 15px; }
+  .nav-bar .m3-nav-bar-item .indicator svg { width: 25px; height: 25px; }
 
   /* Header row: logo | league select | hamburger, as three independent
      grid columns (not two flex groups) so the select can sit truly

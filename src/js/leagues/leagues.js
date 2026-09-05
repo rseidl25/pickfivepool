@@ -11,6 +11,38 @@ const auth = getAuth(app);
 // deeply nested the page loading this script is (e.g. /leagues.html vs
 // /v1/leagues.html both need this to mean the same public/icons/ file).
 const DEFAULT_AVATAR = "/icons/default_avatar.png";
+// League photos (row thumbnail, Manage League preview) fall back to a
+// trophy silhouette instead of the person icon, since these aren't a
+// member's photo.
+const DEFAULT_LEAGUE_ICON = "/icons/default_league.png";
+
+// Custom icons replacing emoji — standard settings-gear and people/group
+// glyphs, matching the industry-standard icon shapes for these two actions
+// (Material Symbols / iOS-style), built as inline SVG rather than a font
+// glyph so they render identically across every OS/browser.
+const ICON_GEAR = `<svg viewBox="0 0 24 24" aria-hidden="true">
+  <circle cx="12" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="3"></circle>
+  <rect x="10.7" y="1.6" width="2.6" height="3.4" rx="0.8" fill="currentColor"></rect>
+  <rect x="10.7" y="1.6" width="2.6" height="3.4" rx="0.8" fill="currentColor" transform="rotate(45 12 12)"></rect>
+  <rect x="10.7" y="1.6" width="2.6" height="3.4" rx="0.8" fill="currentColor" transform="rotate(90 12 12)"></rect>
+  <rect x="10.7" y="1.6" width="2.6" height="3.4" rx="0.8" fill="currentColor" transform="rotate(135 12 12)"></rect>
+  <rect x="10.7" y="1.6" width="2.6" height="3.4" rx="0.8" fill="currentColor" transform="rotate(180 12 12)"></rect>
+  <rect x="10.7" y="1.6" width="2.6" height="3.4" rx="0.8" fill="currentColor" transform="rotate(225 12 12)"></rect>
+  <rect x="10.7" y="1.6" width="2.6" height="3.4" rx="0.8" fill="currentColor" transform="rotate(270 12 12)"></rect>
+  <rect x="10.7" y="1.6" width="2.6" height="3.4" rx="0.8" fill="currentColor" transform="rotate(315 12 12)"></rect>
+</svg>`;
+const ICON_PEOPLE = `<svg viewBox="0 0 24 24" aria-hidden="true">
+  <circle cx="8" cy="7.5" r="2.8" fill="currentColor" opacity="0.55"></circle>
+  <rect x="3.2" y="13" width="9.6" height="7.6" rx="4.5" fill="currentColor" opacity="0.55"></rect>
+  <circle cx="15" cy="9" r="3.6" fill="currentColor"></circle>
+  <rect x="8.8" y="15.6" width="12.4" height="8.8" rx="6" fill="currentColor"></rect>
+</svg>`;
+// Same pencil glyph used on the Manage League photo's edit badge, reused
+// here for visual consistency across the app's edit affordances.
+const ICON_PENCIL = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 20h9"></path>
+  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+</svg>`;
 
 function ordinal(n) {
   const mod100 = n % 100;
@@ -25,6 +57,10 @@ function ordinal(n) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const userName = document.getElementById("user-name");
+  // user-avatar only exists on the current leagues.html — /v1/leagues.html
+  // (which also loads this module) predates this header identity chip.
+  const userAvatar = document.getElementById("user-avatar");
+  if (userAvatar) userAvatar.onerror = () => { userAvatar.src = DEFAULT_AVATAR; };
   const logoutBtn = document.getElementById("logout-btn");
   const editProfileBtn = document.getElementById("edit-profile-btn");
   const leaguesList = document.getElementById("leagues-list");
@@ -51,6 +87,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const leaguePlayersTitle = document.getElementById("league-players-title");
   const leaguePlayersList = document.getElementById("league-players-list");
 
+  // local-profile-modal only exists on the current leagues.html — /v1/leagues.html
+  // (which also loads this module) predates this feature, so guard rather than assume.
+  const localProfileModal = document.getElementById("local-profile-modal");
+  const closeLocalProfile = document.getElementById("close-local-profile");
+  const localProfileTitle = document.getElementById("local-profile-title");
+  const localProfileForm = document.getElementById("local-profile-form");
+  const localProfileNameInput = document.getElementById("local-profile-name");
+  const localProfilePhotoInput = document.getElementById("local-profile-photo");
+  const localProfilePhotoPicker = document.getElementById("local-profile-photo-picker");
+  let currentLocalProfileLeagueId = null;
+
   const manageLeagueModal = document.getElementById("manage-league-modal");
   const closeManageLeague = document.getElementById("close-manage-league");
   const manageLeagueTitle = document.getElementById("manage-league-title");
@@ -67,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const archiveLeagueBtn = document.getElementById("archive-league-btn");
 
   let currentManagedLeagueId = null;
+  let currentManagedLeagueName = null;
 
   // Safety net: if onAuthStateChanged itself never fires (seen in the wild
   // during a Firebase Auth outage/rate-limit), the page would otherwise
@@ -108,6 +156,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     userName.textContent = user.displayName || user.email || "User";
+    // Firestore, not user.photoURL — Auth's own copy is skipped for an
+    // uploaded (relative-path) photo, see PATCH /api/profile's note, so it
+    // can't be trusted as "the" current photo.
+    if (userAvatar) {
+      try {
+        const profile = await authedFetch("/api/profile/me");
+        userAvatar.src = profile.photoURL || DEFAULT_AVATAR;
+      } catch (err) {
+        console.error("Error loading profile photo:", err);
+      }
+    }
     await loadLeagues();
     hideLoadingOverlay();
   });
@@ -192,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       const img = document.createElement("img");
-      img.src = league.photoURL || DEFAULT_AVATAR;
+      img.src = league.photoURL || DEFAULT_LEAGUE_ICON;
       img.alt = league.name;
       img.className = "league-photo";
       enterBtn.appendChild(img);
@@ -214,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const playersBtn = document.createElement("button");
         playersBtn.type = "button";
         playersBtn.className = "league-gear-btn";
-        playersBtn.textContent = "👥";
+        playersBtn.innerHTML = ICON_PEOPLE;
         playersBtn.setAttribute("aria-label", `View players in ${league.name}`);
         playersBtn.onclick = (e) => {
           e.stopPropagation();
@@ -223,15 +282,31 @@ document.addEventListener("DOMContentLoaded", () => {
         li.appendChild(playersBtn);
       }
 
+      // local-profile-modal only exists on the current leagues.html — see
+      // guard note by closeLocalProfile below. Open to every member (not
+      // just the owner), unlike the gear/Manage League button below.
+      if (localProfileModal) {
+        const editProfileRowBtn = document.createElement("button");
+        editProfileRowBtn.type = "button";
+        editProfileRowBtn.className = "league-gear-btn";
+        editProfileRowBtn.innerHTML = ICON_PENCIL;
+        editProfileRowBtn.setAttribute("aria-label", `Edit your profile in ${league.name}`);
+        editProfileRowBtn.onclick = (e) => {
+          e.stopPropagation();
+          openLocalProfile(league.id, league.name);
+        };
+        li.appendChild(editProfileRowBtn);
+      }
+
       if (league.role === "owner") {
         const gearBtn = document.createElement("button");
         gearBtn.type = "button";
         gearBtn.className = "league-gear-btn";
-        gearBtn.textContent = "⚙";
+        gearBtn.innerHTML = ICON_GEAR;
         gearBtn.setAttribute("aria-label", `Manage ${league.name}`);
         gearBtn.onclick = (e) => {
           e.stopPropagation();
-          openManageLeague(league.id);
+          openManageLeague(league.id, league.name);
         };
         li.appendChild(gearBtn);
       }
@@ -338,12 +413,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // Manage league (owner gear)
   // =========================
-  async function openManageLeague(leagueId) {
+  async function openManageLeague(leagueId, leagueName) {
     currentManagedLeagueId = leagueId;
-    manageLeagueTitle.textContent = "Manage League";
+    currentManagedLeagueName = leagueName ?? currentManagedLeagueName;
+    manageLeagueTitle.textContent = currentManagedLeagueName || "League";
     manageLeagueNameInput.value = "";
     manageLeaguePhotoInput.value = "";
-    manageLeaguePhotoPreview.src = DEFAULT_AVATAR;
+    manageLeaguePhotoPreview.src = DEFAULT_LEAGUE_ICON;
     manageLeagueInviteCode.textContent = "Loading...";
     manageLeagueMembers.innerHTML = "<li>Loading...</li>";
     transferOwnerSelect.innerHTML = "";
@@ -351,10 +427,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const league = await authedFetch(`/api/leagues/${leagueId}`);
-      manageLeagueTitle.textContent = `Manage "${league.name}"`;
+      manageLeagueTitle.textContent = league.name;
       manageLeagueNameInput.value = league.name;
       manageLeaguePhotoInput.value = league.photoURL || "";
-      manageLeaguePhotoPreview.src = league.photoURL || DEFAULT_AVATAR;
+      manageLeaguePhotoPreview.src = league.photoURL || DEFAULT_LEAGUE_ICON;
       manageLeagueInviteCode.textContent = league.inviteCode;
 
       manageLeagueMembers.innerHTML = "";
@@ -458,11 +534,57 @@ document.addEventListener("DOMContentLoaded", () => {
     closeLeaguePlayers.onclick = () => leaguePlayersModal.classList.add("hidden");
   }
 
+  // =========================
+  // Edit Local Profile (per-league, from the leagues list)
+  // =========================
+  async function openLocalProfile(leagueId, leagueName) {
+    currentLocalProfileLeagueId = leagueId;
+    localProfileTitle.textContent = leagueName;
+    localProfileNameInput.value = "";
+    localProfilePhotoInput.value = "";
+    localProfileModal.classList.remove("hidden");
+
+    let currentPhotoURL = null;
+    try {
+      const league = await authedFetch(`/api/leagues/${leagueId}`);
+      const me = league.members.find((m) => m.uid === auth.currentUser?.uid);
+      localProfileNameInput.value = me?.displayName || "";
+      currentPhotoURL = me?.photoURL || null;
+    } catch (err) {
+      console.error("Error loading league member profile:", err);
+    }
+    initPhotoPicker(localProfilePhotoPicker, { onSelect: (url) => { localProfilePhotoInput.value = url; }, currentPhotoURL });
+  }
+
+  // local-profile-modal only exists on the current leagues.html — see guard
+  // note above by closeLeaguePlayers.
+  if (closeLocalProfile) {
+    closeLocalProfile.onclick = () => localProfileModal.classList.add("hidden");
+
+    localProfileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        const update = {};
+        if (localProfileNameInput.value) update.displayName = localProfileNameInput.value;
+        if (localProfilePhotoInput.value) update.photoURL = localProfilePhotoInput.value;
+        await authedFetch(`/api/leagues/${currentLocalProfileLeagueId}/members/me`, {
+          method: "PATCH",
+          body: JSON.stringify(update),
+        });
+        localProfileModal.classList.add("hidden");
+        showToast("Profile updated for this league!", "success");
+        await loadLeagues();
+      } catch (err) {
+        showToast("Error updating profile: " + err.message, "error");
+      }
+    });
+  }
+
   manageLeaguePhotoInput.addEventListener("input", () => {
-    manageLeaguePhotoPreview.src = manageLeaguePhotoInput.value.trim() || DEFAULT_AVATAR;
+    manageLeaguePhotoPreview.src = manageLeaguePhotoInput.value.trim() || DEFAULT_LEAGUE_ICON;
   });
   manageLeaguePhotoPreview.onerror = () => {
-    manageLeaguePhotoPreview.src = DEFAULT_AVATAR;
+    manageLeaguePhotoPreview.src = DEFAULT_LEAGUE_ICON;
   };
 
   // manage-league-photo-file/-upload-btn only exist on the current leagues.html
@@ -545,5 +667,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === editProfileModal) editProfileModal.classList.add("hidden");
     if (e.target === manageLeagueModal) manageLeagueModal.classList.add("hidden");
     if (e.target === leaguePlayersModal) leaguePlayersModal.classList.add("hidden");
+    if (e.target === localProfileModal) localProfileModal.classList.add("hidden");
   });
 });

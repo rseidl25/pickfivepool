@@ -4,14 +4,17 @@
   flex-direction: column;
 }
 
-/* ---- Top app bar ---- */
+/* ---- Top app bar ----
+   Logo on the left; on the right, a compact identity (avatar + name, no
+   "Hello," — a Reddit-style top-right account chip) sitting right next to
+   the menu trigger, instead of a separate greeting line elsewhere on the
+   page. */
 .top-app-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 24px;
-  flex-wrap: wrap;
+  padding: 10px 20px;
 }
 
 .brand {
@@ -20,19 +23,30 @@
   gap: 10px;
 }
 .brand-logo {
-  height: 56px;
+  height: 44px;
   width: auto;
 }
 
-.user-info {
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.header-identity {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+.header-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
 .welcome-text {
   font: var(--md-type-body-md);
   color: var(--md-sys-color-on-surface-variant);
-  margin-right: 4px;
 }
 
 /* ---- Main content ---- */
@@ -45,10 +59,11 @@
   box-sizing: border-box;
 }
 
+.leagues-titlebar { margin: 8px 0 24px; }
 .page-title {
   font: var(--md-type-headline-lg);
   color: var(--md-sys-color-on-surface);
-  margin: 8px 0 20px;
+  margin: 0;
 }
 
 .leagues-list {
@@ -62,38 +77,42 @@
   list-style: none;
 }
 
-/* League row is a flex pairing of the (JS-generated) enter-button list-item
-   and, for owners, a trailing gear icon button. */
+/* Each league is one unified card (M3 list-item / HIG grouped-row shape) —
+   the row itself carries the surface/elevation, and the enter-button plus
+   the trailing icon actions all sit transparently inside it, instead of the
+   enter-button being its own elevated card sitting next to separate boxy
+   action buttons. */
 .league-row {
   display: flex;
-  align-items: stretch;
-  gap: 8px;
+  align-items: center;
+  gap: 4px;
   min-width: 0;
+  padding: 10px 12px 10px 16px;
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-xl);
+  box-shadow: var(--md-sys-elevation-1);
+  transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 }
+.league-row:hover { box-shadow: var(--md-sys-elevation-2); }
 
 .league-enter-btn {
   flex: 1;
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   text-align: left;
-  padding: 16px 20px;
-  background: var(--md-sys-color-surface-container-low);
+  padding: 6px 0;
+  background: none;
   border: none;
-  border-radius: var(--md-sys-shape-corner-lg);
   font: var(--md-type-body-lg);
   color: var(--md-sys-color-on-surface);
   cursor: pointer;
-  box-sizing: border-box;
-  box-shadow: var(--md-sys-elevation-1);
-  transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 }
-.league-enter-btn:hover { box-shadow: var(--md-sys-elevation-2); }
 
 .league-photo {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -109,18 +128,26 @@
 .league-my-name,
 .league-my-position { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); }
 
+/* Trailing icon-button cluster (View Players / Manage) — plain M3 icon
+   buttons: no resting background, just a tinted circle on hover/focus, so
+   the row reads as one card with two small actions rather than a card
+   glued to separate boxes. */
 .league-gear-btn {
   flex-shrink: 0;
-  width: 56px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  border-radius: var(--md-sys-shape-corner-lg);
-  background: var(--md-sys-color-surface-container-highest);
+  border-radius: 50%;
+  background: none;
   color: var(--md-sys-color-on-surface-variant);
   cursor: pointer;
-  font-size: 22px;
   transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 }
-.league-gear-btn:hover { background: var(--md-sys-color-secondary-container); }
+.league-gear-btn:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent); }
+.league-gear-btn svg { width: 20px; height: 20px; display: block; }
 
 /* ---- FAB ---- */
 .fab {
@@ -296,20 +323,21 @@
    Mobile (<= 600px)
    ========================= */
 @media (max-width: 600px) {
-  .top-app-bar {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
-  }
-  .user-info { justify-content: center; flex-wrap: wrap; }
+  .top-app-bar { padding: 14px 16px; }
+  .brand-logo { height: 46px; }
+  .header-avatar { width: 36px; height: 36px; }
 
   .leagues-main { padding: 20px 12px 100px; }
-  .page-title { font: var(--md-type-headline-md); text-align: center; }
+  .leagues-titlebar { margin: 4px 0 20px; text-align: center; }
+  .page-title { font: var(--md-type-headline-md); }
 
-  .league-enter-btn { padding: 12px 14px; gap: 14px; }
-  .league-photo { width: 48px; height: 48px; }
-  .league-gear-btn { width: 48px; font-size: 18px; }
+  .header-right { gap: 8px; }
+
+  .league-row { padding: 12px 10px 12px 14px; }
+  .league-enter-btn { gap: 14px; }
+  .league-photo { width: 58px; height: 58px; }
+  .league-gear-btn { width: 38px; height: 38px; }
+  .league-gear-btn svg { width: 19px; height: 19px; }
 
   .fab { right: 16px; bottom: 16px; }
 }

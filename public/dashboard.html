@@ -12,8 +12,8 @@
 
   <link rel="icon" type="image/png" href="icons/favicon.png">
 
-  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=4">
-  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=9">
+  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=11">
+  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=18">
 </head>
 <body>
   <div id="page-loading-overlay" class="page-loading-overlay">
@@ -35,7 +35,10 @@
       </div>
 
       <div class="user-info">
-        <span class="welcome-text">Hello, <span id="user-name">...</span></span>
+        <div class="header-identity">
+          <img id="user-avatar" src="icons/default_avatar.png" alt="" class="nav-avatar header-avatar">
+          <span class="welcome-text"><span id="user-name">...</span></span>
+        </div>
         <div class="m3-menu-wrap">
           <button id="menu-trigger" type="button" class="m3-icon-btn" aria-label="Menu" aria-haspopup="true" aria-expanded="false" style="display:none;">
             <span class="hamburger-bars"><span></span><span></span><span></span></span>
@@ -59,13 +62,56 @@
       <!-- Navigation Rail (desktop) -->
       <nav class="m3-nav-rail nav-rail">
         <button class="m3-nav-rail-item" data-tab="my-week">
-          <span class="indicator avatar-indicator"><img class="nav-avatar" src="icons/default_avatar.png" alt=""></span><span>My Week</span>
+          <span class="indicator">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <g fill="currentColor">
+                <rect x="70" y="140" width="372" height="296" rx="38"/>
+                <rect x="148" y="66" width="40" height="116" rx="20"/>
+                <rect x="324" y="66" width="40" height="116" rx="20"/>
+              </g>
+            </svg>
+          </span><span>My Week</span>
         </button>
         <button class="m3-nav-rail-item active" data-tab="leaderboard">
-          <span class="indicator">🏆</span><span>Leaderboard</span>
+          <span class="indicator">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <g fill="currentColor">
+                <path d="M160 90h192v96c0 60-40 96-96 96s-96-36-96-96V90z"/>
+                <path d="M210 120c-80 0-126 32-126 70 0 40 38 68 92 74l6-40c-34-4-58-20-58-36 0-20 24-32 86-32v-36z"/>
+                <path d="M302 120c80 0 126 32 126 70 0 40-38 68-92 74l-6-40c34-4 58-20 58-36 0-20-24-32-86-32v-36z"/>
+                <path d="M230 280h52l6 70h-64z"/>
+                <path d="M188 350h136l12 38H176z"/>
+                <rect x="160" y="388" width="192" height="38" rx="9"/>
+              </g>
+            </svg>
+          </span><span>Leaderboard</span>
         </button>
         <button class="m3-nav-rail-item" data-tab="picks">
-          <span class="indicator">🏈</span><span>Picks</span>
+          <span class="indicator">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <g fill="currentColor" fill-rule="evenodd" transform="rotate(-32 256 256) translate(256 256) scale(1.22) translate(-256 -256)">
+                <path d="
+                  M 76 256
+                  Q 130 148 256 148
+                  Q 382 148 436 256
+                  Q 382 364 256 364
+                  Q 130 364 76 256
+                  Z
+
+                  M 132 250
+                  Q 256 234 380 250
+                  L 380 264
+                  Q 256 248 132 264
+                  Z
+
+                  M 186 240 L 194 240 L 194 272 L 186 272 Z
+                  M 222 236 L 230 236 L 230 276 L 222 276 Z
+                  M 282 236 L 290 236 L 290 276 L 282 276 Z
+                  M 318 240 L 326 240 L 326 272 L 318 272 Z
+                "/>
+              </g>
+            </svg>
+          </span><span>Picks</span>
         </button>
         <button id="week-rail-toggle" type="button" class="week-rail-toggle" aria-label="Collapse week selector" aria-expanded="true">
           <span id="week-rail-toggle-arrow">‹</span>
@@ -162,13 +208,56 @@
     <!-- Navigation Bar (mobile bottom) -->
     <nav class="m3-nav-bar nav-bar">
       <button class="m3-nav-bar-item" data-tab="my-week">
-        <span class="indicator avatar-indicator"><img class="nav-avatar" src="icons/default_avatar.png" alt=""></span><span>My Week</span>
+        <span class="indicator">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <g fill="currentColor">
+              <rect x="70" y="140" width="372" height="296" rx="38"/>
+              <rect x="148" y="66" width="40" height="116" rx="20"/>
+              <rect x="324" y="66" width="40" height="116" rx="20"/>
+            </g>
+          </svg>
+        </span><span>My Week</span>
       </button>
       <button class="m3-nav-bar-item active" data-tab="leaderboard">
-        <span class="indicator">🏆</span><span>Leaderboard</span>
+        <span class="indicator">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <g fill="currentColor">
+              <path d="M160 90h192v96c0 60-40 96-96 96s-96-36-96-96V90z"/>
+              <path d="M210 120c-80 0-126 32-126 70 0 40 38 68 92 74l6-40c-34-4-58-20-58-36 0-20 24-32 86-32v-36z"/>
+              <path d="M302 120c80 0 126 32 126 70 0 40-38 68-92 74l-6-40c34-4 58-20 58-36 0-20-24-32-86-32v-36z"/>
+              <path d="M230 280h52l6 70h-64z"/>
+              <path d="M188 350h136l12 38H176z"/>
+              <rect x="160" y="388" width="192" height="38" rx="9"/>
+            </g>
+          </svg>
+        </span><span>Leaderboard</span>
       </button>
       <button class="m3-nav-bar-item" data-tab="picks">
-        <span class="indicator">🏈</span><span>Picks</span>
+        <span class="indicator">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <g fill="currentColor" fill-rule="evenodd" transform="rotate(-32 256 256) translate(256 256) scale(1.22) translate(-256 -256)">
+              <path d="
+                M 76 256
+                Q 130 148 256 148
+                Q 382 148 436 256
+                Q 382 364 256 364
+                Q 130 364 76 256
+                Z
+
+                M 132 250
+                Q 256 234 380 250
+                L 380 264
+                Q 256 248 132 264
+                Z
+
+                M 186 240 L 194 240 L 194 272 L 186 272 Z
+                M 222 236 L 230 236 L 230 276 L 222 276 Z
+                M 282 236 L 290 236 L 290 276 L 282 276 Z
+                M 318 240 L 326 240 L 326 272 L 318 272 Z
+              "/>
+            </g>
+          </svg>
+        </span><span>Picks</span>
       </button>
     </nav>
 
@@ -202,7 +291,10 @@
   <div id="message-board-modal" class="modal hidden">
     <div class="modal-content m3-dialog">
       <div class="modal-header">
-        <h2>Message Board</h2>
+        <div>
+          <h2 id="message-board-title">League</h2>
+          <p class="modal-header-subtitle">Message Board</p>
+        </div>
         <span class="close-btn" id="close-message-board">&times;</span>
       </div>
       <div class="modal-body">
@@ -220,7 +312,10 @@
   <div id="league-stats-modal" class="modal hidden">
     <div class="modal-content m3-dialog wide-dialog">
       <div class="modal-header">
-        <h2 id="league-stats-title">League Stats</h2>
+        <div>
+          <h2 id="league-stats-title">League</h2>
+          <p class="modal-header-subtitle">League Stats</p>
+        </div>
         <span class="close-btn" id="close-league-stats">&times;</span>
       </div>
       <div class="modal-body">
@@ -251,7 +346,10 @@
   <div id="settings-modal" class="modal hidden">
     <div class="modal-content m3-dialog">
       <div class="modal-header">
-        <h2>Edit Profile</h2>
+        <div>
+          <h2 id="settings-title">League</h2>
+          <p class="modal-header-subtitle">Edit Profile</p>
+        </div>
         <span class="close-btn" id="close-settings">&times;</span>
       </div>
       <div class="modal-body">
@@ -289,6 +387,6 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/dashboard/dashboard.js?v=12"></script>
+  <script type="module" src="../src/js/dashboard/dashboard.js?v=16"></script>
 </body>
 </html>

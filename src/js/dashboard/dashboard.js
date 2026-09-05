@@ -13,6 +13,17 @@ import { attemptAuthStallRecovery, clearAuthStallRecoveryFlag } from "../util/au
 const auth = getAuth(app);
 const DEFAULT_AVATAR = "/icons/default_avatar.png";
 
+// Hall of Fame award icon — custom SVG (no emoji), shown only on the
+// Champion card; the other award cards are plain (title + stats only).
+const HOF_ICON_TROPHY = `<svg viewBox="0 0 512 512" aria-hidden="true"><g fill="currentColor">
+  <path d="M160 90h192v96c0 60-40 96-96 96s-96-36-96-96V90z"/>
+  <path d="M210 120c-80 0-126 32-126 70 0 40 38 68 92 74l6-40c-34-4-58-20-58-36 0-20 24-32 86-32v-36z"/>
+  <path d="M302 120c80 0 126 32 126 70 0 40-38 68-92 74l-6-40c34-4 58-20 58-36 0-20-24-32-86-32v-36z"/>
+  <path d="M230 280h52l6 70h-64z"/>
+  <path d="M188 350h136l12 38H176z"/>
+  <rect x="160" y="388" width="192" height="38" rx="9"/>
+</g></svg>`;
+
 function ordinal(n) {
   const mod100 = n % 100;
   if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
@@ -143,6 +154,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const matchupsList = document.getElementById("matchups-list");
 
   const userName = document.getElementById("user-name");
+  const userAvatar = document.getElementById("user-avatar");
+  // scoresData isn't loaded yet at this point, so this just guards against a
+  // broken/expired URL later — the initial src (default avatar) already
+  // covers the "nothing loaded yet" gap, and the scores loader below (the
+  // ".nav-avatar" forEach) is what actually sets each nav-avatar's real photo.
+  userAvatar.onerror = () => { userAvatar.src = DEFAULT_AVATAR; };
   const settingsBtn = document.getElementById("settings-btn");
   const logoutBtn = document.getElementById("logout-btn");
 
@@ -155,6 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const messageBoardBtn = document.getElementById("message-board-btn");
   const messageBoardModal = document.getElementById("message-board-modal");
+  const messageBoardTitle = document.getElementById("message-board-title");
   const closeMessageBoard = document.getElementById("close-message-board");
   const postForm = document.getElementById("post-form");
   const postBody = document.getElementById("post-body");
@@ -192,6 +210,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const leaderboardList = document.getElementById("leaderboard-list");
 
   const settingsModal = document.getElementById("settings-modal");
+  const settingsTitle = document.getElementById("settings-title");
   const closeSettings = document.getElementById("close-settings");
   const settingsForm = document.getElementById("settings-form");
   const displayNameInput = document.getElementById("display-name");
@@ -369,6 +388,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Message board
   // =========================
   messageBoardBtn.onclick = () => {
+    messageBoardTitle.textContent = myLeagues.find((l) => l.id === currentLeagueId)?.name || "League";
     openModal(messageBoardModal, loadPosts);
 
     // Clear immediately (don't wait on the network) — opening the board is
@@ -452,8 +472,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   leagueStatsBtn.onclick = () =>
     openModal(leagueStatsModal, async () => {
-      const leagueName = myLeagues.find((l) => l.id === currentLeagueId)?.name;
-      leagueStatsTitle.textContent = leagueName ? `League Stats - ${leagueName}` : "League Stats";
+      leagueStatsTitle.textContent = myLeagues.find((l) => l.id === currentLeagueId)?.name || "League";
       switchStatsTab("season");
       await loadSeasonStats();
     });
@@ -520,16 +539,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  function awardCard(label, text) {
-    return `<div class="hof-award-card"><div class="hof-award-label">${label}</div><div class="hof-award-value">${text}</div></div>`;
+  // Hall of Fame "trophy case" — a card per award category, styled from the
+  // app's own theme palette (see dashboard.css) instead of the old flat
+  // label/value list.
+  function hofCard({ icon, title, lines, champion }) {
+    const body = lines.length
+      ? lines.map((l) => `
+          <div class="hof-line">
+            <div class="hof-name-wrap">
+              <span class="hof-name">${l.name}</span>
+              ${l.sub ? `<span class="hof-sub">${l.sub}</span>` : ""}
+            </div>
+            <span class="hof-chip">${l.chip}</span>
+          </div>
+        `).join("")
+      : `<p class="hof-empty">Nobody yet this season.</p>`;
+    // Only Champion gets an icon badge — the rest read as a plain title now.
+    return `
+      <div class="hof-card${champion ? " hof-champion" : ""}">
+        <div class="hof-card-head">
+          ${champion ? `<span class="hof-icon-badge">${icon}</span>` : ""}
+          <span class="hof-card-title">${title}</span>
+        </div>
+        ${body}
+      </div>
+    `;
   }
 
-  // One self-contained "Player — stat" line per tied player, rather than
-  // stacking bare names with one shared stat line at the end — matters for
-  // awards like Highest Scoring Week, where two players can each own the
-  // top score but in different weeks.
-  function awardLines(award, formatLine) {
-    return award.players.map((p) => formatLine(p, award.best)).join("<br>");
+  // One self-contained line per tied player, rather than stacking bare names
+  // with one shared stat at the end — matters for awards like Highest
+  // Scoring Week, where two players can each own the top score but in
+  // different weeks.
+  function hofLines(award, formatLine) {
+    return award ? award.players.map((p) => formatLine(p, award.best)) : [];
   }
 
   hofLoadBtn.onclick = async () => {
@@ -537,13 +579,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const s = await fetchSeasonHistory(currentLeagueId, hofYearSelect.value);
       hofAwards.innerHTML = [
-        awardCard("🏆 Champion", s.champion ? awardLines(s.champion, (p, best) => `${p.name} — ${best} pts`) : "—"),
-        awardCard("🔥 Highest Scoring Week", s.highestScoringWeek ? awardLines(s.highestScoringWeek, (p, best) => `${p.name} — ${p.week.replace("week", "Week ")} (${best} pts)`) : "—"),
-        awardCard("📈 Longest Win Streak", s.longestWinStreak ? awardLines(s.longestWinStreak, (p, best) => `${p.name} — ${best} week${best === 1 ? "" : "s"}`) : "—"),
-        awardCard("🥇 Most Weeks Won", s.mostWeeksWon ? awardLines(s.mostWeeksWon, (p, best) => `${p.name} — ${best} week${best === 1 ? "" : "s"}`) : "—"),
-        awardCard("💰 Most Bonuses Won", s.mostBonusesWon ? awardLines(s.mostBonusesWon, (p, best) => `${p.name} — ${best} bonus${best === 1 ? "" : "es"}`) : "—"),
-        awardCard("🤝 Most Ties", s.mostTies ? awardLines(s.mostTies, (p, best) => `${p.name} — ${best} week${best === 1 ? "" : "s"}`) : "—"),
-        awardCard("🥄 Wooden Spoon", s.woodenSpoon ? awardLines(s.woodenSpoon, (p, best) => `${p.name} — ${best} pts`) : "—"),
+        hofCard({
+          icon: HOF_ICON_TROPHY, title: "Champion", champion: true,
+          lines: hofLines(s.champion, (p, best) => ({ name: p.name, chip: `${best.toLocaleString()} pts` })),
+        }),
+        hofCard({
+          title: "Highest Scoring Week",
+          lines: hofLines(s.highestScoringWeek, (p, best) => ({ name: p.name, sub: p.week.replace("week", "Week "), chip: `${best} pts` })),
+        }),
+        hofCard({
+          title: "Longest Win Streak",
+          lines: hofLines(s.longestWinStreak, (p, best) => ({ name: p.name, chip: `${best} week${best === 1 ? "" : "s"}` })),
+        }),
+        hofCard({
+          title: "Most Weeks Won",
+          lines: hofLines(s.mostWeeksWon, (p, best) => ({ name: p.name, chip: `${best} week${best === 1 ? "" : "s"}` })),
+        }),
+        hofCard({
+          title: "Most Bonuses Won",
+          lines: hofLines(s.mostBonusesWon, (p, best) => ({ name: p.name, chip: `${best} bonus${best === 1 ? "" : "es"}` })),
+        }),
+        hofCard({
+          title: "Most Ties",
+          lines: hofLines(s.mostTies, (p, best) => ({ name: p.name, chip: `${best} week${best === 1 ? "" : "s"}` })),
+        }),
       ].join("");
     } catch (err) {
       hofAwards.innerHTML = `<p>${err.message}</p>`;
@@ -555,6 +614,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   settingsBtn.onclick = () =>
     openModal(settingsModal, async () => {
+      settingsTitle.textContent = myLeagues.find((l) => l.id === currentLeagueId)?.name || "League";
       displayNameInput.value = "";
       profileUrlInput.value = "";
       let currentPhotoURL = null;

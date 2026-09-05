@@ -12,8 +12,8 @@
 
   <link rel="icon" type="image/png" href="icons/favicon.png">
 
-  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=4">
-  <link rel="stylesheet" href="../src/css/leagues/leagues.css?v=8">
+  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=11">
+  <link rel="stylesheet" href="../src/css/leagues/leagues.css?v=21">
 </head>
 <body>
   <div id="page-loading-overlay" class="page-loading-overlay">
@@ -26,15 +26,18 @@
       <div class="brand">
         <img src="icons/PICK5LOGO_transparent.png" alt="Pick 5 Logo" class="brand-logo">
       </div>
-      <div class="user-info">
-        <span class="welcome-text">Hello, <span id="user-name">...</span></span>
+      <div class="header-right">
+        <div class="header-identity">
+          <img id="user-avatar" src="icons/default_avatar.png" alt="" class="header-avatar">
+          <span id="user-name" class="welcome-text">...</span>
+        </div>
         <div class="m3-menu-wrap">
           <button id="menu-trigger" type="button" class="m3-icon-btn" aria-label="Menu" aria-haspopup="true" aria-expanded="false">
             <span class="hamburger-bars"><span></span><span></span><span></span></span>
           </button>
           <div id="header-menu" class="m3-menu hidden">
             <button id="how-to-play-btn" type="button" class="m3-menu-item">How to Play</button>
-            <button id="edit-profile-btn" type="button" class="m3-menu-item">Edit Profile</button>
+            <button id="edit-profile-btn" type="button" class="m3-menu-item">Edit Global Profile</button>
             <button id="theme-btn" type="button" class="m3-menu-item">Theme</button>
             <div class="m3-menu-divider"></div>
             <button id="logout-btn" type="button" class="m3-menu-item danger">Log Out</button>
@@ -44,7 +47,9 @@
     </header>
 
     <main class="leagues-main">
-      <h1 class="page-title">Your Leagues</h1>
+      <div class="leagues-titlebar">
+        <h1 class="page-title">Your Leagues</h1>
+      </div>
       <ul id="leagues-list" class="m3-list leagues-list"></ul>
     </main>
 
@@ -105,7 +110,7 @@
   <div id="edit-profile-modal" class="modal hidden">
     <div class="modal-content m3-dialog">
       <div class="modal-header">
-        <h2>Edit Profile</h2>
+        <h2>Edit Global Profile</h2>
         <span class="close-btn" id="close-edit-profile">&times;</span>
       </div>
       <div class="modal-body">
@@ -150,7 +155,10 @@
   <div id="manage-league-modal" class="modal hidden">
     <div class="modal-content m3-dialog">
       <div class="modal-header">
-        <h2 id="manage-league-title">Manage League</h2>
+        <div>
+          <h2 id="manage-league-title">League</h2>
+          <p class="modal-header-subtitle">Manage League</p>
+        </div>
         <span class="close-btn" id="close-manage-league">&times;</span>
       </div>
       <div class="modal-body">
@@ -226,7 +234,39 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/leagues/leagues.js?v=9"></script>
+  <!-- Edit Local Profile Modal — open to every member, lets you change how
+       you appear in one specific league (name/photo), without leaving
+       leagues.html to go edit it from inside that league's dashboard. -->
+  <div id="local-profile-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 id="local-profile-title">League</h2>
+          <p class="modal-header-subtitle">Edit Your Profile</p>
+        </div>
+        <span class="close-btn" id="close-local-profile">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtext">Change how you appear in this league ONLY.</p>
+        <form id="local-profile-form">
+          <label for="local-profile-name">Display Name:</label>
+          <input class="m3-field" type="text" id="local-profile-name" placeholder="Enter new name" maxlength="30">
+
+          <label for="local-profile-photo">Profile Picture URL:</label>
+          <!-- type="text", not "url" — an uploaded photo's path (/uploads/...)
+               is relative, and type="url" only accepts an absolute URL. -->
+          <input class="m3-field" type="text" id="local-profile-photo" placeholder="Paste image URL here">
+
+          <label>Your Photos:</label>
+          <div id="local-profile-photo-picker"></div>
+
+          <button type="submit" class="m3-btn m3-btn-filled">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../src/js/leagues/leagues.js?v=14"></script>
 
   <!-- leagues.js toggles #new-league-panel's "hidden" class (it predates
        this panel being a real full-screen modal overlay), but doesn't wire

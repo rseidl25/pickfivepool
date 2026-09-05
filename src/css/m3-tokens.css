@@ -398,19 +398,31 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
    blue. Original theme overrides this below with its own blue tone. */
 .m3-nav-rail {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
-  width: 88px; padding: 12px 0; background: var(--md-sys-color-surface-container-low); flex-shrink: 0;
+  width: 96px; padding: 12px 0; background: var(--md-sys-color-surface-container-low); flex-shrink: 0;
 }
 .m3-nav-rail-item {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
-  width: 100%; padding: 4px 0; cursor: pointer; background: none; border: none;
+  width: 100%; padding: 4px 6px; box-sizing: border-box; cursor: pointer; background: none; border: none;
   color: var(--md-sys-color-on-surface-variant); font: var(--md-type-label-md);
 }
 .m3-nav-rail-item .indicator {
-  width: 56px; height: 32px; border-radius: var(--md-sys-shape-corner-full);
+  width: 62px; height: 36px; border-radius: var(--md-sys-shape-corner-full);
   display: flex; align-items: center; justify-content: center; font-size: 20px;
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 }
 .m3-nav-rail-item.active .indicator { background: var(--md-sys-color-secondary-container); }
 .m3-nav-rail-item.active { color: var(--md-sys-color-on-surface); }
+/* currentColor, not a fixed on-surface tint — this pill sits on wildly
+   different backgrounds depending on theme (neutral gray in Light/Dark,
+   navy in Original), and the item's own text color is already tuned to
+   read against whichever one is active, so mixing from it keeps the
+   hover visible (and never washed-out or invisible) in every theme. */
+.m3-nav-rail-item:not(.active):hover .indicator {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+.m3-nav-rail-item.active:hover .indicator {
+  background: color-mix(in srgb, var(--md-sys-color-secondary-container) 88%, var(--md-sys-color-on-secondary-container) 12%);
+}
 
 /* ---- Navigation Bar (mobile bottom) ---- */
 .m3-nav-bar {
@@ -423,18 +435,20 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   color: var(--md-sys-color-on-surface-variant); font: var(--md-type-label-sm);
 }
 .m3-nav-bar-item .indicator {
-  width: 52px; height: 26px; border-radius: var(--md-sys-shape-corner-full);
+  width: 56px; height: 28px; border-radius: var(--md-sys-shape-corner-full);
   display: flex; align-items: center; justify-content: center; font-size: 18px;
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 }
 .m3-nav-bar-item.active .indicator { background: var(--md-sys-color-secondary-container); }
 .m3-nav-bar-item.active { color: var(--md-sys-color-on-surface); }
+.m3-nav-bar-item:not(.active):hover .indicator {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+.m3-nav-bar-item.active:hover .indicator {
+  background: color-mix(in srgb, var(--md-sys-color-secondary-container) 88%, var(--md-sys-color-on-secondary-container) 12%);
+}
 
-/* Bigger than the emoji indicators (56x32 rail / 52x26 bar) — the wrapper
-   itself grows too, so the avatar isn't cropped by the pill's shape. */
-.m3-nav-rail-item .avatar-indicator { width: 48px; height: 48px; }
 .nav-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
-.m3-nav-bar-item .avatar-indicator { width: 38px; height: 38px; }
-.m3-nav-bar-item .nav-avatar { width: 34px; height: 34px; }
 
 /* Original theme: nav rail/bar read as a solid blue panel, like v1's
    week-nav sidebar, instead of gray — its own distinct look (Light/Dark
@@ -450,6 +464,15 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 :root[data-theme="original"] .m3-nav-rail-item.active,
 :root[data-theme="original"] .m3-nav-bar-item.active {
   color: var(--md-sys-color-on-primary-container);
+}
+/* The active pill itself is secondary-container (cream/gold, set above),
+   not primary-container (navy) — its icon needs on-secondary-container
+   (dark navy) for contrast, not the on-primary-container (white) the rest
+   of the active item uses against the navy bar behind it. Without this,
+   the icon rendered pale-on-pale against its own pill. */
+:root[data-theme="original"] .m3-nav-rail-item.active .indicator,
+:root[data-theme="original"] .m3-nav-bar-item.active .indicator {
+  color: var(--md-sys-color-on-secondary-container);
 }
 
 /* ---- Top app bar ----
