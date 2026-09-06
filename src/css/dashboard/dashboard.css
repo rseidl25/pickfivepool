@@ -122,6 +122,11 @@ html, body { height: 100%; }
 :root[data-theme="original"] .week-rail {
   background: color-mix(in srgb, var(--md-sys-color-primary) 55%, var(--md-sys-color-primary-container));
 }
+/* Light theme: swapped with .m3-top-app-bar's tone (m3-tokens.css) — see
+   that rule's comment. */
+:root[data-theme="light"] .week-rail {
+  background: var(--md-sys-color-surface-container);
+}
 
 .week-chip-row {
   flex: 1;
@@ -290,6 +295,23 @@ html, body { height: 100%; }
 :root[data-theme="original"] .leaderboard-table td {
   background: var(--md-sys-color-surface-container-lowest);
 }
+
+/* Light/Dark: the default header/even-row pairing below both land on
+   surface-container-highest, so the header visually disappears into every
+   other body row instead of reading as a header. Give it its own tone and
+   soften the stripe itself (low/container, not lowest/highest — that jump
+   read as a flat white/near-black-vs-gray checkerboard). Original is
+   unaffected — it already has its own navy-header override above. */
+:root[data-theme="light"] .leaderboard-table th,
+:root[data-theme="dark"] .leaderboard-table th {
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+}
+:root[data-theme="light"] #leaderboard-list tr:nth-child(odd) td,
+:root[data-theme="dark"] #leaderboard-list tr:nth-child(odd) td { background: var(--md-sys-color-surface-container-low); }
+:root[data-theme="light"] #leaderboard-list tr:nth-child(even) td,
+:root[data-theme="dark"] #leaderboard-list tr:nth-child(even) td { background: var(--md-sys-color-surface-container); }
+
 .leaderboard-player-cell { display: flex; align-items: center; justify-content: flex-start; gap: 10px; text-align: left; }
 .leaderboard-mini-pic { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; flex-shrink: 0; cursor: zoom-in; }
 

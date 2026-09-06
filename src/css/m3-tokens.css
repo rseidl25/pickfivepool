@@ -483,6 +483,13 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   color: var(--md-sys-color-on-surface);
 }
 
+/* Light theme: swapped with .week-rail's tone (dashboard.css) at the
+   user's request — the header takes the slightly darker gray the
+   week-select panel used to have, and vice versa. Dark/Original unaffected. */
+:root[data-theme="light"] .m3-top-app-bar {
+  background: var(--md-sys-color-surface-container-high);
+}
+
 /* Original theme: header reads as v1's solid navy bar. */
 :root[data-theme="original"] .m3-top-app-bar {
   background: var(--md-sys-color-primary);
