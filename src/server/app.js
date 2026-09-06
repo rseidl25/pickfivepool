@@ -12,6 +12,7 @@ import lastUpdatedRouter from "./routes/lastUpdated.js";
 import configRouter from "./routes/config.js";
 import leaguesRouter from "./routes/leagues.js";
 import leaguePicksRouter from "./routes/leaguePicks.js";
+import adminRouter from "./routes/admin.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..", "..");
@@ -36,6 +37,7 @@ app.use("/api/config", configRouter);
 // through to leaguePicksRouter, which mergeParams the same :id.
 app.use("/api/leagues", leaguesRouter);
 app.use("/api/leagues/:id", leaguePicksRouter);
+app.use("/api/admin", adminRouter);
 
 // Final safety net — no route handler does its own try/catch, so this is
 // what stands between an unexpected error (a bad Firestore write, a null

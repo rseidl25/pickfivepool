@@ -6,8 +6,12 @@ import { db } from "./firebaseAdmin.js";
 // hydration/resync time. See docs/plan_3.0.md + docs/api_pattern_guide.md.
 
 let seasonConfig = null; // { year, lockAt: <ms epoch> }
-const leagues = new Map(); // leagueId -> league record (shape below)
-const inviteCodeIndex = new Map(); // inviteCode -> leagueId
+// let, not const — hydrateStore() below builds a full replacement pair of
+// maps on the side and only reassigns these once everything succeeds, so a
+// failed hydrate/resync can never leave live traffic looking at a half-wiped
+// store (see hydrateStore()'s comment for why this matters).
+let leagues = new Map(); // leagueId -> league record (shape below)
+let inviteCodeIndex = new Map(); // inviteCode -> leagueId
 
 const RECENT_POSTS_CAP = 50; // message board is a bounded "recent" cache, not full history
 
@@ -46,11 +50,13 @@ async function hydrateSeasonConfig() {
   seasonConfig = { year: data.year, lockAt: toMillis(data.lockAt) };
 }
 
-async function hydrateLeagueMeta(leagueDoc) {
+// Takes the in-progress replacement maps as parameters, rather than writing
+// straight into the live `leagues`/`inviteCodeIndex` — see hydrateStore().
+async function hydrateLeagueMeta(leagueDoc, targetLeagues, targetInviteCodeIndex, year) {
   const leagueId = leagueDoc.id;
   const record = newLeagueRecord(leagueId, leagueDoc.data());
-  leagues.set(leagueId, record);
-  if (record.inviteCode) inviteCodeIndex.set(record.inviteCode, leagueId);
+  targetLeagues.set(leagueId, record);
+  if (record.inviteCode) targetInviteCodeIndex.set(record.inviteCode, leagueId);
 
   const membersSnap = await db.collection("leagues").doc(leagueId).collection("members").get();
   membersSnap.forEach((doc) => {
@@ -64,7 +70,6 @@ async function hydrateLeagueMeta(leagueDoc) {
     });
   });
 
-  const year = String(seasonConfig.year);
   const submissionsSnap = await db
     .collection("leagues")
     .doc(leagueId)
@@ -111,8 +116,7 @@ async function hydrateLeagueMeta(leagueDoc) {
 // current season's path shape, is the only reliable way to enumerate them —
 // done once for the whole store rather than per-league to avoid redundant
 // full scans.
-async function hydrateAllLeaguePicks() {
-  const year = String(seasonConfig.year);
+async function hydrateAllLeaguePicks(targetLeagues, year) {
   const weeksSnap = await db.collectionGroup("weeks").get();
 
   for (const weekDoc of weeksSnap.docs) {
@@ -129,7 +133,7 @@ async function hydrateAllLeaguePicks() {
       continue;
     }
 
-    const league = leagues.get(segments[1]);
+    const league = targetLeagues.get(segments[1]);
     if (!league) continue;
     const uid = segments[5];
     const weekId = segments[7];
@@ -144,24 +148,29 @@ async function hydrateAllLeaguePicks() {
   }
 }
 
+// Builds a full replacement store into fresh, private maps and only swaps
+// them into the live `leagues`/`inviteCodeIndex` bindings once every read
+// above has succeeded. This used to clear the live maps up front and refill
+// them in place — meaning any failure partway through (e.g. a transient
+// Firestore error) left every real user looking at a completely empty
+// league list until the next hydrate happened to run to completion. Nothing
+// below can affect what's currently being served until the final two lines.
 export async function hydrateStore() {
   await hydrateSeasonConfig();
+  const year = String(seasonConfig.year);
 
-  leagues.clear();
-  inviteCodeIndex.clear();
+  const newLeagues = new Map();
+  const newInviteCodeIndex = new Map();
 
   const leaguesSnap = await db.collection("leagues").get();
   for (const leagueDoc of leaguesSnap.docs) {
-    await hydrateLeagueMeta(leagueDoc);
+    await hydrateLeagueMeta(leagueDoc, newLeagues, newInviteCodeIndex, year);
   }
 
-  await hydrateAllLeaguePicks();
-}
+  await hydrateAllLeaguePicks(newLeagues, year);
 
-export function startPeriodicResync(intervalMs = 15 * 60 * 1000) {
-  setInterval(() => {
-    hydrateStore().catch((err) => console.error("[store] Resync failed:", err.message));
-  }, intervalMs);
+  leagues = newLeagues;
+  inviteCodeIndex = newInviteCodeIndex;
 }
 
 // ---- Season config ----
