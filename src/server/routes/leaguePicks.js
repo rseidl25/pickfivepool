@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireAuth } from "../middleware/auth.js";
 import { requireOpenSeason } from "../middleware/seasonLock.js";
+import { createRateLimiter } from "../middleware/rateLimit.js";
 import { db } from "../firebaseAdmin.js";
 import * as store from "../store.js";
 import { getGames } from "../espn/poller.js";
@@ -10,6 +11,11 @@ import { simulateWinChance } from "../winProbability.js";
 const router = Router({ mergeParams: true }); // mergeParams lets it see :id from the parent mount
 
 const TOTAL_WEEKS = 18;
+
+// Shared across both Hall of Fame routes below (not one each) — they're the
+// two endpoints that read archived-season data straight from Firestore on
+// every call, so 3/hour caps the combined cost of hammering either one.
+const hallOfFameRateLimit = createRateLimiter({ max: 3, windowMs: 60 * 60 * 1000 });
 
 function requireLeagueMember(req, res, next) {
   const league = store.getLeague(req.params.id);
@@ -222,21 +228,22 @@ router.get("/my-week", requireAuth, requireLeagueMember, (req, res) => {
 // have actually finished; the active year's live standings live under the
 // "This Season" tab instead). Drives the Hall of Fame year picker so it only
 // ever offers years the league genuinely existed for.
-router.get("/seasons", requireAuth, requireLeagueMember, async (req, res) => {
+//
+// listDocuments() (not get()) on purpose: a year never gets its own .set() —
+// only its picks/submissions subcollections are written, so the year "doc"
+// only exists as Firestore's implicit parent of those. listDocuments() still
+// returns a reference for it (get() on it would report exists:false), and
+// scopes the read to just this league's own season count instead of the old
+// collectionGroup("weeks") scan, which read every week, for every user, in
+// every league, every time this endpoint was hit.
+router.get("/seasons", requireAuth, hallOfFameRateLimit, requireLeagueMember, async (req, res) => {
   const leagueId = req.params.id;
   const currentYear = String(store.getSeasonConfig().year);
 
-  const weeksSnap = await db.collectionGroup("weeks").get();
-  const prefix = `leagues/${leagueId}/seasons/`;
-  const years = new Set();
-  for (const doc of weeksSnap.docs) {
-    const path = doc.ref.path;
-    if (!path.startsWith(prefix)) continue;
-    const year = path.slice(prefix.length).split("/")[0];
-    if (year !== currentYear) years.add(year);
-  }
+  const yearRefs = await db.collection("leagues").doc(leagueId).collection("seasons").listDocuments();
+  const years = yearRefs.map((ref) => ref.id).filter((year) => year !== currentYear);
 
-  res.json([...years].sort((a, b) => b.localeCompare(a)));
+  res.json(years.sort((a, b) => b.localeCompare(a)));
 });
 
 // Longest consecutive run of weekly wins anywhere in the season (not just a
@@ -311,7 +318,7 @@ function computeSeasonAwardsPerUser(scores) {
 }
 
 // GET /api/leagues/:id/seasons/:year — Hall of Fame awards for a finished season
-router.get("/seasons/:year", requireAuth, requireLeagueMember, async (req, res) => {
+router.get("/seasons/:year", requireAuth, hallOfFameRateLimit, requireLeagueMember, async (req, res) => {
   const leagueId = req.params.id;
   const year = req.params.year;
   const league = req.league;
@@ -323,22 +330,35 @@ router.get("/seasons/:year", requireAuth, requireLeagueMember, async (req, res) 
   const games = seasonSnap.data().games || [];
 
   // picks/{uid} parent docs are never explicitly written (only their weeks
-  // subcollection is — same Firestore "implicit parent" gotcha as store.js),
-  // so .collection("picks").get() would silently find nothing. Scan
-  // collectionGroup("weeks") and filter to this league+year's path instead.
-  const weeksSnap = await db.collectionGroup("weeks").get();
-  const pathPrefix = `leagues/${leagueId}/seasons/${year}/picks/`;
+  // subcollection is — same Firestore "implicit parent" gotcha as store.js).
+  // listDocuments() still returns a reference for each uid that has picks
+  // here (Firestore includes implicit parents), scoped to just this
+  // league+year — the collectionGroup("weeks") scan this replaced read every
+  // week, for every user, in every league's every season, on every request,
+  // including ones that used to leave/get kicked from this league (their
+  // historical picks stay under their old uid regardless of current
+  // membership, which the per-uid read below preserves).
+  const userRefs = await db
+    .collection("leagues")
+    .doc(leagueId)
+    .collection("seasons")
+    .doc(year)
+    .collection("picks")
+    .listDocuments();
 
   const leaguePicksMap = new Map();
-  for (const weekDoc of weeksSnap.docs) {
-    const path = weekDoc.ref.path;
-    if (!path.startsWith(pathPrefix)) continue;
-    const [uid, , weekId] = path.slice(pathPrefix.length).split("/");
-
-    const d = weekDoc.data();
-    if (!leaguePicksMap.has(uid)) leaguePicksMap.set(uid, new Map());
-    leaguePicksMap.get(uid).set(weekId, { teamsPicked: d.teamsPicked || [], bonusPick: d.bonusPick ?? null });
-  }
+  await Promise.all(
+    userRefs.map(async (userRef) => {
+      const weeksSnap = await userRef.collection("weeks").get();
+      if (weeksSnap.empty) return;
+      const weeksMap = new Map();
+      for (const weekDoc of weeksSnap.docs) {
+        const d = weekDoc.data();
+        weeksMap.set(weekDoc.id, { teamsPicked: d.teamsPicked || [], bonusPick: d.bonusPick ?? null });
+      }
+      leaguePicksMap.set(userRef.id, weeksMap);
+    })
+  );
 
   if (leaguePicksMap.size === 0) {
     return res.status(404).json({ error: "No archived data for that season" });
