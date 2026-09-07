@@ -399,7 +399,11 @@ html, body { height: 100%; }
   background: none;
   box-shadow: none;
 }
-.my-week-avatar { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; margin-bottom: 18px; }
+.my-week-avatar {
+  width: 160px; height: 160px; border-radius: 50%; object-fit: cover; margin-bottom: 18px;
+  border: 4px solid var(--md-sys-color-primary);
+  box-shadow: var(--md-sys-elevation-1);
+}
 .my-week-name { font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); margin-bottom: 4px; }
 .my-week-total-points { font: var(--md-type-title-md); color: var(--md-sys-color-on-surface-variant); margin-bottom: 26px; }
 /* No box of its own on desktop — the two stat boxes just stack in normal
@@ -685,6 +689,11 @@ html, body { height: 100%; }
 /* ---- Navigation Bar (mobile, hidden on desktop) ---- */
 .nav-bar { display: none; }
 
+/* "Last Updated" hamburger-menu item — only meaningful on mobile, where the
+   footer below is hidden (see the 840px breakpoint); desktop keeps showing
+   the always-visible footer instead, so this stays out of that menu there. */
+.mobile-only-menu-item { display: none; }
+
 /* ---- Footer ---- */
 .dashboard-footer {
   display: flex; justify-content: center; gap: 6px; padding: 10px;
@@ -945,7 +954,12 @@ html, body { height: 100%; }
      number but this row's is fractional (line-height math), so without
      the 1px overlap the page background can peek through as a stray
      line at the seam. */
-  .dashboard-footer { order: 1; margin-bottom: 0; margin-top: -1px; }
+  /* Replaced on mobile by the "Last Updated" hamburger-menu item + modal —
+     there's no good spot for a footer bar once the nav-bar claims the
+     bottom of the screen, so the time now lives behind a tap instead of
+     sitting on screen at all times. */
+  .dashboard-footer { display: none; }
+  .mobile-only-menu-item { display: flex; }
 
   .body-row { order: 2; flex-direction: column; }
 

@@ -9,6 +9,7 @@
 import { authedFetch } from "./api.js";
 import { showToast } from "./toast.js";
 import { showConfirm } from "./confirm-dialog.js";
+import { cropImage } from "./photo-cropper.js";
 
 const MAX_PHOTOS = 3;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -151,9 +152,11 @@ export async function initPhotoPicker(container, { onSelect, currentPhotoURL }) 
           showToast("That photo is too large — 5MB max.", "error");
           return;
         }
+        const cropped = await cropImage(file);
+        if (!cropped) return;
         try {
           const formData = new FormData();
-          formData.append("photo", file);
+          formData.append("photo", cropped);
           const data = await authedFetch("/api/profile/photos", { method: "POST", body: formData });
           photos = data.uploadedPhotos || [];
           render();

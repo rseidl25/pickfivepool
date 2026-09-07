@@ -4,6 +4,7 @@ import { authedFetch } from "../util/api.js";
 import { showToast } from "../util/toast.js";
 import { showConfirm } from "../util/confirm-dialog.js";
 import { initPhotoPicker } from "../util/photo-picker.js";
+import { cropImage } from "../util/photo-cropper.js";
 import { attemptAuthStallRecovery, clearAuthStallRecoveryFlag } from "../util/auth-recovery.js";
 
 const auth = getAuth(app);
@@ -601,9 +602,11 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("That photo is too large — 5MB max.", "error");
         return;
       }
+      const cropped = await cropImage(file);
+      if (!cropped) return;
       try {
         const formData = new FormData();
-        formData.append("photo", file);
+        formData.append("photo", cropped);
         const data = await authedFetch(`/api/leagues/${currentManagedLeagueId}/photo`, { method: "POST", body: formData });
         manageLeaguePhotoInput.value = data.photoURL;
         manageLeaguePhotoPreview.src = data.photoURL;

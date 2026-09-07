@@ -31,6 +31,7 @@ body { background: var(--md-sys-color-surface); }
   margin: -12px -12px 12px;
 }
 .site-header-topbar { grid-column: 1; grid-row: 1; justify-self: start; }
+.brand { display: flex; align-items: center; text-decoration: none; }
 .brand-logo { height: 64px; width: auto; }
 
 /* The hamburger's Original-theme coloring already comes from the generic

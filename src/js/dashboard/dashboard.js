@@ -220,6 +220,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const howToPlayModal = document.getElementById("how-to-play-modal");
   const closeHowToPlay = document.getElementById("close-how-to-play");
 
+  const lastUpdatedBtn = document.getElementById("last-updated-btn");
+  const lastUpdatedModal = document.getElementById("last-updated-modal");
+  const closeLastUpdated = document.getElementById("close-last-updated");
+
   const messageBoardBtn = document.getElementById("message-board-btn");
   const messageBoardModal = document.getElementById("message-board-modal");
   const messageBoardTitle = document.getElementById("message-board-title");
@@ -285,7 +289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Modals — centered M3 dialogs (not anchored popovers); only one open
   // at a time, click-outside or the X closes it.
   // =========================
-  const allModals = [howToPlayModal, messageBoardModal, leagueStatsModal, settingsModal, themeModal];
+  const allModals = [howToPlayModal, lastUpdatedModal, messageBoardModal, leagueStatsModal, settingsModal, themeModal];
   function closeAllModals() {
     allModals.forEach((m) => m.classList.add("hidden"));
   }
@@ -454,6 +458,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   howToPlayBtn.onclick = () => openModal(howToPlayModal);
   closeHowToPlay.onclick = () => closeAllModals();
+
+  lastUpdatedBtn.onclick = () => openModal(lastUpdatedModal);
+  closeLastUpdated.onclick = () => closeAllModals();
 
   // =========================
   // Message board
