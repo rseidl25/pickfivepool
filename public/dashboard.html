@@ -14,7 +14,7 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
 
   <link rel="stylesheet" href="../src/css/m3-tokens.css?v=13">
-  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=21">
+  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=27">
 </head>
 <body>
   <div id="page-loading-overlay" class="page-loading-overlay">
@@ -290,7 +290,7 @@
 
   <!-- Message Board -->
   <div id="message-board-modal" class="modal hidden">
-    <div class="modal-content m3-dialog">
+    <div class="modal-content m3-dialog message-board-content">
       <div class="modal-header">
         <div>
           <h2 id="message-board-title">League</h2>
@@ -299,12 +299,16 @@
         <span class="close-btn" id="close-message-board">&times;</span>
       </div>
       <div class="modal-body">
-        <form id="post-form">
-          <textarea id="post-body" class="m3-field post-body" placeholder="Say something to the league..." maxlength="250" required></textarea>
-          <span id="post-body-counter" class="post-body-counter">0/250</span>
-          <button type="submit" class="m3-btn m3-btn-filled">Post</button>
-        </form>
         <ul id="posts-list" class="posts-list"></ul>
+        <form id="post-form" class="post-form">
+          <div class="post-input-bar">
+            <textarea id="post-body" class="post-body-input" placeholder="Message the league..." maxlength="250" required rows="1"></textarea>
+            <button type="submit" id="post-send-btn" class="post-send-btn" aria-label="Send message" disabled>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2Z"/></svg>
+            </button>
+          </div>
+          <span id="post-body-counter" class="post-body-counter">0/250</span>
+        </form>
       </div>
     </div>
   </div>
@@ -388,6 +392,6 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/dashboard/dashboard.js?v=16"></script>
+  <script type="module" src="../src/js/dashboard/dashboard.js?v=23"></script>
 </body>
 </html>

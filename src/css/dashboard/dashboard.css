@@ -571,20 +571,83 @@ html, body { height: 100%; }
 .modal-content label { font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface-variant); }
 .modal-content .m3-btn[type="submit"] { align-self: flex-end; margin-top: 8px; }
 
-.post-body { height: auto; min-height: 90px; padding: 14px 16px; resize: vertical; }
-/* .m3-field:focus resets padding to 0 top/bottom (fine for the single-line
-   inputs it's designed for, which center text via a fixed height instead)
-   — override it here so the textarea's own vertical padding survives focus
-   instead of the text jumping to hug the top edge while typing. */
-.post-body:focus { padding: 13px 15px; }
-.post-body-counter { align-self: flex-end; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin-top: -6px; }
+/* ---- Message Board (chat-style: history above, input pinned to the
+   bottom, newest message at the bottom — same shape as iMessage/IG DMs) ---- */
+.message-board-content { height: 78vh; max-height: 640px; }
+.message-board-content .modal-body {
+  display: flex; flex-direction: column; flex: 1; min-height: 0;
+  padding: 12px 20px 16px; overflow: hidden;
+}
+
+.posts-list {
+  list-style: none; margin: 0 0 12px; padding: 4px 2px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+}
+.post-date-divider {
+  align-self: center; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant);
+  text-transform: uppercase; letter-spacing: 0.04em; margin: 6px 0 2px;
+}
+/* max-width resolves against .posts-list (a definite width), which is what
+   keeps the bubble a sane size; nesting a percentage max-width one level
+   deeper, against a shrink-to-fit flex row, is what previously made
+   bubbles collapse and the board scroll sideways. */
+.post-row { max-width: 78%; cursor: pointer; }
+.post-row.own-message { align-self: flex-end; }
+.post-meta { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin: 0 4px 3px; }
+/* position:relative so .post-time-side (absolutely positioned) can sit in
+   the gutter beside the bubble without ever being a layout sibling that
+   competes with it for width — revealing/hiding it must never resize or
+   reflow the bubble. Scoped to just this wrapper (not the whole row, which
+   also includes the meta label and delete button) so the timestamp centers
+   vertically on the bubble itself, not the row's combined height. */
+.post-bubble-anchor { position: relative; }
+.post-body-text {
+  white-space: pre-wrap; word-break: break-word; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface);
+  padding: 10px 14px; border-radius: var(--md-sys-shape-corner-lg); background: var(--md-sys-color-surface-container-highest);
+}
+.post-row.own-message .post-body-text { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.post-delete-btn {
+  flex-shrink: 0; margin: 4px 4px 0; height: 22px; padding: 0 10px; background: transparent; color: var(--md-sys-color-on-surface-variant);
+  border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-full); cursor: pointer; font: var(--md-type-body-sm);
+}
+.post-row.own-message .post-delete-btn { margin-left: auto; display: block; }
+.post-time-side {
+  display: none; position: absolute; top: 50%; transform: translateY(-50%);
+  white-space: nowrap; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant);
+}
+/* Others' bubbles hug the list's left edge, so their timestamp sits in the
+   gutter to the right; own messages hug the right edge (own-message rule
+   below), so theirs sits in the gutter to the left instead. */
+.post-time-side { left: 100%; margin-left: 8px; }
+.post-row.own-message .post-time-side { left: auto; right: 100%; margin-left: 0; margin-right: 8px; }
+@media (hover: hover) {
+  .post-row:hover .post-time-side { display: block; }
+}
+.posts-list.show-all-times .post-time-side { display: block; }
+.no-posts { color: var(--md-sys-color-on-surface-variant); font-style: italic; align-self: center; cursor: default; }
+
+.post-form { flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
+.post-input-bar {
+  display: flex; align-items: center; gap: 6px; padding: 6px 6px 6px 16px;
+  background: var(--md-sys-color-surface-container-highest); border-radius: var(--md-sys-shape-corner-xl);
+}
+.post-body-input {
+  flex: 1; min-width: 0; border: none; background: transparent; resize: none; outline: none;
+  font: var(--md-type-body-lg); color: var(--md-sys-color-on-surface); padding: 9px 0;
+  max-height: 100px; overflow-y: auto;
+}
+.post-body-input::placeholder { color: var(--md-sys-color-on-surface-variant); }
+.post-send-btn {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+  transition: opacity var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.post-send-btn svg { width: 17px; height: 17px; }
+.post-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.post-body-counter { align-self: flex-end; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin: 2px 10px 0 0; }
 .post-body-counter.limit-reached { color: var(--md-sys-color-error); font-weight: bold; }
-.posts-list { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; }
-.post-row { padding: 12px; border-radius: var(--md-sys-shape-corner-md); background: var(--md-sys-color-surface-container-highest); }
-.post-meta { font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin-bottom: 4px; }
-.post-body-text { white-space: pre-wrap; word-break: break-word; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); }
-.post-delete-btn { margin-top: 8px; height: 28px; padding: 0 12px; background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); border: none; border-radius: var(--md-sys-shape-corner-full); cursor: pointer; font: var(--md-type-label-sm); }
-.no-posts { color: var(--md-sys-color-on-surface-variant); font-style: italic; }
 .no-picks-message { grid-column: 1 / -1; color: var(--md-sys-color-on-surface-variant); font-style: italic; text-align: center; padding: 24px 0; }
 
 .stats-panel.hidden { display: none; }

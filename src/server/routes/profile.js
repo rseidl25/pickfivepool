@@ -27,7 +27,7 @@ router.get("/me", requireAuth, async (req, res) => {
   const profile = {
     uid: req.uid,
     email: authUser.email || null,
-    displayName: authUser.displayName || null,
+    displayName: authUser.displayName ? authUser.displayName.slice(0, 30) : null,
     photoURL: authUser.photoURL || null,
     createdAt: new Date(),
   };

@@ -2,7 +2,7 @@
 // old tabs+popover version lives on at src/js/v1/dashboard.js.
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { app } from "../auth/firebase_init.js";
-import { authedFetch, publicFetch } from "../util/api.js";
+import { authedFetch, publicFetch, getSeasonConfig } from "../util/api.js";
 import { initHeaderMenu } from "../util/header-menu.js";
 import { initThemeSwitcher } from "../util/theme.js";
 import { showToast } from "../util/toast.js";
@@ -53,6 +53,38 @@ const DEMO_SCORES = [
 // ============================
 async function fetchGames() { return publicFetch("/api/games"); }
 async function fetchLastUpdated() { return publicFetch("/api/last-updated"); }
+
+// Message board timestamps drop the year while it matches the season's own
+// start year (the common case all season long) and bring it back once a
+// post genuinely falls outside that year — e.g. carried-over history once
+// a new season rolls the config year forward.
+let seasonYearPromise = null;
+async function getCachedSeasonYear() {
+  if (!seasonYearPromise) seasonYearPromise = getSeasonConfig().then((cfg) => cfg.year);
+  return seasonYearPromise;
+}
+function formatPostTime(dateInput, seasonYear) {
+  const date = new Date(dateInput);
+  const opts = { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true };
+  if (date.getFullYear() !== seasonYear) opts.year = "numeric";
+  return new Intl.DateTimeFormat("en-US", opts).format(date);
+}
+
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+// Centered divider text grouping runs of messages by calendar day, the same
+// idea as iMessage's "Today"/"Yesterday" dividers between message clusters.
+function formatDateDivider(date) {
+  const now = new Date();
+  if (isSameDay(date, now)) return "Today";
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (isSameDay(date, yesterday)) return "Yesterday";
+  const opts = { weekday: "long", month: "long", day: "numeric" };
+  if (date.getFullYear() !== now.getFullYear()) opts.year = "numeric";
+  return new Intl.DateTimeFormat("en-US", opts).format(date);
+}
 async function fetchDates() {
   const res = await fetch("/src/data/game/dates.json");
   return res.json();
@@ -177,6 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const postForm = document.getElementById("post-form");
   const postBody = document.getElementById("post-body");
   const postBodyCounter = document.getElementById("post-body-counter");
+  const postSendBtn = document.getElementById("post-send-btn");
   const postsList = document.getElementById("posts-list");
   const menuTriggerDot = document.getElementById("menu-trigger-dot");
   const messageBoardDot = document.getElementById("message-board-dot");
@@ -407,34 +440,87 @@ document.addEventListener("DOMContentLoaded", async () => {
     const len = postBody.value.length;
     postBodyCounter.textContent = `${len}/${POST_BODY_MAX_LEN}`;
     postBodyCounter.classList.toggle("limit-reached", len >= POST_BODY_MAX_LEN);
+    postSendBtn.disabled = postBody.value.trim().length === 0;
+  });
+  postBody.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!postSendBtn.disabled) postForm.requestSubmit();
+    }
+  });
+
+  // Tapping any message reveals every message's timestamp at once (and
+  // tapping again hides them all) — same behavior as iMessage. Desktop
+  // additionally reveals a single message's timestamp on hover, handled
+  // purely in CSS. Ignore taps on the delete button itself.
+  postsList.addEventListener("click", (e) => {
+    if (e.target.closest(".post-delete-btn")) return;
+    postsList.classList.toggle("show-all-times");
   });
 
   async function loadPosts() {
     postsList.innerHTML = "<li>Loading...</li>";
     try {
-      const posts = await authedFetch(`/api/leagues/${currentLeagueId}/posts`);
+      const [posts, seasonYear] = await Promise.all([
+        authedFetch(`/api/leagues/${currentLeagueId}/posts`),
+        getCachedSeasonYear(),
+      ]);
       const me = auth.currentUser;
       postsList.innerHTML = "";
       if (posts.length === 0) {
         postsList.innerHTML = "<li class='no-posts'>No posts yet — say something!</li>";
       }
-      posts.forEach((post) => {
+      // API returns newest-first; a chat-style board reads top-to-bottom
+      // oldest-to-newest, with the latest message at the bottom.
+      let lastDay = null;
+      [...posts].reverse().forEach((post) => {
+        const postDate = new Date(post.createdAt);
+        if (!lastDay || !isSameDay(postDate, lastDay)) {
+          const divider = document.createElement("li");
+          divider.className = "post-date-divider";
+          divider.textContent = formatDateDivider(postDate);
+          postsList.appendChild(divider);
+          lastDay = postDate;
+        }
+
+        const isMine = post.authorUid === me?.uid;
         const li = document.createElement("li");
-        li.className = "post-row";
-        const meta = document.createElement("div");
-        meta.className = "post-meta";
-        meta.textContent = `${post.authorName} — ${new Date(post.createdAt).toLocaleString()}`;
-        li.appendChild(meta);
+        li.className = isMine ? "post-row own-message" : "post-row";
+
+        if (!isMine) {
+          const meta = document.createElement("div");
+          meta.className = "post-meta";
+          meta.textContent = post.authorName;
+          li.appendChild(meta);
+        }
+
+        // Bubble + timestamp share this wrapper (not the whole row, which
+        // also includes meta/delete) so the timestamp's vertical centering
+        // is scoped to just the bubble's own height, regardless of whether
+        // a name label above or a delete button below is also present.
+        const bubbleAnchor = document.createElement("div");
+        bubbleAnchor.className = "post-bubble-anchor";
         const body = document.createElement("div");
         body.className = "post-body-text";
         body.textContent = post.body;
-        li.appendChild(body);
-        if (isLeagueOwner || post.authorUid === me?.uid) {
+        bubbleAnchor.appendChild(body);
+
+        // Hidden by default — revealed on hover (desktop) or, on any tap
+        // anywhere in the board, all of these toggle on/off together (see
+        // the postsList click listener below).
+        const timeSide = document.createElement("div");
+        timeSide.className = "post-time-side";
+        timeSide.textContent = formatPostTime(post.createdAt, seasonYear);
+        bubbleAnchor.appendChild(timeSide);
+
+        li.appendChild(bubbleAnchor);
+        if (isLeagueOwner || isMine) {
           const deleteBtn = document.createElement("button");
           deleteBtn.type = "button";
           deleteBtn.className = "post-delete-btn";
           deleteBtn.textContent = "Delete";
-          deleteBtn.onclick = async () => {
+          deleteBtn.onclick = async (e) => {
+            e.stopPropagation();
             try {
               await authedFetch(`/api/leagues/${currentLeagueId}/posts/${post.id}`, { method: "DELETE" });
               await loadPosts();
@@ -444,8 +530,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           };
           li.appendChild(deleteBtn);
         }
+
         postsList.appendChild(li);
       });
+      postsList.scrollTop = postsList.scrollHeight;
     } catch (err) {
       postsList.innerHTML = `<li>Error loading posts: ${err.message}</li>`;
     }
@@ -461,6 +549,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       postBody.value = "";
       postBodyCounter.textContent = `0/${POST_BODY_MAX_LEN}`;
       postBodyCounter.classList.remove("limit-reached");
+      postSendBtn.disabled = true;
       await loadPosts();
     } catch (err) {
       showToast("Error posting: " + err.message, "error");
