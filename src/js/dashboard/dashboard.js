@@ -784,25 +784,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         <li class="pick-row">
           <img src="${getLogoPath(p.team)}" alt="${p.team}" class="team-logo">
           <span class="team-name">${p.team}</span>
-          <span class="team-points">${p.winPct}% <span class="win-chance-source">${
-              p.source === "live" ? "live" : p.source === "odds" ? "odds" : "even"
-            }</span></span>
+          <span class="team-points">${p.winPct}%</span>
         </li>`
           )
           .join("")
       : "<li>All your picks this week are already decided.</li>";
 
     winChanceDetail.innerHTML = `
-      <div class="win-chance-formula">
-        <span>You finish #1 of ${detail.playerCount} players in</span>
-        <span><strong>${detail.winningOutcomes} of ${detail.totalOutcomes}</strong></span>
-        <span>possible ways the week's remaining games can go</span>
-        <span class="wc-arrow">→</span>
-        <span>weighted by each game's win probability</span>
-        <span class="wc-arrow">=</span>
-        <span><strong>${pct}%</strong></span>
-      </div>
-      <p class="modal-subtext">Locked in so far: <strong>${detail.decidedTotal} pts</strong>. Your still-undecided picks (everyone else's count too, just not shown here):</p>
+      <div class="win-chance-big"><strong>${pct}%</strong> chance to win the week</div>
+      <p class="modal-subtext">Locked in: <strong>${detail.decidedTotal} pts</strong>. Win probability for your remaining picks:</p>
       <ul class="pick-list">${picksHtml}</ul>
     `;
     openModal(winChanceModal);

@@ -708,15 +708,8 @@ html, body { height: 100%; }
 .modal-header-subtitle { margin: 2px 0 0; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); }
 .modal-body { padding: 16px 24px 32px; overflow-y: auto; }
 .modal-subtext { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); margin: 0 0 16px; }
-.win-chance-formula {
-  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px;
-  font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); margin: 0 0 16px;
-}
-.win-chance-formula .wc-arrow { color: var(--md-sys-color-on-surface-variant); }
-.win-chance-source {
-  font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant);
-  text-transform: uppercase; margin-left: 4px;
-}
+.win-chance-big { font: var(--md-type-headline-sm); color: var(--md-sys-color-on-surface); margin: 0 0 16px; }
+.win-chance-big strong { color: var(--md-sys-color-primary); }
 .how-to-play-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); }
 .close-btn {
   flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
