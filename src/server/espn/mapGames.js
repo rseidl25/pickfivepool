@@ -20,6 +20,19 @@ function formatGameTime(isoDate) {
   }).format(new Date(isoDate));
 }
 
+// American-odds moneyline as a plain number ("-162" / "+136" -> -162 / 136),
+// or null if this book hasn't posted one (bye-adjacent or very early-week
+// games sometimes lack odds briefly). Only meaningful pre-kickoff — used by
+// winProbability.js as the pre-game win estimate instead of a flat coin
+// flip; once the game is actually in progress, the live score/clock is a
+// better signal and takes over instead.
+function parseMoneyline(sideOdds) {
+  const raw = sideOdds?.close?.odds ?? sideOdds?.open?.odds;
+  if (raw == null) return null;
+  const n = parseInt(raw, 10);
+  return Number.isNaN(n) ? null : n;
+}
+
 // Maps one ESPN scoreboard API response (single week) to the shape
 // games.json has always used: { week, games: [{ homeTeam, homeScore,
 // awayTeam, awayScore, weekday, gameTime, status }] }.
@@ -35,6 +48,10 @@ export function mapEspnWeekToGames(espnResponse, weekNumber) {
     const state = competition?.status?.type?.state;
     const status = STATUS_MAP[state] || "Scheduled";
 
+    // First odds provider ESPN lists (currently always DraftKings) — good
+    // enough for a pre-game estimate; not trying to shop/average books.
+    const moneyline = competition?.odds?.[0]?.moneyline;
+
     return {
       homeTeam: home?.team?.displayName || "",
       homeScore: parseInt(home?.score, 10) || 0,
@@ -48,6 +65,8 @@ export function mapEspnWeekToGames(espnResponse, weekNumber) {
       // of a flat coin flip. period: 1-4 regulation, 5+ overtime.
       period: competition?.status?.period ?? null,
       clockSeconds: typeof competition?.status?.clock === "number" ? competition.status.clock : null,
+      homeMoneyline: parseMoneyline(moneyline?.home),
+      awayMoneyline: parseMoneyline(moneyline?.away),
     };
   });
 

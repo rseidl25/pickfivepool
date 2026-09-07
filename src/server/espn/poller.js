@@ -40,6 +40,27 @@ async function fetchWeek(year, week) {
   return mapEspnWeekToGames(data, week);
 }
 
+// ESPN stops including the odds object once a game leaves "Scheduled" (it's
+// posted pre-kickoff market data, not a live feed), so a freshly-fetched
+// in-progress or completed game always has null moneylines. winProbability.js
+// anchors its live win-probability curve to the pre-game line for a smooth
+// transition at kickoff, so that line has to survive somewhere past the
+// moment ESPN stops sending it — carry it forward from whatever this same
+// game looked like on the previous poll, where it was presumably captured
+// while still Scheduled.
+function carryForwardOdds(freshWeek, previousWeek) {
+  if (!previousWeek) return freshWeek;
+  for (const game of freshWeek.games) {
+    if (game.homeMoneyline != null && game.awayMoneyline != null) continue;
+    const prevGame = previousWeek.games.find((g) => g.homeTeam === game.homeTeam && g.awayTeam === game.awayTeam);
+    if (prevGame?.homeMoneyline != null && prevGame?.awayMoneyline != null) {
+      game.homeMoneyline = prevGame.homeMoneyline;
+      game.awayMoneyline = prevGame.awayMoneyline;
+    }
+  }
+  return freshWeek;
+}
+
 async function getSeasonYear() {
   const snap = await db.collection("config").doc("season").get();
   return snap.data()?.year;
@@ -51,11 +72,11 @@ async function pollOnce() {
   const results = [];
 
   for (let week = 1; week <= TOTAL_WEEKS; week++) {
+    const prevWeek = previous.find((w) => w.week === week);
     try {
-      results.push(await fetchWeek(year, week));
+      results.push(carryForwardOdds(await fetchWeek(year, week), prevWeek));
     } catch (err) {
       console.error(`[poller] Week ${week} fetch failed, keeping previous data:`, err.message);
-      const prevWeek = previous.find((w) => w.week === week);
       results.push(prevWeek || { week, games: [] });
     }
   }

@@ -146,6 +146,17 @@ html, body { height: 100%; }
   min-height: 0;
   padding: 8px 20px 32px;
   overflow-y: auto;
+  /* Without this, a real (non-overlay) OS scrollbar only appears once
+     content height crosses the viewport — and toggling minimal view's
+     picks list between 1 and 2 columns changes its height enough to cross
+     that line, so showing/hiding the matchups panel could make a scrollbar
+     appear or disappear and shift the available width by its ~15-17px,
+     just enough to flip the picks grid's auto-fit column count and leave
+     it stuck wider (or narrower) than before even after returning to the
+     exact same toggle state. Reserving the gutter unconditionally means
+     that width never moves depending on whether a scrollbar happens to be
+     showing. */
+  scrollbar-gutter: stable;
 }
 
 .tab-section.hidden { display: none; }
@@ -402,7 +413,7 @@ html, body { height: 100%; }
   gap: 2px;
 }
 .my-week-overall-pos-box { margin-bottom: 12px; }
-.my-week-win-chance-box { margin-top: 20px; }
+.my-week-win-chance-box { margin-top: 20px; cursor: pointer; }
 .my-week-overall-pos-rank,
 .my-week-win-chance-pct { font: var(--md-type-display-md); color: var(--md-sys-color-primary); }
 .my-week-overall-pos-label,
@@ -427,21 +438,28 @@ html, body { height: 100%; }
 .picks-controls {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
 }
+/* Invisible on desktop — its two <select>s stay flat siblings of the
+   buttons within .picks-controls, exactly as if this wrapper weren't here.
+   Mobile gives it real layout (see the max-width: 840px block) so it always
+   claims one full row on its own instead of competing with the buttons for
+   space on the same line. */
+.picks-filters { display: contents; }
+/* Same invisible-on-desktop trick for the toggle buttons — mobile gives it
+   real layout below so "Show Odds"/"Minimal View" split the row width the
+   same way the two filters above them do (Show Matchups is display: none
+   on mobile regardless, so it doesn't factor into that split). */
+.picks-buttons { display: contents; }
 .picks-select { height: 40px; padding: 0 12px; font: var(--md-type-body-md); }
 :root[data-theme="original"] .picks-select {
   background: var(--md-sys-color-surface-container-lowest);
 }
 .team-pick-counter { font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface-variant); }
-:root[data-theme="original"] #toggle-scores-btn {
-  background: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
-  border-color: transparent;
-}
 
 .picks-layout { display: flex; gap: 20px; align-items: flex-start; }
 
 .weekly-picks-grid {
   flex: 3;
+  min-width: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 14px;
@@ -456,8 +474,10 @@ html, body { height: 100%; }
 .pick-box.is-me { outline: 2px solid var(--brand-gold); outline-offset: -2px; }
 .player-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: var(--md-sys-color-surface-container-lowest); cursor: zoom-in; }
-.player-header h3 { margin: 0; font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface); }
-
+.player-header h3 {
+  margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface);
+}
 /* Original theme: player cards read as v1's navy boxes, with a slightly
    bigger profile photo, instead of a neutral surface tone. */
 :root[data-theme="original"] .pick-box {
@@ -497,7 +517,127 @@ html, body { height: 100%; }
 .pick-row .team-name.win { color: #146c2e; }
 .pick-row .team-name.loss { color: var(--md-sys-color-error); }
 .pick-row .team-points { flex-shrink: 0; color: var(--md-sys-color-on-surface-variant); }
+.pick-row .team-odds { flex-shrink: 0; font-weight: 400; font-size: 0.85em; color: var(--md-sys-color-on-surface-variant); }
 .pick-list li:not(.pick-row) { color: var(--md-sys-color-on-surface-variant); font: var(--md-type-body-md); }
+
+/* ---- Minimal view: one small card per player, not a card grid or a table ----
+   Went through two other shapes first: a single-column table (dead space
+   at in-between widths — a column only appears once there's room for a
+   FULL extra column-width, so plenty of viewport sizes landed just short
+   of that and stretched one lone column across a mostly-empty row) and one
+   shared "grouped list" card (reads as a single monolithic block at full
+   width instead of individually-scannable players). auto-fill/minmax is
+   the same responsive mechanic full-view's own card grid already uses —
+   cards grow to actually fill whatever width is available instead of
+   leaving a gap OR jumping straight to a whole extra column, and however
+   many fit is exactly how many show, no dead strip at any width. Each card
+   keeps the compact single-row content (avatar/name/5 picks/total) built
+   for the table version — only the outer chrome changed back to a card. */
+.weekly-picks-grid.minimal-list {
+  /* auto-fit, not auto-fill (unlike the full-view grid above) — auto-fill
+     would reserve empty placeholder tracks whenever there are fewer players
+     than fit the row (a team filter narrowed to 1-2 people, or a leftover
+     partial last row), which is exactly the dead-space complaint this is
+     fixing; auto-fit collapses those so the real cards actually stretch to
+     use the space instead. 300px (down from an initial 340px) is chosen so
+     a 2nd column kicks in around ~610px of content width instead of ~690 —
+     340 meant a wide "just under 2 columns" range (a half-width monitor
+     window, say) rendered as one lone column stretched to fill the whole
+     row, with icons blown up well past what a "minimal" view should look
+     like, instead of two properly compact columns. */
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; align-items: start;
+}
+/* Player photo dropped entirely — several players are still on the default
+   placeholder image, which made a row of "same-size circle" avatars next to
+   real team logos look inconsistent/broken rather than just plain. The name
+   moves to its own centered header row above the pick grid instead; the
+   grid itself keeps the exact column widths the avatar version used (just
+   one fewer flexible column) so the chip sizing logic is unchanged. */
+.pick-list-row {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)) 28px; column-gap: 6px; row-gap: 4px;
+  align-items: center; padding: 8px 12px;
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-md); box-shadow: var(--md-sys-elevation-1);
+}
+.pick-list-row.is-me { outline: 2px solid var(--brand-gold); outline-offset: -2px; }
+/* Original theme's card language everywhere else — the full-view player
+   cards, "My Picks"/"Hate Watch" on My Week, the matchups panel — is a
+   solid navy fill with white text, not a neutral surface tone with a hint
+   of tint. Matching that solid fill here (rather than the light tint tried
+   earlier) is what actually makes minimal view read as belonging to this
+   theme instead of a reskinned Light. The team-logo circles and the total
+   pill stay their own light/white treatment on top of it, same as the
+   white pick-rows that already sit inside a navy .pick-box in full view. */
+:root[data-theme="original"] .pick-list-row { background: var(--md-sys-color-primary); }
+:root[data-theme="original"] .player-name-mini,
+:root[data-theme="original"] .no-picks-message-inline { color: var(--md-sys-color-on-primary); }
+:root[data-theme="original"] .row-total-mini { background: var(--md-sys-color-on-primary); color: var(--md-sys-color-primary); }
+.player-name-mini {
+  grid-column: 1 / -1; text-align: center;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font: var(--md-type-label-md); font-weight: 700; color: var(--md-sys-color-on-surface);
+}
+/* Each pick is a logo in a ringed circle (like an app icon / contact photo)
+   with its value as a small overlapping badge, instead of a flat gray
+   square with text underneath — the ring color IS the win/loss/pending
+   signal (glanceable without reading the badge at all), and the badge only
+   needs to carry the number. overflow: visible (not hidden) is what lets
+   the badge sit half outside the circle rather than getting clipped. */
+.pick-chip-mini {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 1; width: 100%; max-width: 90px; justify-self: center;
+  border-radius: 50%; overflow: visible;
+  background: var(--md-sys-color-surface-container-lowest);
+  border: 2.5px solid var(--md-sys-color-outline-variant);
+}
+.pick-chip-mini.bonus { border-color: var(--brand-gold); background: var(--bonus-pick-highlight); }
+.pick-chip-mini.highlighted { box-shadow: 0 0 0 2px var(--md-sys-color-primary); }
+.pick-chip-mini.win { border-color: #146c2e; }
+.pick-chip-mini.loss { border-color: var(--md-sys-color-error); }
+/* Sized relative to the chip's own (flexible) width, not a fixed px, so the
+   logo grows right along with the chip on a wider row instead of leaving
+   the extra space blank around a small fixed icon. */
+.pick-chip-mini .team-logo { width: 62%; height: auto; aspect-ratio: 1; object-fit: contain; }
+/* The value badge — pinned to the circle's bottom-center, its own pill with
+   a border matching the row's background so it visually "cuts into" the
+   ring behind it, the same way an iOS notification badge sits on an app
+   icon rather than just being text floating nearby. Centered (not corner-
+   anchored) specifically so it never overlaps sideways into the next
+   chip's circle in this tightly-packed row — a corner badge on chip N
+   painted underneath chip N+1's opaque background and disappeared entirely. */
+.chip-value {
+  position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+  min-width: 24px; height: 18px; padding: 0 5px; border-radius: 9px;
+  border: 2px solid var(--md-sys-color-surface-container-low); z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; line-height: 1; font-weight: 800; white-space: nowrap;
+  background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface-variant);
+}
+:root[data-theme="original"] .chip-value { border-color: var(--md-sys-color-primary); }
+.pick-chip-mini.win .chip-value { background: #146c2e; color: #ffffff; }
+.pick-chip-mini.loss .chip-value { background: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
+/* Odds swapped in for the always-0 pre-game points (see loadWeeklyPicks) —
+   its own accent-colored treatment so it visually reads as "estimate", not
+   a real score, next to actually-scored chips in the same row. The "0"
+   placeholder (no odds available/toggled off) shares this same primary
+   treatment rather than its own separate color — same badge, same meaning
+   ("nothing decided yet"), just a different number, and it keeps every
+   badge in the row visually consistent with the total pill beside them. */
+.chip-odds,
+.chip-pending { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+/* Original theme's card is already this exact navy (.pick-list-row above),
+   so a badge filled with the same color would nearly vanish against it —
+   inverted the same way .row-total-mini already is below, for the same
+   reason. */
+:root[data-theme="original"] .chip-odds,
+:root[data-theme="original"] .chip-pending { background: var(--md-sys-color-on-primary); color: var(--md-sys-color-primary); }
+.row-total-mini {
+  justify-self: end; display: flex; align-items: center; justify-content: center;
+  min-width: 26px; height: 22px; padding: 0 7px; border-radius: 11px;
+  background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+  font: var(--md-type-label-md); font-weight: 800;
+}
+.no-picks-message-inline { color: var(--md-sys-color-on-surface-variant); font-style: italic; font: var(--md-type-body-sm); }
 
 .pick-box-total {
   margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--md-sys-color-outline-variant);
@@ -507,6 +647,11 @@ html, body { height: 100%; }
 .matchups-container { flex: 0 0 300px; padding: 14px; }
 .matchups-container h3 { text-align: center; font: var(--md-type-title-sm); color: var(--md-sys-color-on-surface); margin: 0 0 10px; }
 .matchups-container.hidden { display: none; }
+/* Once weeklyGrid has room for 3+ pick columns, there's spare width here
+   too — widen the panel to use it, but keep the day-box list itself a
+   single column (just a wider one) rather than splitting it into side-by-
+   side sub-columns. */
+.matchups-container.matchups-two-col { flex-basis: 460px; }
 :root[data-theme="original"] .matchups-container {
   background: var(--md-sys-color-primary-container);
   border-color: transparent;
@@ -526,9 +671,13 @@ html, body { height: 100%; }
   padding: 8px; border-top: 1px solid var(--md-sys-color-outline-variant);
   font: var(--md-type-body-sm); font-weight: 600; text-align: center;
 }
-.team-label { display: flex; align-items: center; gap: 4px; }
+/* min-width: 0 overrides the grid item's default min-width: auto, which
+   otherwise refuses to shrink the track below the text's natural width and
+   defeats the ellipsis truncation entirely. */
+.team-label { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .home-label { justify-content: flex-end; }
-.matchup-logo { width: 16px; height: 16px; object-fit: contain; }
+.team-label-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.matchup-logo { flex-shrink: 0; width: 16px; height: 16px; object-fit: contain; }
 .team-score { font-weight: bold; }
 .winner { color: #146c2e !important; }
 .loser { color: var(--md-sys-color-error) !important; }
@@ -559,6 +708,15 @@ html, body { height: 100%; }
 .modal-header-subtitle { margin: 2px 0 0; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); }
 .modal-body { padding: 16px 24px 32px; overflow-y: auto; }
 .modal-subtext { font: var(--md-type-body-md); color: var(--md-sys-color-on-surface-variant); margin: 0 0 16px; }
+.win-chance-formula {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px;
+  font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); margin: 0 0 16px;
+}
+.win-chance-formula .wc-arrow { color: var(--md-sys-color-on-surface-variant); }
+.win-chance-source {
+  font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant);
+  text-transform: uppercase; margin-left: 4px;
+}
 .how-to-play-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font: var(--md-type-body-md); color: var(--md-sys-color-on-surface); }
 .close-btn {
   flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
@@ -621,21 +779,10 @@ html, body { height: 100%; }
    below), so theirs sits in the gutter to the left instead. */
 .post-time-side { left: 100%; margin-left: 8px; }
 .post-row.own-message .post-time-side { left: auto; right: 100%; margin-left: 0; margin-right: 8px; }
-/* The author's *current* name (post.authorName is a snapshot from when
-   they posted, which can go stale after a rename) — sits in normal flow
-   right below that snapshot name, not the side gutter, so it's fine for it
-   to push the bubble down slightly when revealed; only the timestamp had
-   the no-reflow constraint, since that one sits beside the bubble itself. */
-.post-current-name {
-  display: none; margin: 0 4px 3px; font: var(--md-type-body-sm); font-style: italic;
-  color: var(--md-sys-color-on-surface-variant);
-}
 @media (hover: hover) {
   .post-row:hover .post-time-side { display: block; }
-  .post-row:hover .post-current-name { display: block; }
 }
 .posts-list.show-all-times .post-time-side { display: block; }
-.posts-list.show-all-times .post-current-name { display: block; }
 .no-posts { color: var(--md-sys-color-on-surface-variant); font-style: italic; align-self: center; cursor: default; }
 
 .post-form { flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -738,6 +885,31 @@ html, body { height: 100%; }
      below that much more vertical room. */
   .section-title { display: none; }
 
+  /* The player/team filters were each a full-width .m3-field (100% is the
+     field's own default), so they stacked as two whole rows before the
+     toggle buttons even started — side by side instead, shrinking their
+     own height and font a touch too, claims noticeably less of the screen
+     before any actual picks are visible. .picks-filters gets real layout
+     here (it's `display: contents` — invisible — on desktop) with an
+     explicit width: 100%, which is what guarantees it always claims one
+     whole row of .picks-controls' flex-wrap by itself: relying on the two
+     selects' own flex-grow to naturally wrap the buttons below them (tried
+     first) doesn't actually work, since flex-wrap's fit check happens
+     using each item's flex-basis/content size, not its post-growth size —
+     with the selects given a 0 flex-basis they measured as fitting on the
+     same line as the buttons regardless of container width, so growth then
+     divided up only whatever thin sliver of space the buttons hadn't
+     already claimed, clipping "All Players"/"All Teams" down to just "All". */
+  .picks-controls { gap: 8px; margin-bottom: 10px; }
+  .picks-filters { display: flex; gap: 8px; width: 100%; }
+  .picks-select { flex: 1 1 0; min-width: 0; width: auto; height: 36px; padding: 0 8px; font-size: 13px; }
+  /* Odds/Minimal View sit compact next to each other at their own natural
+     width now that they're bare switches, not matched to the filter
+     dropdowns' widths above — no more width: 100% row-claiming or flex: 1
+     stretch (Show Matchups stays display: none on mobile regardless — see
+     its own rule below). */
+  .picks-buttons { display: flex; gap: 20px; }
+
   .nav-rail { display: none; }
   .nav-bar {
     display: flex;
@@ -804,12 +976,28 @@ html, body { height: 100%; }
   .podium-row { flex-basis: auto; width: 100%; }
   .podium-name { max-width: 140px; }
 
-  /* Place + win% side by side instead of stacked — align-items: stretch
-     (the flex default, stated explicitly here) is what keeps both boxes
-     the same height regardless of which one's text wraps to more lines. */
-  .my-week-stats-row { display: flex; flex-direction: row; align-items: stretch; gap: 20px; width: 100%; margin-top: 12px; }
+  /* Two columns: left is the avatar/name/points identity block, right (wider
+     — 60/40) holds both stat boxes stacked. Earlier attempts placed the two
+     stat boxes as separate grid items and tried to center each independently
+     against the avatar or a multi-row span — since their text wraps to a
+     different number of lines, that never lined them up with each other.
+     Here .my-week-stats-row is a real flex column (not display: contents)
+     occupying one single grid cell spanning the full left-column height, so
+     its own flex centering keeps its two children centered as a pair,
+     immune to whatever height either one's text wraps to. */
+  .my-week-profile {
+    display: grid; grid-template-columns: 2fr 3fr; grid-template-rows: auto auto auto;
+    column-gap: 12px; row-gap: 4px; align-items: center;
+  }
+  .my-week-avatar { grid-column: 1; grid-row: 1; justify-self: center; margin-bottom: 0; }
+  .my-week-name { grid-column: 1; grid-row: 2; margin-bottom: 0; }
+  .my-week-total-points { grid-column: 1; grid-row: 3; margin-bottom: 0; }
+  .my-week-stats-row {
+    grid-column: 2; grid-row: 1 / 4;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  }
   .my-week-overall-pos-box,
-  .my-week-win-chance-box { flex: 1; margin: 0; justify-content: center; }
+  .my-week-win-chance-box { margin: 0; }
 
   /* align-items: stretch — the base rule's flex-start (needed for the
      desktop row layout, so the grid and the matchups panel don't stretch
@@ -819,8 +1007,10 @@ html, body { height: 100%; }
   .matchups-container { flex: 1 1 auto; width: 100%; }
 
   /* Matchups aren't useful in the cramped mobile layout — drop the toggle
-     entirely rather than offer a button to a view that doesn't fit. */
-  #toggle-scores-btn { display: none; }
+     entirely rather than offer a switch for a view that doesn't fit. Hides
+     the whole label (not just #toggle-scores-btn, now an <input> nested
+     inside it) so no empty/dead switch is left behind. */
+  #matchups-switch { display: none; }
 
   .modal-content { max-height: 80vh; }
 }

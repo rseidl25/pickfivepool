@@ -184,6 +184,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const toggleScoresBtn = document.getElementById("toggle-scores-btn");
   const matchupsContainer = document.getElementById("matchups-container");
   const matchupsList = document.getElementById("matchups-list");
+  const toggleOddsBtn = document.getElementById("toggle-odds-btn");
+  // Remembered per-device (not per-league/account) — a display preference
+  // like this is about how the person wants their own screen to look, not
+  // data tied to who's logged in, so plain localStorage is enough; no need
+  // to round-trip it through the server the way league/picks data does.
+  let showOdds = localStorage.getItem("pick5_showOdds") === "true";
+  const toggleMinimalBtn = document.getElementById("toggle-minimal-btn");
+  let minimalView = localStorage.getItem("pick5_minimalView") === "true";
+  toggleOddsBtn.checked = showOdds;
+  toggleMinimalBtn.checked = minimalView;
 
   const userName = document.getElementById("user-name");
   const userAvatar = document.getElementById("user-avatar");
@@ -201,6 +211,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const howToPlayBtn = document.getElementById("how-to-play-btn");
   const howToPlayModal = document.getElementById("how-to-play-modal");
   const closeHowToPlay = document.getElementById("close-how-to-play");
+
+  const winChanceModal = document.getElementById("win-chance-modal");
+  const closeWinChance = document.getElementById("close-win-chance");
+  const winChanceDetail = document.getElementById("win-chance-detail");
 
   const messageBoardBtn = document.getElementById("message-board-btn");
   const messageBoardModal = document.getElementById("message-board-modal");
@@ -262,12 +276,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   let myLeagues = [];
   let currentLeagueId = localStorage.getItem("pick5_currentLeagueId") || null;
   let isLeagueOwner = false;
+  // Populated each time loadMyWeek() fetches — read by the win-chance popup
+  // when the player clicks the % (see winChanceModal below).
+  let lastWinChance = null;
 
   // =========================
   // Modals — centered M3 dialogs (not anchored popovers); only one open
   // at a time, click-outside or the X closes it.
   // =========================
-  const allModals = [howToPlayModal, messageBoardModal, leagueStatsModal, settingsModal, themeModal];
+  const allModals = [howToPlayModal, messageBoardModal, leagueStatsModal, settingsModal, themeModal, winChanceModal];
   function closeAllModals() {
     allModals.forEach((m) => m.classList.add("hidden"));
   }
@@ -436,6 +453,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   howToPlayBtn.onclick = () => openModal(howToPlayModal);
   closeHowToPlay.onclick = () => closeAllModals();
+  closeWinChance.onclick = () => closeAllModals();
 
   // =========================
   // Message board
@@ -486,10 +504,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         getCachedSeasonYear(),
         fetchLeagueDetail(currentLeagueId),
       ]);
-      // post.authorName is a snapshot from when that message was posted, so
-      // it can go stale if someone renames themselves later — this map is
-      // each member's name right now, shown alongside the old one on
-      // hover/tap so it's clear who's who after a rename.
+      // post.authorName is a snapshot from when that message was posted and
+      // can go stale after a rename — always show the member's current name
+      // instead, falling back to the snapshot if they've since left the league.
       const currentNameByUid = new Map(league.members.map((m) => [m.uid, m.displayName]));
       const me = auth.currentUser;
       postsList.innerHTML = "";
@@ -516,16 +533,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!isMine) {
           const meta = document.createElement("div");
           meta.className = "post-meta";
-          meta.textContent = post.authorName;
+          meta.textContent = currentNameByUid.get(post.authorUid) || post.authorName;
           li.appendChild(meta);
-
-          const currentName = currentNameByUid.get(post.authorUid);
-          if (currentName) {
-            const currentNameLine = document.createElement("div");
-            currentNameLine.className = "post-current-name";
-            currentNameLine.textContent = `(${currentName})`;
-            li.appendChild(currentNameLine);
-          }
         }
 
         // Bubble + timestamp share this wrapper (not the whole row, which
@@ -575,6 +584,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   postForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    // Disable synchronously, before the request even starts — the handler
+    // is async, so without this a second Enter/click fired while the first
+    // POST is still in flight would sail through (postSendBtn.disabled was
+    // only ever set true *after* the await) and double-post the message.
+    if (postSendBtn.disabled) return;
+    postSendBtn.disabled = true;
     try {
       await authedFetch(`/api/leagues/${currentLeagueId}/posts`, {
         method: "POST",
@@ -583,10 +598,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       postBody.value = "";
       postBodyCounter.textContent = `0/${POST_BODY_MAX_LEN}`;
       postBodyCounter.classList.remove("limit-reached");
-      postSendBtn.disabled = true;
       await loadPosts();
     } catch (err) {
       showToast("Error posting: " + err.message, "error");
+      postSendBtn.disabled = postBody.value.trim().length === 0;
     }
   });
 
@@ -755,6 +770,50 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   themeBtn.onclick = () => openModal(themeModal);
   closeTheme.onclick = () => closeAllModals();
+
+  // Secret feature: click/tap the win-chance % to see the math behind it —
+  // your locked-in points from already-decided games, plus a live win-probability
+  // estimate for each pick still riding on a game in progress or not yet started.
+  function openWinChanceModal() {
+    if (!lastWinChance || !lastWinChance.detail) return;
+    const { pct, detail } = lastWinChance;
+    const picksHtml = detail.picks.length
+      ? detail.picks
+          .map(
+            (p) => `
+        <li class="pick-row">
+          <img src="${getLogoPath(p.team)}" alt="${p.team}" class="team-logo">
+          <span class="team-name">${p.team}</span>
+          <span class="team-points">${p.winPct}% <span class="win-chance-source">${
+              p.source === "live" ? "live" : p.source === "odds" ? "odds" : "even"
+            }</span></span>
+        </li>`
+          )
+          .join("")
+      : "<li>All your picks this week are already decided.</li>";
+
+    winChanceDetail.innerHTML = `
+      <div class="win-chance-formula">
+        <span>You finish #1 of ${detail.playerCount} players in</span>
+        <span><strong>${detail.winningOutcomes} of ${detail.totalOutcomes}</strong></span>
+        <span>possible ways the week's remaining games can go</span>
+        <span class="wc-arrow">→</span>
+        <span>weighted by each game's win probability</span>
+        <span class="wc-arrow">=</span>
+        <span><strong>${pct}%</strong></span>
+      </div>
+      <p class="modal-subtext">Locked in so far: <strong>${detail.decidedTotal} pts</strong>. Your still-undecided picks (everyone else's count too, just not shown here):</p>
+      <ul class="pick-list">${picksHtml}</ul>
+    `;
+    openModal(winChanceModal);
+  }
+  myWeekWinChance.addEventListener("click", openWinChanceModal);
+  myWeekWinChance.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openWinChanceModal();
+    }
+  });
 
   settingsForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -1139,6 +1198,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <span class="my-week-win-chance-pct">${myWeek.winChancePct}%</span>
         <span class="my-week-win-chance-label">chance to win the week</span>
       `;
+      lastWinChance = { pct: myWeek.winChancePct, detail: myWeek.winChanceDetail };
 
       renderSeasonTrend(myUid, gamesData);
     } catch (err) {
@@ -1146,6 +1206,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       myWeekPicksList.innerHTML = "<li>Error loading this week's data</li>";
       myWeekPicksTotal.textContent = "";
       myWeekWinChance.innerHTML = "";
+      lastWinChance = null;
     }
   }
 
@@ -1283,6 +1344,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   async function loadWeeklyPicks(weekNumber) {
     weeklyGrid.innerHTML = "";
+    // Minimal view abandons the card grid entirely for a dense single-column
+    // table-style list (see .weekly-picks-grid.minimal-list in dashboard.css)
+    // — a card per player, each with its own header/padding/shadow, is
+    // exactly the kind of chrome-per-item overhead that eats screen space;
+    // a plain row with a hairline divider (the way a real table or a phone's
+    // Settings list packs rows) is what actually lets many players fit at
+    // once instead of just one or two.
+    weeklyGrid.classList.toggle("minimal-list", minimalView);
     const gamesData = await fetchGames();
     const gamesForWeek = gamesData.find((g) => g.week === weekNumber)?.games || [];
     const selectedPlayer = playerSelect.value;
@@ -1307,9 +1376,116 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     playerCards.forEach((player) => {
       const weekData = player.weekData;
+      const isMe = loggedInUser && player.name === loggedInUser;
+
+      const hasPicks = weekData && Object.keys(weekData.teams).length > 0;
+      let orderedTeams = [];
+      if (hasPicks) {
+        const bonusTeam = Object.entries(weekData.teams).find(([, info]) => info.bonus);
+        const otherTeams = Object.entries(weekData.teams).filter(([, info]) => !info.bonus);
+        otherTeams.sort(([a], [b]) => {
+          const idxA = gamesForWeek.findIndex((g) => g.homeTeam === a || g.awayTeam === a);
+          const idxB = gamesForWeek.findIndex((g) => g.homeTeam === b || g.awayTeam === b);
+          return idxA - idxB;
+        });
+        orderedTeams = bonusTeam ? [bonusTeam, ...otherTeams] : otherTeams;
+      }
+
+      if (minimalView) {
+        // One dense row per player — name across the top, 5 tiny pick
+        // chips + total below — instead of a card with its own header/
+        // padding/shadow. No profile photo: several players are still on
+        // the default placeholder, which read as broken/inconsistent next
+        // to real team logos at the same circle size.
+        const row = document.createElement("div");
+        row.className = "pick-list-row";
+        if (isMe) row.classList.add("is-me");
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "player-name-mini";
+        nameEl.textContent = player.name;
+        row.appendChild(nameEl);
+
+        // Each pick is its own grid cell (5 fixed-width columns defined on
+        // .pick-list-row) rather than living in a flex-wrap strip — a
+        // player's 3rd pick otherwise sits wherever their 1st and 2nd
+        // picks' rendered widths happened to push it, so the 5 chips never
+        // lined up between rows. Fixed columns make every row's chips
+        // align into a real table, whatever each player's own team names
+        // or pick count happen to be.
+        if (!hasPicks) {
+          const msg = document.createElement("span");
+          msg.className = "no-picks-message-inline";
+          msg.style.gridColumn = "1 / 6";
+          msg.textContent = "No picks";
+          row.appendChild(msg);
+        } else {
+          // Explicit column placement (rather than relying on grid
+          // auto-placement) so a player who hasn't finished submitting yet
+          // — fewer than 5 picks — still gets their existing picks pinned
+          // to their real column instead of bunching left and knocking the
+          // total out of its column too.
+          orderedTeams.forEach(([team, info], pickIndex) => {
+            const game = gamesForWeek.find((g) => g.homeTeam === team || g.awayTeam === team);
+            const isDecided = game && game.status === "Completed";
+            let resultClass = "";
+            if (isDecided) resultClass = info.points > 0 ? "win" : "loss";
+
+            const chip = document.createElement("div");
+            chip.className = `pick-chip-mini ${resultClass}`;
+            chip.style.gridColumn = String(1 + pickIndex);
+            if (info.bonus) chip.classList.add("bonus");
+            if (selectedTeam !== "all" && team === selectedTeam) chip.classList.add("highlighted");
+
+            const winPct = !isDecided && game ? (team === game.homeTeam ? game.homeWinPct : game.awayWinPct) : null;
+
+            let title = team;
+            if (isDecided) title += ` (${info.points} pts)`;
+            else if (winPct != null) title += ` (${winPct}% win)`;
+            chip.title = title;
+
+            const logo = document.createElement("img");
+            logo.src = getLogoPath(team);
+            logo.alt = team;
+            logo.className = "team-logo";
+            chip.appendChild(logo);
+
+            // Points are always 0 before a game is decided (there's nothing
+            // to score yet) — swap in the win% instead whenever odds are
+            // toggled on, since that's the actually-meaningful number at
+            // that point, right beside the logo rather than needing a
+            // separate toggled-off view. Falls back to the plain "0"
+            // placeholder if odds are off or a book hasn't posted a line yet.
+            const valueSpan = document.createElement("span");
+            if (isDecided) {
+              valueSpan.className = "chip-value";
+              valueSpan.textContent = info.points;
+            } else if (showOdds && winPct != null) {
+              valueSpan.className = "chip-value chip-odds";
+              valueSpan.textContent = `${winPct}%`;
+            } else {
+              valueSpan.className = "chip-value chip-pending";
+              valueSpan.textContent = "0";
+            }
+            chip.appendChild(valueSpan);
+
+            row.appendChild(chip);
+          });
+        }
+
+        const totalSpan = document.createElement("span");
+        totalSpan.className = "row-total-mini";
+        totalSpan.style.gridColumn = "6";
+        totalSpan.textContent = player.correctedTotal;
+        row.appendChild(totalSpan);
+
+        weeklyGrid.appendChild(row);
+        return;
+      }
+
       const card = document.createElement("div");
       card.className = "pick-box";
-      if (loggedInUser && player.name === loggedInUser) card.classList.add("is-me");
+      if (isMe) card.classList.add("is-me");
 
       const title = document.createElement("div");
       title.className = "player-header";
@@ -1322,23 +1498,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const ul = document.createElement("ul");
       ul.className = "pick-list";
 
-      if (!weekData || Object.keys(weekData.teams).length === 0) {
+      if (!hasPicks) {
         const li = document.createElement("li");
         li.textContent = "No picks submitted";
         ul.appendChild(li);
       } else {
-        const bonusTeam = Object.entries(weekData.teams).find(([, info]) => info.bonus);
-        const otherTeams = Object.entries(weekData.teams).filter(([, info]) => !info.bonus);
-        otherTeams.sort(([a], [b]) => {
-          const idxA = gamesForWeek.findIndex((g) => g.homeTeam === a || g.awayTeam === a);
-          const idxB = gamesForWeek.findIndex((g) => g.homeTeam === b || g.awayTeam === b);
-          return idxA - idxB;
-        });
-
-        const orderedTeams = [];
-        if (bonusTeam) orderedTeams.push(bonusTeam);
-        orderedTeams.push(...otherTeams);
-
         for (const [team, info] of orderedTeams) {
           const li = document.createElement("li");
           li.className = "pick-row";
@@ -1361,6 +1525,22 @@ document.addEventListener("DOMContentLoaded", async () => {
           nameSpan.className = `team-name ${resultClass}`;
           nameSpan.textContent = team;
           li.appendChild(nameSpan);
+
+          // Odds only mean anything before the outcome is known — a
+          // completed game's real result already speaks for itself, so
+          // skip the suffix there rather than show a stale pre-game number.
+          // Kept as its own flex item (not nested in the truncating
+          // team-name span) so it stays fully readable even when a long
+          // team name has to ellipsize in a narrow column.
+          if (showOdds && game && game.status !== "Completed") {
+            const winPct = team === game.homeTeam ? game.homeWinPct : game.awayWinPct;
+            if (winPct != null) {
+              const oddsSpan = document.createElement("span");
+              oddsSpan.className = "team-odds";
+              oddsSpan.textContent = `(${winPct}% win)`;
+              li.appendChild(oddsSpan);
+            }
+          }
 
           const ptsSpan = document.createElement("span");
           ptsSpan.className = "team-points";
@@ -1388,7 +1568,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (selectedTeam !== "all") counterEl.textContent = `${playerCards.length}/${allPlayers.length} player(s)`;
 
     if (!matchupsContainer.classList.contains("hidden")) renderMatchups(gamesForWeek);
+    updateMatchupsColumnCount();
   }
+
+  // weeklyGrid's columns are auto-fill/minmax(280px, 1fr), so its actual
+  // column count depends on the viewport — not something a fixed media-query
+  // breakpoint can know. Once there's room for 3+ pick columns, the matchups
+  // panel widens and lays its own day-boxes out two-wide instead of one long
+  // scrolling list (see .matchups-two-col in dashboard.css).
+  //
+  // Deliberately NOT measured by reading weeklyGrid's live column count:
+  // widening the matchups panel eats into weeklyGrid's own width, which
+  // could drop its column count back below 3 and immediately reverse the
+  // decision that caused the widening — an infinite flip-flop. Instead this
+  // computes how many columns weeklyGrid WOULD have at the panel's normal
+  // (single-column) width, a value that doesn't change once two-col mode
+  // is applied, so the decision is stable. The 280/14/20/300 constants
+  // mirror .weekly-picks-grid / .picks-layout / .matchups-container in
+  // dashboard.css — keep them in sync if those change.
+  const GRID_TRACK_MIN = 280;
+  const GRID_GAP = 14;
+  const PICKS_LAYOUT_GAP = 20;
+  const MATCHUPS_BASE_WIDTH = 300;
+  function updateMatchupsColumnCount() {
+    if (matchupsContainer.classList.contains("hidden")) return;
+    const layoutWidth = document.querySelector(".picks-layout").clientWidth;
+    const availableForGrid = layoutWidth - MATCHUPS_BASE_WIDTH - PICKS_LAYOUT_GAP;
+    const columns = Math.max(1, Math.floor((availableForGrid + GRID_GAP) / (GRID_TRACK_MIN + GRID_GAP)));
+    matchupsContainer.classList.toggle("matchups-two-col", columns >= 3);
+  }
+  window.addEventListener("resize", () => requestAnimationFrame(updateMatchupsColumnCount));
 
   // =========================
   // Matchups
@@ -1420,7 +1629,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         awayLogo.src = getLogoPath(game.awayTeam);
         awayLogo.className = "matchup-logo";
         away.appendChild(awayLogo);
-        away.append(game.awayTeam);
+        const awayName = document.createElement("span");
+        awayName.className = "team-label-text";
+        awayName.textContent = game.awayTeam;
+        awayName.title = game.awayTeam;
+        away.appendChild(awayName);
 
         const awayScore = document.createElement("div");
         awayScore.className = "team-score";
@@ -1436,7 +1649,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         homeLogo.src = getLogoPath(game.homeTeam);
         homeLogo.className = "matchup-logo";
         home.appendChild(homeLogo);
-        home.append(game.homeTeam);
+        const homeName = document.createElement("span");
+        homeName.className = "team-label-text";
+        homeName.textContent = game.homeTeam;
+        homeName.title = game.homeTeam;
+        home.appendChild(homeName);
 
         if (game.status === "Completed") {
           if (game.homeScore > game.awayScore) {
@@ -1470,13 +1687,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     lastUpdatedTimeEls.forEach((el) => { el.textContent = "[Error]"; });
   }
 
-  toggleScoresBtn.addEventListener("click", async () => {
-    matchupsContainer.classList.toggle("hidden");
-    toggleScoresBtn.textContent = matchupsContainer.classList.contains("hidden") ? "Show Matchups" : "Hide Matchups";
-    if (!matchupsContainer.classList.contains("hidden")) {
+  toggleMinimalBtn.addEventListener("change", () => {
+    minimalView = toggleMinimalBtn.checked;
+    localStorage.setItem("pick5_minimalView", minimalView);
+    if (currentTab === "picks") loadWeeklyPicks(currentWeek);
+  });
+
+  toggleOddsBtn.addEventListener("change", () => {
+    showOdds = toggleOddsBtn.checked;
+    localStorage.setItem("pick5_showOdds", showOdds);
+    if (currentTab === "picks") loadWeeklyPicks(currentWeek);
+  });
+
+  toggleScoresBtn.addEventListener("change", async () => {
+    const isShown = toggleScoresBtn.checked;
+    matchupsContainer.classList.toggle("hidden", !isShown);
+    if (isShown) {
       const gamesData = await fetchGames();
       const gamesForWeek = gamesData.find((g) => g.week === currentWeek)?.games || [];
       renderMatchups(gamesForWeek);
+      updateMatchupsColumnCount();
     }
   });
 

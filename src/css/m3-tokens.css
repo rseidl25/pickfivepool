@@ -349,6 +349,39 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .m3-chip:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 .m3-chip:disabled:hover { background: var(--md-sys-color-surface); }
 
+/* ---- Switch ---- */
+/* A labeled on/off switch — bare track+knob+label, no chip/pill container
+   around it (no border/background/padding) — left-aligned within whatever
+   space it sits in rather than centered as a boxed unit. Reads
+   unambiguously as a toggle rather than a momentary action button — a real
+   <input type="checkbox"> under the hood for free keyboard/screen-reader
+   support, just visually hidden in favor of the track+knob it drives via
+   the sibling/general-sibling combinators below. The checked state shows
+   entirely on the track/knob/label themselves (color + a bold label) since
+   there's no pill background left to carry that signal. */
+.m3-switch {
+  display: inline-flex; align-items: center; justify-content: flex-start; gap: 8px; height: 32px;
+  cursor: pointer; user-select: none;
+}
+.m3-switch-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.m3-switch-track {
+  flex-shrink: 0; position: relative; width: 30px; height: 18px; border-radius: 9px;
+  background: var(--md-sys-color-outline);
+  transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-switch-knob {
+  position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--md-sys-color-surface); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: transform var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.m3-switch-label { font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface-variant); }
+.m3-switch-input:checked ~ .m3-switch-track { background: var(--md-sys-color-primary); }
+.m3-switch-input:checked ~ .m3-switch-track .m3-switch-knob {
+  transform: translateX(12px); background: var(--md-sys-color-on-primary);
+}
+.m3-switch-input:checked ~ .m3-switch-label { color: var(--md-sys-color-on-surface); font-weight: 600; }
+.m3-switch-input:focus-visible ~ .m3-switch-track { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
+
 /* ---- Text fields ---- */
 .m3-field-wrap { position: relative; display: flex; flex-direction: column; }
 .m3-field {

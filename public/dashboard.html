@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" href="icons/favicon.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
 
-  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=13">
-  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=28">
+  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=15">
+  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=72">
 </head>
 <body>
   <div id="page-loading-overlay" class="page-loading-overlay">
@@ -151,7 +151,7 @@
                 <div id="my-week-total-points" class="my-week-total-points">-- pts</div>
                 <div class="my-week-stats-row">
                   <div id="my-week-overall-pos" class="my-week-overall-pos-box"></div>
-                  <div id="my-week-win-chance" class="my-week-win-chance-box"></div>
+                  <div id="my-week-win-chance" class="my-week-win-chance-box" role="button" tabindex="0"></div>
                 </div>
               </div>
 
@@ -187,10 +187,28 @@
             <h2 id="picks-title" class="section-title">WEEK # PICKS</h2>
 
             <div class="picks-controls">
-              <select id="select-player" class="m3-field picks-select"></select>
-              <select id="select-team" class="m3-field picks-select"></select>
+              <div class="picks-filters">
+                <select id="select-player" class="m3-field picks-select"></select>
+                <select id="select-team" class="m3-field picks-select"></select>
+              </div>
               <span id="team-pick-counter" class="team-pick-counter" style="display:none;"></span>
-              <button id="toggle-scores-btn" type="button" class="m3-chip">Show Matchups</button>
+              <div class="picks-buttons">
+                <label class="m3-switch" id="matchups-switch">
+                  <input type="checkbox" id="toggle-scores-btn" class="m3-switch-input">
+                  <span class="m3-switch-track"><span class="m3-switch-knob"></span></span>
+                  <span class="m3-switch-label">Matchups</span>
+                </label>
+                <label class="m3-switch">
+                  <input type="checkbox" id="toggle-odds-btn" class="m3-switch-input">
+                  <span class="m3-switch-track"><span class="m3-switch-knob"></span></span>
+                  <span class="m3-switch-label">Odds</span>
+                </label>
+                <label class="m3-switch">
+                  <input type="checkbox" id="toggle-minimal-btn" class="m3-switch-input">
+                  <span class="m3-switch-track"><span class="m3-switch-knob"></span></span>
+                  <span class="m3-switch-label">Minimal View</span>
+                </label>
+              </div>
             </div>
 
             <div class="picks-layout">
@@ -392,6 +410,19 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/dashboard/dashboard.js?v=25"></script>
+  <!-- Win Chance Breakdown -->
+  <div id="win-chance-modal" class="modal hidden">
+    <div class="modal-content m3-dialog">
+      <div class="modal-header">
+        <h2>How this % is calculated</h2>
+        <span class="close-btn" id="close-win-chance">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="win-chance-detail"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../src/js/dashboard/dashboard.js?v=45"></script>
 </body>
 </html>
