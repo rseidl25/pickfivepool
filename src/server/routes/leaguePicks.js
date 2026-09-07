@@ -6,7 +6,7 @@ import { db } from "../firebaseAdmin.js";
 import * as store from "../store.js";
 import { getGames } from "../espn/poller.js";
 import { computeScores } from "../scoring.js";
-import { simulateWinChance, winChanceBreakdown } from "../winProbability.js";
+import { simulateWinChance } from "../winProbability.js";
 
 const router = Router({ mergeParams: true }); // mergeParams lets it see :id from the parent mount
 
@@ -187,7 +187,6 @@ router.get("/my-week", requireAuth, requireLeagueMember, (req, res) => {
   }
 
   const winChancePct = simulateWinChance(submittedSeasonPicks(league), gamesForWeek, weekKey, req.uid);
-  const winChanceDetail = winChanceBreakdown(submittedSeasonPicks(league), gamesForWeek, weekKey, req.uid);
 
   // How many players (league-wide) picked each team this week, for the top-5
   // "Most Picked Teams" list. Gated the same way as everywhere else that
@@ -221,7 +220,6 @@ router.get("/my-week", requireAuth, requireLeagueMember, (req, res) => {
     hateWatch: [...hateWatchSet],
     mostPickedTeams,
     winChancePct,
-    winChanceDetail,
   });
 });
 

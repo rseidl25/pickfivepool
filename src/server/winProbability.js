@@ -138,11 +138,9 @@ function splitPicks(picks, gamesForWeek, undecidedGameIndex) {
   return { decidedTotal, swingPicks };
 }
 
-// Shared enumeration core for simulateWinChance and winChanceBreakdown — runs
-// the exact same 2^k loop once and hands back both the probability-weighted
-// answer and the raw outcome counts behind it, so the "how was this
-// calculated" popup can cite the literal masks that were counted instead of
-// re-deriving (and risking drifting out of sync with) the real number.
+// Enumeration core for simulateWinChance — walks every 2^k combination of
+// the week's still-undecided games once and returns the probability-weighted
+// share in which the caller finishes with the most points.
 function enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid) {
   const undecidedGames = gamesForWeek.filter((g) => !isGameDecided(g));
   const undecidedGameIndex = new Map(undecidedGames.map((g, i) => [g, i]));
@@ -209,54 +207,3 @@ export function simulateWinChance(leagueSeasonPicks, gamesForWeek, week, callerU
   return Math.round(callerWinProbability * 100);
 }
 
-// Human-facing breakdown of simulateWinChance's own inputs and outputs (the
-// "how was this calculated?" popup): the caller's locked-in total, the live
-// win probability behind each of their still-undecided picks, and — the part
-// that actually shows where the % number itself comes from — the literal
-// count of enumerated outcomes (out of every combination of the remaining
-// games) in which the caller finishes with the most points, plus the total
-// probability weight of that share. Both are produced by the exact same
-// enumeration simulateWinChance runs, not re-derived, so they can't drift.
-export function winChanceBreakdown(leagueSeasonPicks, gamesForWeek, week, callerUid) {
-  const undecidedGames = gamesForWeek.filter((g) => !isGameDecided(g));
-  const undecidedGameIndex = new Map(undecidedGames.map((g, i) => [g, i]));
-  const homeWinProbs = undecidedGames.map(scoreDiffToWinProb);
-
-  const weekData = leagueSeasonPicks.get(callerUid)?.get(week);
-  if (!weekData) return null;
-  const { decidedTotal, swingPicks } = splitPicks(weekData, gamesForWeek, undecidedGameIndex);
-
-  const picks = swingPicks.map(({ gameIdx, isHomeTeamPick }) => {
-    const game = undecidedGames[gameIdx];
-    const winProb = isHomeTeamPick ? homeWinProbs[gameIdx] : 1 - homeWinProbs[gameIdx];
-    const isLive = game.status === "In Progress" && game.period != null && game.clockSeconds != null;
-    const hasOdds = game.homeMoneyline != null && game.awayMoneyline != null;
-    return {
-      team: isHomeTeamPick ? game.homeTeam : game.awayTeam,
-      opponent: isHomeTeamPick ? game.awayTeam : game.homeTeam,
-      status: game.status,
-      winPct: Math.round(winProb * 100),
-      // What the % is actually sourced from, so the popup can label it
-      // instead of showing an unexplained number: "live" once the game has
-      // started (score + clock), "odds" from the book's pre-game line, or
-      // "even" only if a book hasn't posted a line for this game yet.
-      source: isLive ? "live" : hasOdds ? "odds" : "even",
-    };
-  });
-
-  const { totalOutcomes, winningOutcomes, callerWinProbability } = enumerateOutcomes(
-    leagueSeasonPicks,
-    gamesForWeek,
-    week,
-    callerUid
-  );
-
-  return {
-    decidedTotal,
-    picks,
-    playerCount: leagueSeasonPicks.size,
-    totalOutcomes,
-    winningOutcomes,
-    winProbabilityPct: Math.round(callerWinProbability * 100),
-  };
-}

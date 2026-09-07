@@ -194,6 +194,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   let minimalView = localStorage.getItem("pick5_minimalView") === "true";
   toggleOddsBtn.checked = showOdds;
   toggleMinimalBtn.checked = minimalView;
+  // Just the checkbox + panel visibility here, not the panel's actual
+  // content — currentWeek isn't known yet this early in startup. Content
+  // fills in on its own once the Picks tab is actually loaded, since
+  // loadWeeklyPicks() already re-renders the matchups list on every call
+  // whenever the panel isn't hidden (see its own body further down).
+  const showMatchups = localStorage.getItem("pick5_showMatchups") === "true";
+  toggleScoresBtn.checked = showMatchups;
+  matchupsContainer.classList.toggle("hidden", !showMatchups);
 
   const userName = document.getElementById("user-name");
   const userAvatar = document.getElementById("user-avatar");
@@ -211,10 +219,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const howToPlayBtn = document.getElementById("how-to-play-btn");
   const howToPlayModal = document.getElementById("how-to-play-modal");
   const closeHowToPlay = document.getElementById("close-how-to-play");
-
-  const winChanceModal = document.getElementById("win-chance-modal");
-  const closeWinChance = document.getElementById("close-win-chance");
-  const winChanceDetail = document.getElementById("win-chance-detail");
 
   const messageBoardBtn = document.getElementById("message-board-btn");
   const messageBoardModal = document.getElementById("message-board-modal");
@@ -276,15 +280,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   let myLeagues = [];
   let currentLeagueId = localStorage.getItem("pick5_currentLeagueId") || null;
   let isLeagueOwner = false;
-  // Populated each time loadMyWeek() fetches — read by the win-chance popup
-  // when the player clicks the % (see winChanceModal below).
-  let lastWinChance = null;
 
   // =========================
   // Modals — centered M3 dialogs (not anchored popovers); only one open
   // at a time, click-outside or the X closes it.
   // =========================
-  const allModals = [howToPlayModal, messageBoardModal, leagueStatsModal, settingsModal, themeModal, winChanceModal];
+  const allModals = [howToPlayModal, messageBoardModal, leagueStatsModal, settingsModal, themeModal];
   function closeAllModals() {
     allModals.forEach((m) => m.classList.add("hidden"));
   }
@@ -453,7 +454,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   howToPlayBtn.onclick = () => openModal(howToPlayModal);
   closeHowToPlay.onclick = () => closeAllModals();
-  closeWinChance.onclick = () => closeAllModals();
 
   // =========================
   // Message board
@@ -770,40 +770,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   themeBtn.onclick = () => openModal(themeModal);
   closeTheme.onclick = () => closeAllModals();
-
-  // Secret feature: click/tap the win-chance % to see the math behind it —
-  // your locked-in points from already-decided games, plus a live win-probability
-  // estimate for each pick still riding on a game in progress or not yet started.
-  function openWinChanceModal() {
-    if (!lastWinChance || !lastWinChance.detail) return;
-    const { pct, detail } = lastWinChance;
-    const picksHtml = detail.picks.length
-      ? detail.picks
-          .map(
-            (p) => `
-        <li class="pick-row">
-          <img src="${getLogoPath(p.team)}" alt="${p.team}" class="team-logo">
-          <span class="team-name">${p.team}</span>
-          <span class="team-points">${p.winPct}%</span>
-        </li>`
-          )
-          .join("")
-      : "<li>All your picks this week are already decided.</li>";
-
-    winChanceDetail.innerHTML = `
-      <div class="win-chance-big"><strong>${pct}%</strong> chance to win the week</div>
-      <p class="modal-subtext">Locked in: <strong>${detail.decidedTotal} pts</strong>. Win probability for your remaining picks:</p>
-      <ul class="pick-list">${picksHtml}</ul>
-    `;
-    openModal(winChanceModal);
-  }
-  myWeekWinChance.addEventListener("click", openWinChanceModal);
-  myWeekWinChance.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      openWinChanceModal();
-    }
-  });
 
   settingsForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -1188,7 +1154,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         <span class="my-week-win-chance-pct">${myWeek.winChancePct}%</span>
         <span class="my-week-win-chance-label">chance to win the week</span>
       `;
-      lastWinChance = { pct: myWeek.winChancePct, detail: myWeek.winChanceDetail };
 
       renderSeasonTrend(myUid, gamesData);
     } catch (err) {
@@ -1196,7 +1161,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       myWeekPicksList.innerHTML = "<li>Error loading this week's data</li>";
       myWeekPicksTotal.textContent = "";
       myWeekWinChance.innerHTML = "";
-      lastWinChance = null;
     }
   }
 
@@ -1691,6 +1655,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   toggleScoresBtn.addEventListener("change", async () => {
     const isShown = toggleScoresBtn.checked;
+    localStorage.setItem("pick5_showMatchups", isShown);
     matchupsContainer.classList.toggle("hidden", !isShown);
     if (isShown) {
       const gamesData = await fetchGames();
