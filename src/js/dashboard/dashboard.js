@@ -360,6 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       currentLeagueId = myLeagues[0].id;
     }
     setCurrentLeague(currentLeagueId);
+    refreshHeaderName();
     isLeagueOwner = myLeagues.find((l) => l.id === currentLeagueId)?.role === "owner";
     if (redirectToPicksIfNotSubmitted()) return;
 
@@ -380,6 +381,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentLeagueId = leagueId;
     if (leagueId) localStorage.setItem("pick5_currentLeagueId", leagueId);
     else localStorage.removeItem("pick5_currentLeagueId");
+  }
+
+  // The header identity is per-league (same account can go by a different
+  // name in different leagues), not the global profile name — re-fetch it
+  // whenever the active league changes. Falls back to whatever's already
+  // shown (the global name) if the lookup fails; never leaves it blank.
+  async function refreshHeaderName() {
+    if (!currentLeagueId) return;
+    try {
+      const league = await fetchLeagueDetail(currentLeagueId);
+      const me = league.members.find((m) => m.uid === auth.currentUser?.uid);
+      if (me?.displayName) {
+        loggedInUser = me.displayName;
+        userName.textContent = me.displayName;
+      }
+    } catch (err) {
+      console.error("Error loading per-league display name:", err);
+    }
   }
 
   // Reflects the currently-selected league's hasUnread flag (from
@@ -405,6 +424,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   leagueSelect.addEventListener("change", () => {
     setCurrentLeague(leagueSelect.value);
+    refreshHeaderName();
     isLeagueOwner = myLeagues.find((l) => l.id === currentLeagueId)?.role === "owner";
     if (redirectToPicksIfNotSubmitted()) return;
     updateUnreadIndicator();
@@ -461,10 +481,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadPosts() {
     postsList.innerHTML = "<li>Loading...</li>";
     try {
-      const [posts, seasonYear] = await Promise.all([
+      const [posts, seasonYear, league] = await Promise.all([
         authedFetch(`/api/leagues/${currentLeagueId}/posts`),
         getCachedSeasonYear(),
+        fetchLeagueDetail(currentLeagueId),
       ]);
+      // post.authorName is a snapshot from when that message was posted, so
+      // it can go stale if someone renames themselves later — this map is
+      // each member's name right now, shown alongside the old one on
+      // hover/tap so it's clear who's who after a rename.
+      const currentNameByUid = new Map(league.members.map((m) => [m.uid, m.displayName]));
       const me = auth.currentUser;
       postsList.innerHTML = "";
       if (posts.length === 0) {
@@ -492,6 +518,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           meta.className = "post-meta";
           meta.textContent = post.authorName;
           li.appendChild(meta);
+
+          const currentName = currentNameByUid.get(post.authorUid);
+          if (currentName) {
+            const currentNameLine = document.createElement("div");
+            currentNameLine.className = "post-current-name";
+            currentNameLine.textContent = `(${currentName})`;
+            li.appendChild(currentNameLine);
+          }
         }
 
         // Bubble + timestamp share this wrapper (not the whole row, which

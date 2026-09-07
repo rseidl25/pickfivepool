@@ -621,10 +621,21 @@ html, body { height: 100%; }
    below), so theirs sits in the gutter to the left instead. */
 .post-time-side { left: 100%; margin-left: 8px; }
 .post-row.own-message .post-time-side { left: auto; right: 100%; margin-left: 0; margin-right: 8px; }
+/* The author's *current* name (post.authorName is a snapshot from when
+   they posted, which can go stale after a rename) — sits in normal flow
+   right below that snapshot name, not the side gutter, so it's fine for it
+   to push the bubble down slightly when revealed; only the timestamp had
+   the no-reflow constraint, since that one sits beside the bubble itself. */
+.post-current-name {
+  display: none; margin: 0 4px 3px; font: var(--md-type-body-sm); font-style: italic;
+  color: var(--md-sys-color-on-surface-variant);
+}
 @media (hover: hover) {
   .post-row:hover .post-time-side { display: block; }
+  .post-row:hover .post-current-name { display: block; }
 }
 .posts-list.show-all-times .post-time-side { display: block; }
+.posts-list.show-all-times .post-current-name { display: block; }
 .no-posts { color: var(--md-sys-color-on-surface-variant); font-style: italic; align-self: center; cursor: default; }
 
 .post-form { flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
