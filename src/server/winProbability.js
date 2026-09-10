@@ -15,24 +15,31 @@
 // not a sportsbook-grade model — see scoreDiffToWinProb's comment for the
 // specifics and honest limitations (no possession/timeouts/etc.).
 //
-// Enumerating every 2^k outcome of the k still-undecided games (instead of
+// Enumerating every combination of the k still-undecided games (instead of
 // sampling a fixed number of random trials) makes the result exact under
 // whatever per-game probabilities were used and, crucially, deterministic:
 // the same picks + the same score/clock state always produce the same
 // percentage, so it doesn't drift on every page refresh with nothing
 // having actually changed — it only moves when a score or the clock
-// actually does. An NFL week has at most 16 games, so 2^k tops out at
-// 65536 — cheap enough to enumerate in full on every request at this app's
-// scale (~50ms measured with 15 players and all 16 games undecided).
+// actually does. A game nobody has as their bonus pick still only has 2
+// possible states (win/lose), same as a plain 2^k bitmask always did; a
+// game where someone's live bonus pick lives has a few more (see
+// buildGameStates) since that side's actual score, not just win/lose, now
+// matters for a correct-bonus payout — the combination count grows with
+// how many *distinct games* are anyone's bonus pick, not with the number
+// of players, so it stays cheap even in a large league.
 //
-// Scoring note: a correct bonus pick normally scores 10 + the team's actual
-// final score, but a simulated (not-yet-decided) game has no real final
-// score to use. For simulation purposes only, a correct pick — bonus or
-// not — scores a flat 10. Already-completed games still use their real,
-// exact scored value (via the same rule as scoring.js). This slightly
-// undercounts bonus-heavy upside in the simulation, but there's no honest
-// way to simulate an unplayed game's final score, and the simulation's job
-// is relative ranking (who finishes #1), not exact point totals.
+// Scoring note: a correct pick — bonus or not — on an already-completed
+// game uses its real, exact scored value (10 + actual score for the bonus
+// team, via the same rule as scoring.js). A non-bonus pick always scores a
+// flat 10 regardless of margin — that's the game's actual rule, not an
+// approximation, so there's nothing to simulate there. A correct bonus pick
+// on a still-undecided game is the one genuinely simulated piece: instead
+// of a single flat point estimate, its payout is drawn from a small set of
+// discrete score buckets around the market's implied score (see
+// BONUS_SCORE_BUCKETS) — capturing that a real final score has real spread
+// around its expected value, which specifically matters here since "who
+// wins the week" is a question about tails, not medians.
 
 const REGULATION_SECONDS = 4 * 15 * 60; // 4 quarters, 15 min each
 // How fast the win probability swings toward the leader as the score
@@ -120,10 +127,30 @@ function impliedTeamScore(game, isHomeTeam) {
   return isHomeTeam ? homeImplied : awayImplied;
 }
 
+// A single implied score is still just a guess at the mean — real NFL
+// final scores land all over the place around that number, and "who wins
+// the week" is inherently a tail-outcome question, not a median one.
+// Discretizing into a few buckets around the implied score (instead of one
+// flat point estimate) captures that spread while staying an exact,
+// deterministic enumeration — no random sampling. Offsets are the 25th/75th
+// percentile points of a normal curve (z = ±0.6745) at a hand-picked
+// spread-of-outcomes of 10 points (roughly the real spread NFL team scores
+// show around their expected value) — probably not fittable more precisely
+// than that without real historical score-distribution data, but "some
+// spread" beats "none" for a question about which tail you land in.
+const BONUS_SCORE_BUCKETS = [
+  { offset: -7, weight: 0.25 },
+  { offset: 0, weight: 0.5 },
+  { offset: 7, weight: 0.25 },
+];
+
 // Splits a player's picks into a fixed points total from already-decided
 // games plus a list of "swing" picks whose outcome depends on one of the
 // still-undecided games — so the per-outcome enumeration below only has to
-// do this cheap lookup work once per player, not once per outcome.
+// do this cheap lookup work once per player, not once per outcome. Bonus
+// scoring for a still-undecided game is resolved later, per-outcome, by
+// buildGameStates — it's a property of the *game* (shared by anyone who
+// picked that team as their bonus), not something to precompute per player.
 function splitPicks(picks, gamesForWeek, undecidedGameIndex) {
   let decidedTotal = 0;
   const swingPicks = [];
@@ -142,32 +169,46 @@ function splitPicks(picks, gamesForWeek, undecidedGameIndex) {
     } else {
       const isHomeTeamPick = game.homeTeam.includes(pick.team);
       const isBonus = pick.team === picks.bonusPick;
-      // A correct bonus pick on a still-undecided game used to be credited
-      // a flat 10, same as any other pick — undervaluing it relative to an
-      // already-decided bonus pick's real 10 + actual score, and making an
-      // early already-banked bonus (like a completed game's) look far more
-      // dominant than a same-caliber bonus pick that just hasn't kicked
-      // off yet. Using the implied score keeps that comparison honest;
-      // falls back to the old flat 10 if this book hasn't posted a
-      // spread/total for the game yet.
-      let pointsIfCorrect = 10;
-      if (isBonus) {
-        const implied = impliedTeamScore(game, isHomeTeamPick);
-        if (implied != null) pointsIfCorrect = 10 + Math.round(implied);
-      }
-      swingPicks.push({ gameIdx: undecidedGameIndex.get(game), isHomeTeamPick, pointsIfCorrect });
+      swingPicks.push({ gameIdx: undecidedGameIndex.get(game), isHomeTeamPick, isBonus });
     }
   }
 
   return { decidedTotal, swingPicks };
 }
 
-// Enumeration core for simulateWeekChances — walks every 2^k combination of
-// the week's still-undecided games once and returns the probability-weighted
-// share in which the caller finishes with the most points (outright win),
-// plus the share in which they finish in a top-3 (competition-ranked, ties
-// share a rank) position — both computed from the same single pass over
-// every outcome rather than running the enumeration twice.
+// One side's (home or away) possible resolutions when it wins, given its
+// bonus "mode": "none" (nobody's bonus pick — a single state, bonusPoints
+// never read), "point" (someone else's live bonus pick — the point-estimate
+// fix from earlier, one state worth 10 + the implied score), or "bucketed"
+// (the caller's own live bonus pick — several discrete states spread around
+// that same implied score instead of collapsing to one number).
+function bonusStatesForSide(game, isHomeTeam, winProb, mode) {
+  if (mode === "none") return [{ prob: winProb, bonusPoints: null }];
+  const implied = impliedTeamScore(game, isHomeTeam);
+  if (mode === "point" || implied == null) {
+    return [{ prob: winProb, bonusPoints: implied != null ? 10 + Math.round(implied) : 10 }];
+  }
+  return BONUS_SCORE_BUCKETS.map((b) => ({ prob: winProb * b.weight, bonusPoints: 10 + Math.round(implied + b.offset) }));
+}
+
+// One undecided game's possible resolutions, as a small list of mutually
+// exclusive {homeWon, prob, bonusPoints} states summing to 1 — 2 states
+// (plain win/lose) for a game where neither side is bucket-mode, expanding
+// only for whichever side is the caller's own live bonus pick.
+function buildGameStates(game, homeWinProb, homeMode, awayMode) {
+  const homeStates = bonusStatesForSide(game, true, homeWinProb, homeMode).map((s) => ({ homeWon: true, prob: s.prob, bonusPoints: s.bonusPoints }));
+  const awayStates = bonusStatesForSide(game, false, 1 - homeWinProb, awayMode).map((s) => ({ homeWon: false, prob: s.prob, bonusPoints: s.bonusPoints }));
+  return [...homeStates, ...awayStates];
+}
+
+// Enumeration core for simulateWeekChances — walks every combination of the
+// week's still-undecided games once (mixed-radix, not a plain 2^k bitmask,
+// since a game where somebody's bonus pick lives has more than 2 possible
+// states — see buildGameStates) and returns the probability-weighted share
+// in which the caller finishes with the most points (outright win), plus
+// the share in which they finish in a top-3 (competition-ranked, ties share
+// a rank) position — both computed from the same single pass over every
+// combination rather than running the enumeration twice.
 function enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid) {
   const undecidedGames = gamesForWeek.filter((g) => !isGameDecided(g));
   const undecidedGameIndex = new Map(undecidedGames.map((g, i) => [g, i]));
@@ -180,51 +221,100 @@ function enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid) {
     players.push({ uid, ...splitPicks(weekData, gamesForWeek, undecidedGameIndex) });
   }
 
-  const totalOutcomes = 1 << undecidedGames.length; // 2^k, k <= 16 games/week
   if (players.length === 0) {
-    return { callerWinProbability: 0, callerTop3Probability: 0, totalOutcomes, winningOutcomes: 0 };
+    return { callerWinProbability: 0, callerTop3Probability: 0, totalOutcomes: 1 << undecidedGames.length, winningOutcomes: 0 };
   }
+
+  // Bucket only the *caller's own* live bonus pick, not everyone's — an
+  // earlier version bucketed every player's bonus game and measured ~4s for
+  // a single request on real league data (bucket states compound
+  // multiplicatively across every distinct bonus-relevant game, and this
+  // app runs on a Raspberry Pi, not a server). The caller's own bonus
+  // uncertainty is also the dominant piece of "how sure am I about my own
+  // outcome" anyway; everyone else's still uses the point-estimate fix
+  // ("point" mode) rather than collapsing all the way back to a flat 10.
+  // This keeps the combination count at essentially the same order of
+  // magnitude as the original plain-2^k version (one game gets a few extra
+  // states instead of 2, nothing else changes) regardless of how many other
+  // players also have a live bonus pick.
+  const homeMode = new Array(undecidedGames.length).fill("none");
+  const awayMode = new Array(undecidedGames.length).fill("none");
+  for (const player of players) {
+    const isCaller = player.uid === callerUid;
+    for (const sp of player.swingPicks) {
+      if (!sp.isBonus) continue;
+      const modes = sp.isHomeTeamPick ? homeMode : awayMode;
+      // "bucketed" wins over "point" if somehow both apply to the same side
+      // (can't happen in practice — that would mean the caller and someone
+      // else both have the same team as their bonus, in which case they'd
+      // already share "bucketed" — kept as a max() for clarity/safety).
+      if (isCaller) modes[sp.gameIdx] = "bucketed";
+      else if (modes[sp.gameIdx] === "none") modes[sp.gameIdx] = "point";
+    }
+  }
+
+  const gameStates = undecidedGames.map((game, i) => buildGameStates(game, homeWinProbs[i], homeMode[i], awayMode[i]));
+  const stateCounts = gameStates.map((s) => s.length);
+  const totalOutcomes = stateCounts.reduce((a, b) => a * b, 1);
 
   let callerWinProbability = 0;
   let callerTop3Probability = 0;
   let winningOutcomes = 0;
 
-  for (let mask = 0; mask < totalOutcomes; mask++) {
-    let maskProbability = 1;
-    for (let i = 0; i < undecidedGames.length; i++) {
-      const homeWon = (mask >> i) & 1;
-      maskProbability *= homeWon ? homeWinProbs[i] : 1 - homeWinProbs[i];
-    }
-    if (maskProbability === 0) continue;
+  const resolvedHomeWon = new Array(undecidedGames.length);
+  const resolvedBonusPoints = new Array(undecidedGames.length);
+  // Reused across every combo instead of allocating a fresh sorted array
+  // each time — this loop can run tens of thousands of times per request,
+  // and a full sort()-with-closure per combo is what made an earlier
+  // version of this (bucketing every player, not just the caller) measure
+  // ~4s for a single request. Competition rank only needs "how many
+  // *distinct* totals beat the caller's", not a full ordering, so this
+  // avoids sorting everyone entirely.
+  const allTotals = new Array(players.length);
+  const distinctHigher = [];
 
-    const totals = players.map((player) => {
+  for (let combo = 0; combo < totalOutcomes; combo++) {
+    let rem = combo;
+    let comboProbability = 1;
+    for (let i = 0; i < undecidedGames.length; i++) {
+      const stateIdx = rem % stateCounts[i];
+      rem = (rem - stateIdx) / stateCounts[i];
+      const state = gameStates[i][stateIdx];
+      comboProbability *= state.prob;
+      resolvedHomeWon[i] = state.homeWon;
+      resolvedBonusPoints[i] = state.bonusPoints;
+    }
+    if (comboProbability === 0) continue;
+
+    let callerTotal = 0;
+    for (let idx = 0; idx < players.length; idx++) {
+      const player = players[idx];
       let total = player.decidedTotal;
       for (const sp of player.swingPicks) {
-        const homeWon = (mask >> sp.gameIdx) & 1;
-        if (homeWon === (sp.isHomeTeamPick ? 1 : 0)) total += sp.pointsIfCorrect;
+        if (resolvedHomeWon[sp.gameIdx] !== sp.isHomeTeamPick) continue;
+        total += sp.isBonus ? resolvedBonusPoints[sp.gameIdx] : 10;
       }
-      return { uid: player.uid, total };
-    });
-    totals.sort((a, b) => b.total - a.total);
+      allTotals[idx] = total;
+      if (player.uid === callerUid) callerTotal = total;
+    }
 
     // Competition ranking (1224) — tied players share the rank they're
     // tied for, same rule used everywhere else scores are ranked in this
-    // app (leaderboard, "T-4th of 16 players", etc.).
-    let currentRank = 0;
-    let prevTotal = null;
-    let callerRank = null;
-    for (let i = 0; i < totals.length; i++) {
-      if (totals[i].total !== prevTotal) currentRank = i + 1;
-      prevTotal = totals[i].total;
-      if (totals[i].uid === callerUid) callerRank = currentRank;
+    // app (leaderboard, "T-4th of 16 players", etc.): rank = 1 + however
+    // many distinct totals beat the caller's.
+    distinctHigher.length = 0;
+    for (let idx = 0; idx < allTotals.length; idx++) {
+      const t = allTotals[idx];
+      if (t > callerTotal && !distinctHigher.includes(t)) distinctHigher.push(t);
     }
+    const callerRank = distinctHigher.length + 1;
 
     if (callerRank === 1) {
-      callerWinProbability += maskProbability;
+      callerWinProbability += comboProbability;
       winningOutcomes++;
     }
-    if (callerRank !== null && callerRank <= 3) {
-      callerTop3Probability += maskProbability;
+    if (callerRank <= 3) {
+      callerTop3Probability += comboProbability;
     }
   }
 
