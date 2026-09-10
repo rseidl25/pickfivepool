@@ -258,6 +258,21 @@ html, body { height: 100%; }
 }
 .podium-score { font: var(--md-type-body-md); font-weight: 700; color: #444444; }
 
+/* Desktop: names read as "grand" — the pill has a lot of empty vertical
+   space at the base 16px title-md size. This is just the starting size;
+   fitPodiumNames() (dashboard.js) then shrinks each name only as far as its
+   own length actually requires, so a short name stays huge instead of every
+   name settling for one small safe-for-anything size. max-width is dropped
+   (JS measures the real flex-allotted width instead) and the ellipsis never
+   actually triggers once JS has run, but stays as a no-JS fallback. Mobile
+   (≤840px) is untouched — this whole block simply doesn't apply there. */
+@media (min-width: 841px) {
+  .podium-name { font-size: 32px; max-width: none; }
+  .podium-rank-2 .podium-name,
+  .podium-rank-3 .podium-name { font-size: 24px; }
+  .podium-score { font-size: 15px; }
+}
+
 .leaderboard-table {
   width: 100%;
   border-collapse: collapse;
@@ -365,6 +380,36 @@ html, body { height: 100%; }
 .trend-dot-points { fill: var(--trend-points-color); }
 .trend-dot-rank { fill: var(--trend-rank-color); }
 .trend-axis-label { fill: var(--md-sys-color-on-surface-variant); }
+.trend-axis-line { stroke-width: 1; opacity: 0.35; }
+.trend-axis-line-points { stroke: var(--trend-points-color); }
+.trend-axis-line-rank { stroke: var(--trend-rank-color); }
+.trend-axis-tick { stroke-width: 1; opacity: 0.6; }
+.trend-axis-tick-points { stroke: var(--trend-points-color); }
+.trend-axis-tick-rank { stroke: var(--trend-rank-color); }
+.trend-axis-tick-label-points { fill: var(--trend-points-color); }
+.trend-axis-tick-label-rank { fill: var(--trend-rank-color); }
+.trend-dot-hit { fill: transparent; cursor: pointer; }
+
+.trend-tooltip {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 8px));
+  background: var(--md-sys-color-inverse-surface, #1a1a1a);
+  color: var(--md-sys-color-inverse-on-surface, #fff);
+  font: var(--md-type-body-sm);
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: var(--md-sys-shape-corner-xs, 6px);
+  box-shadow: var(--md-sys-elevation-1);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 500;
+}
+/* This codebase has no bare, generic .hidden utility rule — every other
+   .hidden usage is its own compound selector (.m3-menu.hidden, etc.), and
+   this one was missing entirely. Every hide call was correctly toggling the
+   class the whole time; without this rule it just had nothing to do,
+   which is why the tooltip visually never actually went away. */
+.trend-tooltip.hidden { display: none; }
 .trend-legend { display: flex; gap: 16px; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); }
 .trend-legend-item { display: flex; align-items: center; gap: 6px; }
 .trend-swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
@@ -409,15 +454,26 @@ html, body { height: 100%; }
 /* No box of its own on desktop — the two stat boxes just stack in normal
    flow alongside their siblings, same as before this wrapper existed. */
 .my-week-stats-row { display: contents; }
-.my-week-overall-pos-box,
-.my-week-win-chance-box {
+.my-week-overall-pos-box {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  margin-bottom: 12px;
 }
-.my-week-overall-pos-box { margin-bottom: 12px; }
-.my-week-win-chance-box { margin-top: 20px; }
+/* Win chance alone read as needlessly bleak early in a week — a single
+   already-decided game elsewhere (e.g. someone else's bonus pick) can
+   crater it to single digits before the caller's own games have even
+   kicked off — so it's shown stacked above the steadier top-3 chance
+   instead of replacing it outright. Both numbers come from the same
+   simulation. Desktop only — the top-3 stat is dropped entirely on mobile
+   (see the 840px breakpoint below), where space is tighter and the
+   original single win-chance number is kept as the only stat shown. */
+/* gap: 32px matches the space above this box (overall-pos-box's 12px
+   margin-bottom + this box's own 20px margin-top) so the win% -> top-3%
+   gap reads the same as the position -> win% gap above it. */
+.my-week-win-chance-box { display: flex; flex-direction: column; align-items: center; gap: 32px; margin-top: 20px; }
+.my-week-chance-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .my-week-overall-pos-rank,
 .my-week-win-chance-pct { font: var(--md-type-display-md); color: var(--md-sys-color-primary); }
 .my-week-overall-pos-label,
@@ -425,17 +481,41 @@ html, body { height: 100%; }
 
 /* My Picks / Hate Watch List rows get bigger icons and text than the
    Picks tab's own pick-row use — that grid packs several narrow cards per
-   row, but these columns only ever hold one, so there's room to spare. */
-.my-week-col .pick-row { padding: 10px 14px; }
+   row, but these columns only ever hold one, so there's room to spare.
+   min-height pins every one of these rows (My Picks, Most Picked Teams,
+   Players Close Behind — anything using .pick-row inside a My Week card) to
+   the same explicit height instead of leaving it to intrinsic content
+   sizing, which otherwise drifts slightly with font-loading timing (the
+   webfont swapping in changes line-height briefly) and made rows in
+   different cards render at visibly different heights depending on which
+   one happened to paint before vs after the font finished loading. */
+.my-week-col .pick-row { padding: 10px 14px; min-height: 46px; box-sizing: border-box; }
 .my-week-col .pick-row .team-logo { width: 26px; height: 26px; }
 .my-week-col .pick-row .team-name { font: var(--md-type-title-sm); }
 .my-week-col .pick-row .team-points { font: var(--md-type-title-sm); }
+
+/* Players Close Behind: shows exactly 5 rows worth of height, then scrolls
+   internally for anyone beyond that instead of the card growing to fit an
+   arbitrarily long list (a big league could have well more than 5 players
+   within 50 points). 5 rows (46px, see min-height above) + 4 gaps (.pick-list's
+   own 6px gap) = 254px. */
+#my-week-on-your-heels {
+  max-height: 254px;
+  overflow-y: auto;
+  /* Right padding so rows don't butt up against the scrollbar — box-sizing
+     is border-box globally, so this narrows the rows slightly from the
+     right rather than widening the list itself. */
+  padding-right: 8px;
+}
 
 @media (max-width: 900px) {
   #my-week-section.tab-section:not(.hidden) { min-height: 0; display: block; }
   .my-week-grid { flex: none; grid-template-columns: 1fr; grid-template-rows: none; }
   .my-week-profile { align-self: auto; }
   .my-week-avatar { width: 96px; height: 96px; }
+  /* Mobile keeps just the original single win-chance stat — less space to
+     work with, and top-3 chance is a desktop-only addition. */
+  .my-week-chance-stat-top3 { display: none; }
 }
 
 /* ---- Picks tab ---- */

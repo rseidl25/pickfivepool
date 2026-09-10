@@ -123,6 +123,7 @@ import { showToast } from "../util/toast.js";
 import { showConfirm } from "../util/confirm-dialog.js";
 import { initHeaderMenu } from "../util/header-menu.js";
 import { attemptAuthStallRecovery, clearAuthStallRecoveryFlag } from "../util/auth-recovery.js";
+import { shrinkFontToFit } from "../util/fit-text.js";
 
 initHeaderMenu();
 
@@ -259,15 +260,6 @@ function renderWeek(weekNumber) {
 
 // Long team names shrink to fit their box first; if even the smallest
 // readable size still doesn't fit, it wraps rather than getting an ellipsis.
-function shrinkFontToFit(label, minFontSize) {
-  const maxFontSize = parseFloat(getComputedStyle(label).fontSize);
-  let fontSize = maxFontSize;
-  label.style.fontSize = "";
-  while (label.scrollWidth > label.clientWidth && fontSize > minFontSize) {
-    fontSize -= 0.5;
-    label.style.fontSize = `${fontSize}px`;
-  }
-}
 const TEAM_LABEL_MIN_FONT_PX = 10;
 function fitTeamBoxLabels() {
   document.querySelectorAll(".team-box span").forEach((label) => {

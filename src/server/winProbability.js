@@ -108,6 +108,18 @@ export function scoreDiffToWinProb(game) {
   return Math.min(MAX_LIVE_PROB, Math.max(MIN_LIVE_PROB, raw));
 }
 
+// A team's expected final score implied by the closing spread + total —
+// same market data moneylineToProb already reads, just the other two
+// numbers off the same line. Standard split: favorite's implied score is
+// half the total plus half the (positive) margin. Returns null if this
+// book hasn't posted a spread/total yet (same gap moneylineToProb can hit).
+function impliedTeamScore(game, isHomeTeam) {
+  if (game.spread == null || game.overUnder == null) return null;
+  const homeImplied = (game.overUnder - game.spread) / 2;
+  const awayImplied = (game.overUnder + game.spread) / 2;
+  return isHomeTeam ? homeImplied : awayImplied;
+}
+
 // Splits a player's picks into a fixed points total from already-decided
 // games plus a list of "swing" picks whose outcome depends on one of the
 // still-undecided games — so the per-outcome enumeration below only has to
@@ -128,19 +140,34 @@ function splitPicks(picks, gamesForWeek, undecidedGameIndex) {
         decidedTotal += isBonus ? 10 + actualScore : 10;
       }
     } else {
-      swingPicks.push({
-        gameIdx: undecidedGameIndex.get(game),
-        isHomeTeamPick: game.homeTeam.includes(pick.team),
-      });
+      const isHomeTeamPick = game.homeTeam.includes(pick.team);
+      const isBonus = pick.team === picks.bonusPick;
+      // A correct bonus pick on a still-undecided game used to be credited
+      // a flat 10, same as any other pick — undervaluing it relative to an
+      // already-decided bonus pick's real 10 + actual score, and making an
+      // early already-banked bonus (like a completed game's) look far more
+      // dominant than a same-caliber bonus pick that just hasn't kicked
+      // off yet. Using the implied score keeps that comparison honest;
+      // falls back to the old flat 10 if this book hasn't posted a
+      // spread/total for the game yet.
+      let pointsIfCorrect = 10;
+      if (isBonus) {
+        const implied = impliedTeamScore(game, isHomeTeamPick);
+        if (implied != null) pointsIfCorrect = 10 + Math.round(implied);
+      }
+      swingPicks.push({ gameIdx: undecidedGameIndex.get(game), isHomeTeamPick, pointsIfCorrect });
     }
   }
 
   return { decidedTotal, swingPicks };
 }
 
-// Enumeration core for simulateWinChance — walks every 2^k combination of
+// Enumeration core for simulateWeekChances — walks every 2^k combination of
 // the week's still-undecided games once and returns the probability-weighted
-// share in which the caller finishes with the most points.
+// share in which the caller finishes with the most points (outright win),
+// plus the share in which they finish in a top-3 (competition-ranked, ties
+// share a rank) position — both computed from the same single pass over
+// every outcome rather than running the enumeration twice.
 function enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid) {
   const undecidedGames = gamesForWeek.filter((g) => !isGameDecided(g));
   const undecidedGameIndex = new Map(undecidedGames.map((g, i) => [g, i]));
@@ -155,10 +182,11 @@ function enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid) {
 
   const totalOutcomes = 1 << undecidedGames.length; // 2^k, k <= 16 games/week
   if (players.length === 0) {
-    return { callerWinProbability: 0, totalOutcomes, winningOutcomes: 0, winningProbability: 0 };
+    return { callerWinProbability: 0, callerTop3Probability: 0, totalOutcomes, winningOutcomes: 0 };
   }
 
   let callerWinProbability = 0;
+  let callerTop3Probability = 0;
   let winningOutcomes = 0;
 
   for (let mask = 0; mask < totalOutcomes; mask++) {
@@ -169,41 +197,57 @@ function enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid) {
     }
     if (maskProbability === 0) continue;
 
-    let maxTotal = -Infinity;
-    let leaders = [];
-
-    for (const player of players) {
+    const totals = players.map((player) => {
       let total = player.decidedTotal;
       for (const sp of player.swingPicks) {
         const homeWon = (mask >> sp.gameIdx) & 1;
-        if (homeWon === (sp.isHomeTeamPick ? 1 : 0)) total += 10;
+        if (homeWon === (sp.isHomeTeamPick ? 1 : 0)) total += sp.pointsIfCorrect;
       }
-      if (total > maxTotal) {
-        maxTotal = total;
-        leaders = [player.uid];
-      } else if (total === maxTotal) {
-        leaders.push(player.uid);
-      }
+      return { uid: player.uid, total };
+    });
+    totals.sort((a, b) => b.total - a.total);
+
+    // Competition ranking (1224) — tied players share the rank they're
+    // tied for, same rule used everywhere else scores are ranked in this
+    // app (leaderboard, "T-4th of 16 players", etc.).
+    let currentRank = 0;
+    let prevTotal = null;
+    let callerRank = null;
+    for (let i = 0; i < totals.length; i++) {
+      if (totals[i].total !== prevTotal) currentRank = i + 1;
+      prevTotal = totals[i].total;
+      if (totals[i].uid === callerUid) callerRank = currentRank;
     }
 
-    if (leaders.includes(callerUid)) {
+    if (callerRank === 1) {
       callerWinProbability += maskProbability;
       winningOutcomes++;
     }
+    if (callerRank !== null && callerRank <= 3) {
+      callerTop3Probability += maskProbability;
+    }
   }
 
-  return { callerWinProbability, totalOutcomes, winningOutcomes };
+  return { callerWinProbability, callerTop3Probability, totalOutcomes, winningOutcomes };
 }
 
 /**
  * @param leagueSeasonPicks Map<uid, Map<week, {teamsPicked, bonusPick}>> — the whole league's picks
  * @param gamesForWeek this week's games from the poller
  * @param week e.g. "week3"
- * @param callerUid whose win% we want
- * @returns number 0-100
+ * @param callerUid whose chances we want
+ * @returns { winChancePct, top3ChancePct } both 0-100 — outright-win chance
+ * alone reads as needlessly bleak early in a week (a single already-decided
+ * game — e.g. someone else's bonus pick — can crater it to single digits
+ * before the caller's own games have even kicked off), so top3ChancePct is
+ * shown alongside it as a steadier, still-honest read on how someone's
+ * actually doing.
  */
-export function simulateWinChance(leagueSeasonPicks, gamesForWeek, week, callerUid) {
-  const { callerWinProbability } = enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid);
-  return Math.round(callerWinProbability * 100);
+export function simulateWeekChances(leagueSeasonPicks, gamesForWeek, week, callerUid) {
+  const { callerWinProbability, callerTop3Probability } = enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid);
+  return {
+    winChancePct: Math.round(callerWinProbability * 100),
+    top3ChancePct: Math.round(callerTop3Probability * 100),
+  };
 }
 

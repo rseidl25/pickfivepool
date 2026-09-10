@@ -51,11 +51,18 @@ async function fetchWeek(year, week) {
 function carryForwardOdds(freshWeek, previousWeek) {
   if (!previousWeek) return freshWeek;
   for (const game of freshWeek.games) {
-    if (game.homeMoneyline != null && game.awayMoneyline != null) continue;
     const prevGame = previousWeek.games.find((g) => g.homeTeam === game.homeTeam && g.awayTeam === game.awayTeam);
-    if (prevGame?.homeMoneyline != null && prevGame?.awayMoneyline != null) {
-      game.homeMoneyline = prevGame.homeMoneyline;
-      game.awayMoneyline = prevGame.awayMoneyline;
+    if (game.homeMoneyline == null && game.awayMoneyline == null) {
+      if (prevGame?.homeMoneyline != null && prevGame?.awayMoneyline != null) {
+        game.homeMoneyline = prevGame.homeMoneyline;
+        game.awayMoneyline = prevGame.awayMoneyline;
+      }
+    }
+    if (game.spread == null && game.overUnder == null) {
+      if (prevGame?.spread != null && prevGame?.overUnder != null) {
+        game.spread = prevGame.spread;
+        game.overUnder = prevGame.overUnder;
+      }
     }
   }
   return freshWeek;

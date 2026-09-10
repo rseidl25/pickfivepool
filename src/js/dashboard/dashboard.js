@@ -9,6 +9,7 @@ import { showToast } from "../util/toast.js";
 import { initPhotoPicker } from "../util/photo-picker.js";
 import { openLightbox } from "../util/lightbox.js";
 import { attemptAuthStallRecovery, clearAuthStallRecoveryFlag } from "../util/auth-recovery.js";
+import { shrinkFontToFit } from "../util/fit-text.js";
 
 const auth = getAuth(app);
 const DEFAULT_AVATAR = "/icons/default_avatar.png";
@@ -223,6 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const lastUpdatedBtn = document.getElementById("last-updated-btn");
   const lastUpdatedModal = document.getElementById("last-updated-modal");
   const closeLastUpdated = document.getElementById("close-last-updated");
+
 
   const messageBoardBtn = document.getElementById("message-board-btn");
   const messageBoardModal = document.getElementById("message-board-modal");
@@ -461,6 +463,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   lastUpdatedBtn.onclick = () => openModal(lastUpdatedModal);
   closeLastUpdated.onclick = () => closeAllModals();
+
 
   // =========================
   // Message board
@@ -800,6 +803,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Nav (rail + bar) — tab switching
   // =========================
   async function showSection(tab) {
+    // Switching tabs hides the My Week section outright without the mouse
+    // ever actually leaving a hovered trend-chart dot, so no mouseleave
+    // fires — without this, a stuck tooltip from My Week would keep
+    // floating on top of whichever tab you switch to next.
+    trendTooltipEl?.classList.add("hidden");
+
     currentTab = tab;
     // Leaderboard used to default to "Overall" — now opens on the current
     // week instead, same week getCurrentWeek() already picks for Picks/My
@@ -1012,7 +1021,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     // and 3rd share a row side by side underneath. Either can be missing
     // (a tie for 1st skips rank 2 entirely, e.g.) — each row only renders
     // if it has a rank to show.
-    const rank1Players = ranked.filter((p) => p.rank === 1);
+    // A 0-pt player never belongs on the podium, even if 0 happens to be
+    // the best (or tied-best) score in the league right now — a "1st place"
+    // trophy for zero points reads as an actual accomplishment it isn't.
+    // They fall through to the plain list below instead, same as anyone
+    // ranked below 3rd.
+    const rank1Players = ranked.filter((p) => p.rank === 1 && p.score > 0);
     if (rank1Players.length) {
       const topRow = document.createElement("div");
       topRow.className = "podium-top-row";
@@ -1020,8 +1034,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       leaderboardPodium.appendChild(topRow);
     }
 
-    const rank2Players = ranked.filter((p) => p.rank === 2);
-    const rank3Players = ranked.filter((p) => p.rank === 3);
+    const rank2Players = ranked.filter((p) => p.rank === 2 && p.score > 0);
+    const rank3Players = ranked.filter((p) => p.rank === 3 && p.score > 0);
     if (rank2Players.length || rank3Players.length) {
       const bottomRow = document.createElement("div");
       bottomRow.className = "podium-bottom-row";
@@ -1030,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       leaderboardPodium.appendChild(bottomRow);
     }
 
-    const rest = ranked.filter((p) => p.rank > 3);
+    const rest = ranked.filter((p) => p.rank > 3 || p.score === 0);
     rest.forEach((player) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -1043,6 +1057,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       `;
       leaderboardList.appendChild(tr);
     });
+
+    fitPodiumNames();
+  }
+
+  // Desktop only ("keep mobile as is") — starts each podium name at its big
+  // CSS-defined size (see the min-width:841px block in dashboard.css) and
+  // shrinks only that specific name down as far as it individually needs to
+  // avoid overflowing its pill, so a short name stays huge and only a long
+  // one gives up size. Always resets first: without that, resizing a window
+  // from desktop down to mobile would leave a previous run's shrunk inline
+  // font-size stuck on top of mobile's own (smaller, fixed) CSS size.
+  const PODIUM_NAME_MIN_FONT_PX = 14;
+  function fitPodiumNames() {
+    const names = document.querySelectorAll(".podium-name");
+    names.forEach((label) => { label.style.fontSize = ""; });
+    if (window.innerWidth <= 840) return;
+    names.forEach((label) => shrinkFontToFit(label, PODIUM_NAME_MIN_FONT_PX));
   }
 
   // =========================
@@ -1082,8 +1113,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Ties (gap of 0) are excluded — "behind" means strictly trailing, and a
     // stable sort can otherwise place a tied player after me by coincidence.
     const myOverall = myRankIndex >= 0 ? ranked[myRankIndex].overall : 0;
+    // No cap here anymore — the list shows 5 rows at a time and scrolls
+    // internally (see #my-week-on-your-heels in dashboard.css) instead of
+    // truncating past a fixed count, so every qualifying player is reachable.
+    // Explicitly sorted (smallest gap first, alphabetical to break ties) —
+    // slicing straight from `ranked` happened to already read closest-first
+    // for non-tied gaps, but left players tied on the same gap in whatever
+    // arbitrary order Object.entries(scoresData) originally produced.
     const onYourHeels = myRankIndex >= 0
-      ? ranked.slice(myRankIndex + 1).filter((p) => myOverall - p.overall > 0 && myOverall - p.overall <= 50).slice(0, 3)
+      ? ranked
+          .slice(myRankIndex + 1)
+          .filter((p) => myOverall - p.overall > 0 && myOverall - p.overall <= 50)
+          .sort((a, b) => {
+            const gapDiff = (myOverall - a.overall) - (myOverall - b.overall);
+            if (gapDiff !== 0) return gapDiff;
+            return (scoresData[a.uid]?.name || "").localeCompare(scoresData[b.uid]?.name || "");
+          })
       : [];
 
     myWeekOnYourHeels.innerHTML = "";
@@ -1107,7 +1152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     myWeekPicksList.innerHTML = "<li>Loading...</li>";
     myWeekPicksTotal.textContent = "";
     myWeekMostPicked.innerHTML = "";
-    myWeekWinChance.innerHTML = `<span class="my-week-win-chance-label">Calculating chance to win the week...</span>`;
+    myWeekWinChance.innerHTML = `<span class="my-week-win-chance-label">Calculating your chances...</span>`;
 
     try {
       const [myWeek, gamesData] = await Promise.all([fetchMyWeek(currentLeagueId, week), fetchGames()]);
@@ -1166,8 +1211,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       myWeekWinChance.innerHTML = `
-        <span class="my-week-win-chance-pct">${myWeek.winChancePct}%</span>
-        <span class="my-week-win-chance-label">chance to win the week</span>
+        <div class="my-week-chance-stat">
+          <span class="my-week-win-chance-pct">${myWeek.winChancePct}%</span>
+          <span class="my-week-win-chance-label">chance to win the week</span>
+        </div>
+        <div class="my-week-chance-stat my-week-chance-stat-top3">
+          <span class="my-week-win-chance-pct">${myWeek.top3ChancePct}%</span>
+          <span class="my-week-win-chance-label">chance of a top-3 finish</span>
+        </div>
       `;
 
       renderSeasonTrend(myUid, gamesData);
@@ -1179,6 +1230,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Basic breakdown behind the "chance to win the week" stat — one row per
   // Weekly points + weekly overall rank, plotted as two lines across every
   // week that's had at least one completed game so far. Computed entirely
   // from scoresData (already fetched for the league) — no extra network call.
@@ -1195,24 +1247,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     const weeks = [];
     const pointsSeries = [];
     const rankSeries = [];
+    const rankTiedSeries = [];
 
     for (let w = 1; w <= 18; w++) {
       const gamesForWeek = gamesData.find((g) => g.week === w)?.games || [];
-      const anyCompleted = gamesForWeek.some((g) => g.status === "Completed");
-      if (!anyCompleted) break;
+      // A week's final score isn't real yet while any of its games are
+      // still in progress — only plot it once every game in the week has
+      // actually finished (i.e. once the next week has started), not the
+      // moment the first game of the week wraps up.
+      const weekFullyDecided = gamesForWeek.length > 0 && gamesForWeek.every((g) => g.status === "Completed");
+      if (!weekFullyDecided) break;
 
       players.forEach((uid) => {
         cumulative[uid] += scoresData[uid].weeks?.[`week${w}`]?.total || 0;
       });
 
+      // Competition ranking (1224), same as the "T-4th of 16 players" stat
+      // above — tied players share the rank they're tied for. A plain
+      // findIndex+1 here would instead spread tied players out across
+      // distinct ranks in whatever order Object.keys(scoresData) happens to
+      // return them, which reads as an arbitrary, wrong position (e.g. a
+      // 4-way tie for 4th showing as 4th/5th/6th/7th depending on uid order).
       const rankedThroughWeek = players
         .map((uid) => ({ uid, total: cumulative[uid] }))
         .sort((a, b) => b.total - a.total);
-      const myRankThroughWeek = rankedThroughWeek.findIndex((p) => p.uid === myUid) + 1;
+      const myIndexThroughWeek = rankedThroughWeek.findIndex((p) => p.uid === myUid);
+      let myRankThroughWeek = 0, currentRank = 0, prevTotal = null;
+      for (let i = 0; i <= myIndexThroughWeek; i++) {
+        if (rankedThroughWeek[i].total !== prevTotal) currentRank = i + 1;
+        prevTotal = rankedThroughWeek[i].total;
+      }
+      myRankThroughWeek = currentRank;
+      const myTotalThroughWeek = rankedThroughWeek[myIndexThroughWeek].total;
+      const isTied = rankedThroughWeek.filter((p) => p.total === myTotalThroughWeek).length > 1;
 
       weeks.push(w);
       pointsSeries.push(scoresData[myUid].weeks?.[`week${w}`]?.total || 0);
       rankSeries.push(myRankThroughWeek);
+      rankTiedSeries.push(isTied);
     }
 
     if (weeks.length === 0) {
@@ -1220,13 +1292,101 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    myWeekTrendChart.innerHTML = buildTrendChart(weeks, pointsSeries, rankSeries, players.length);
+    myWeekTrendChart.innerHTML = buildTrendChart(weeks, pointsSeries, rankSeries, rankTiedSeries, players.length);
+    wireTrendTooltips();
   }
 
-  function buildTrendChart(weeks, pointsSeries, rankSeries, totalPlayers) {
+  // Single shared tooltip element, reused for every dot — created lazily on
+  // first hover rather than up front, since most page loads never touch it.
+  let trendTooltipEl = null;
+  let trendTooltipScrollHooked = false;
+  function ensureTrendTooltip() {
+    if (!trendTooltipEl) {
+      trendTooltipEl = document.createElement("div");
+      trendTooltipEl.className = "trend-tooltip hidden";
+      document.body.appendChild(trendTooltipEl);
+    }
+    // The tooltip is position:fixed, placed once at hover-time from the
+    // dot's on-screen rect — scrolling .dashboard-main (the actual scroll
+    // container; see the note by its scrollTo(0,0) call above) moves the
+    // dot without the mouse itself moving, so no mouseleave ever fires and
+    // the tooltip is left floating over whatever's now under those fixed
+    // coordinates. Hook this once, not per-render, since the container
+    // itself persists across every re-render of the chart it scrolls.
+    if (!trendTooltipScrollHooked) {
+      trendTooltipScrollHooked = true;
+      document.querySelector(".dashboard-main")?.addEventListener("scroll", () => {
+        trendTooltipEl?.classList.add("hidden");
+      });
+      // Ground-truth watchdog, not another event listener — mouseenter/
+      // mouseleave kept proving unreliable for closing this tooltip (still
+      // stuck after hard-refreshing in two different browsers), so instead
+      // of guessing at which specific event isn't firing, just track where
+      // the cursor actually is and directly ask the DOM what's really under
+      // it a few times a second. If that's not a hit circle, force-closed —
+      // this can't get stuck no matter which underlying event was the
+      // problem, since it never depends on one firing in the first place.
+      let lastMouseX = -1, lastMouseY = -1;
+      document.addEventListener("mousemove", (e) => {
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+      });
+      setInterval(() => {
+        if (!trendTooltipEl || trendTooltipEl.classList.contains("hidden")) return;
+        const hovered = document.elementFromPoint(lastMouseX, lastMouseY);
+        if (!hovered || !hovered.closest(".trend-dot-hit")) {
+          trendTooltipEl.classList.add("hidden");
+        }
+      }, 150);
+    }
+    return trendTooltipEl;
+  }
+
+  // Attaches hover listeners to the invisible hit-target circles built into
+  // the chart's SVG — called once per render, since the SVG is rebuilt from
+  // scratch (via innerHTML) every time the trend chart updates.
+  function wireTrendTooltips() {
+    myWeekTrendChart.querySelectorAll(".trend-dot-hit").forEach((hit) => {
+      hit.addEventListener("mouseenter", () => {
+        const week = hit.dataset.week;
+        const value = hit.dataset.value;
+        const text = hit.dataset.kind === "points"
+          ? `Week ${week}: ${value} pts`
+          : `Week ${week}: ${hit.dataset.tied === "1" ? "T-" : ""}${ordinal(Number(value))}`;
+
+        const tooltip = ensureTrendTooltip();
+        tooltip.textContent = text;
+        tooltip.classList.remove("hidden");
+        const rect = hit.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + rect.width / 2}px`;
+        tooltip.style.top = `${rect.top}px`;
+      });
+      hit.addEventListener("mouseleave", () => {
+        trendTooltipEl?.classList.add("hidden");
+      });
+    });
+  }
+
+  // Evenly spaced tick values for the points axis (left) — 0, a midpoint,
+  // and the max, rounded to whole points since fractional points don't
+  // happen. For the rank axis (right), every rank if there are few enough
+  // players to list without crowding, otherwise just top/middle/bottom.
+  function pointsAxisTicks(maxPoints) {
+    return [0, Math.round(maxPoints / 2), maxPoints];
+  }
+  function rankAxisTicks(totalPlayers) {
+    if (totalPlayers <= 1) return [1];
+    if (totalPlayers <= 4) return Array.from({ length: totalPlayers }, (_, i) => i + 1);
+    return [1, Math.round((1 + totalPlayers) / 2), totalPlayers];
+  }
+
+  function buildTrendChart(weeks, pointsSeries, rankSeries, rankTiedSeries, totalPlayers) {
     const width = 320;
     const height = 190;
-    const padL = 8, padR = 8, padT = 12, padB = 22;
+    // Left/right padding widened from the original 8px to leave room for
+    // this chart's two y-axis labels (points on the left, rank on the
+    // right) — everything else about the plot area is unchanged.
+    const padL = 22, padR = 20, padT = 12, padB = 22;
     const innerW = width - padL - padR;
     const innerH = height - padT - padB;
     const n = weeks.length;
@@ -1241,6 +1401,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pointsDots = pointsSeries.map((v, i) => `<circle class="trend-dot-points" cx="${xFor(i)}" cy="${yForPoints(v)}" r="3" />`).join("");
     const rankDots = rankSeries.map((v, i) => `<circle class="trend-dot-rank" cx="${xFor(i)}" cy="${yForRank(v)}" r="3" />`).join("");
 
+    // Invisible, larger circles layered on top of the small visible dots —
+    // a bare r=3 dot is a tiny, fiddly hover target, so hovering anywhere
+    // within this wider radius shows that dot's tooltip instead.
+    const pointsHits = pointsSeries
+      .map((v, i) => `<circle class="trend-dot-hit" data-kind="points" data-week="${weeks[i]}" data-value="${v}" cx="${xFor(i)}" cy="${yForPoints(v)}" r="9" />`)
+      .join("");
+    const rankHits = rankSeries
+      .map((v, i) => `<circle class="trend-dot-hit" data-kind="rank" data-week="${weeks[i]}" data-value="${v}" data-tied="${rankTiedSeries[i] ? "1" : "0"}" cx="${xFor(i)}" cy="${yForRank(v)}" r="9" />`)
+      .join("");
+
     const labelStep = n > 9 ? 2 : 1;
     const xLabels = weeks
       .map((w, i) => (i % labelStep === 0 || i === n - 1
@@ -1248,13 +1418,38 @@ document.addEventListener("DOMContentLoaded", async () => {
         : ""))
       .join("");
 
+    // Left axis (points): a vertical rule at padL, a small tick mark, and
+    // the value right-aligned just to its left. Right axis (rank): mirror
+    // image, left-aligned just to the right of its own vertical rule.
+    const pointsY = pointsAxisTicks(maxPoints);
+    const leftAxis = `
+      <line class="trend-axis-line trend-axis-line-points" x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + innerH}" />
+      ${pointsY.map((v) => `
+        <line class="trend-axis-tick trend-axis-tick-points" x1="${padL - 3}" y1="${yForPoints(v)}" x2="${padL}" y2="${yForPoints(v)}" />
+        <text class="trend-axis-tick-label trend-axis-tick-label-points" x="${padL - 5}" y="${yForPoints(v) + 3}" font-size="8" text-anchor="end">${v}</text>
+      `).join("")}
+    `;
+    const rankX = width - padR;
+    const rankTicksArr = rankAxisTicks(totalPlayers);
+    const rightAxis = `
+      <line class="trend-axis-line trend-axis-line-rank" x1="${rankX}" y1="${padT}" x2="${rankX}" y2="${padT + innerH}" />
+      ${rankTicksArr.map((v) => `
+        <line class="trend-axis-tick trend-axis-tick-rank" x1="${rankX}" y1="${yForRank(v)}" x2="${rankX + 3}" y2="${yForRank(v)}" />
+        <text class="trend-axis-tick-label trend-axis-tick-label-rank" x="${rankX + 5}" y="${yForRank(v) + 3}" font-size="8" text-anchor="start">${v}</text>
+      `).join("")}
+    `;
+
     return `
       <svg viewBox="0 0 ${width} ${height}" class="trend-svg" preserveAspectRatio="xMidYMid meet">
+        ${leftAxis}
+        ${rightAxis}
         <polyline class="trend-line-points" points="${pointsPath}" fill="none" stroke-width="2" />
         <polyline class="trend-line-rank" points="${rankPath}" fill="none" stroke-width="2" />
         ${pointsDots}
         ${rankDots}
         ${xLabels}
+        ${pointsHits}
+        ${rankHits}
       </svg>
       <div class="trend-legend">
         <span class="trend-legend-item"><span class="trend-swatch trend-swatch-points"></span>Points</span>
@@ -1567,6 +1762,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     matchupsContainer.classList.toggle("matchups-two-col", columns >= 3);
   }
   window.addEventListener("resize", () => requestAnimationFrame(updateMatchupsColumnCount));
+  window.addEventListener("resize", () => requestAnimationFrame(fitPodiumNames));
 
   // =========================
   // Matchups

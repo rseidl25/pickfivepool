@@ -50,7 +50,8 @@ export function mapEspnWeekToGames(espnResponse, weekNumber) {
 
     // First odds provider ESPN lists (currently always DraftKings) — good
     // enough for a pre-game estimate; not trying to shop/average books.
-    const moneyline = competition?.odds?.[0]?.moneyline;
+    const odds = competition?.odds?.[0];
+    const moneyline = odds?.moneyline;
 
     return {
       homeTeam: home?.team?.displayName || "",
@@ -67,6 +68,14 @@ export function mapEspnWeekToGames(espnResponse, weekNumber) {
       clockSeconds: typeof competition?.status?.clock === "number" ? competition.status.clock : null,
       homeMoneyline: parseMoneyline(moneyline?.home),
       awayMoneyline: parseMoneyline(moneyline?.away),
+      // Point spread (home team's line, negative = home favored) and the
+      // over/under total — only meaningful pre-kickoff, same as the
+      // moneyline above. Used by winProbability.js to estimate a team's
+      // likely final score (not just win/lose) for a still-undecided
+      // bonus pick, instead of crediting every correct bonus pick a flat
+      // 10 regardless of which team it actually is.
+      spread: typeof odds?.spread === "number" ? odds.spread : null,
+      overUnder: typeof odds?.overUnder === "number" ? odds.overUnder : null,
     };
   });
 
