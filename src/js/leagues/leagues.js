@@ -1,6 +1,6 @@
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { app } from "../auth/firebase_init.js";
-import { authedFetch } from "../util/api.js";
+import { authedFetch, getSeasonConfig } from "../util/api.js";
 import { showToast } from "../util/toast.js";
 import { showConfirm } from "../util/confirm-dialog.js";
 import { initPhotoPicker } from "../util/photo-picker.js";
@@ -498,7 +498,10 @@ document.addEventListener("DOMContentLoaded", () => {
     leaguePlayersModal.classList.remove("hidden");
 
     try {
-      const league = await authedFetch(`/api/leagues/${leagueId}`);
+      const [league, season] = await Promise.all([
+        authedFetch(`/api/leagues/${leagueId}`),
+        getSeasonConfig(leagueId),
+      ]);
       leaguePlayersList.innerHTML = "";
       const sortedMembers = [...league.members].sort((a, b) =>
         (a.displayName || "Unknown").localeCompare(b.displayName || "Unknown")
@@ -517,10 +520,16 @@ document.addEventListener("DOMContentLoaded", () => {
         nameSpan.textContent = `${member.displayName || "Unknown"}${member.role === "owner" ? " (owner)" : ""}`;
         li.appendChild(nameSpan);
 
-        const badge = document.createElement("span");
-        badge.className = `submission-badge ${member.submitted ? "submitted" : "not-submitted"}`;
-        badge.textContent = member.submitted ? "Submitted" : "Not Submitted";
-        li.appendChild(badge);
+        // Once the season locks, everyone's picks for the full season are
+        // already decided one way or another — "Submitted"/"Not Submitted"
+        // stops being useful information and starts just looking like a
+        // scoreboard of who missed the deadline, so drop it entirely.
+        if (!season.locked) {
+          const badge = document.createElement("span");
+          badge.className = `submission-badge ${member.submitted ? "submitted" : "not-submitted"}`;
+          badge.textContent = member.submitted ? "Submitted" : "Not Submitted";
+          li.appendChild(badge);
+        }
 
         leaguePlayersList.appendChild(li);
       });

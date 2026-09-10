@@ -61,6 +61,9 @@ export async function publicFetch(path, opts = {}) {
 }
 
 // { year, lockAt, locked } — replaces the old hardcoded signup_period flag.
-export function getSeasonConfig() {
-  return publicFetch("/api/config/season");
+// Pass leagueId to also check that specific league's one-off unlock
+// override (set via POST /api/admin/leagues/:id/unlock) — omit it for the
+// plain global lock (e.g. the signup form, which has no league context).
+export function getSeasonConfig(leagueId) {
+  return publicFetch(leagueId ? `/api/config/season?leagueId=${encodeURIComponent(leagueId)}` : "/api/config/season");
 }

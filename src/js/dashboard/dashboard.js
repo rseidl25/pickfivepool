@@ -801,7 +801,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   async function showSection(tab) {
     currentTab = tab;
-    currentWeek = tab === "leaderboard" ? null : await getCurrentWeek();
+    // Leaderboard used to default to "Overall" — now opens on the current
+    // week instead, same week getCurrentWeek() already picks for Picks/My
+    // Week (games' latest date + 1 day, i.e. the Tuesday after Monday
+    // Night Football). "Overall" is still one tap away via its own chip.
+    currentWeek = await getCurrentWeek();
 
     sections.forEach((section) => section.classList.toggle("hidden", section.id !== `${tab}-section`));
     // .dashboard-main is the scroll container (overflow-y: auto), not the
@@ -864,7 +868,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         btn.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
       }
     }
-    if (tab === "leaderboard") loadLeaderboard();
+    if (tab === "leaderboard") {
+      loadLeaderboard();
+      const btn = Array.from(weekButtonsContainer.children).find((b) => Number(b.dataset.week) === currentWeek);
+      if (btn) btn.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
+    }
     if (tab === "my-week") loadMyWeek(currentWeek);
   }
 
@@ -908,7 +916,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         btn.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
       });
       weekButtonsContainer.appendChild(btn);
-      if (currentTab !== "leaderboard" && i === currentWeek) setActiveWeekButton(btn);
+      if (i === currentWeek) setActiveWeekButton(btn);
     }
   }
 

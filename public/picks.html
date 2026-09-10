@@ -123,7 +123,11 @@
     const auth = getAuth(app);
 
     onAuthStateChanged(auth, async (user) => {
-      const season = await getSeasonConfig();
+      // Pass the current league so a one-off per-league unlock override
+      // (see POST /api/admin/leagues/:id/unlock) is respected here too —
+      // otherwise this guard would still redirect away even for a league
+      // that's been deliberately kept open past the global lock.
+      const season = await getSeasonConfig(localStorage.getItem("pick5_currentLeagueId"));
       if (season.locked) {
         window.location.href = "dashboard.html";
         return;

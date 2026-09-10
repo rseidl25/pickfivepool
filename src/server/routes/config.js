@@ -11,7 +11,7 @@ router.get("/season", (req, res) => {
   res.json({
     year: season.year,
     lockAt: new Date(season.lockAt).toISOString(),
-    locked: isSeasonLocked(),
+    locked: isSeasonLocked(req.query.leagueId),
   });
 });
 

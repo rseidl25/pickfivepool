@@ -179,8 +179,24 @@ export function getSeasonConfig() {
   return seasonConfig;
 }
 
-export function isSeasonLocked() {
-  return Date.now() >= seasonConfig.lockAt;
+// leagueId -> ms-epoch timestamp the override expires at. In-memory only
+// (not persisted to Firestore) — a one-off, time-boxed exception to the
+// global season lock for a single league, e.g. "let THE League keep
+// submitting picks until midnight." Doesn't survive a server restart,
+// which is fine for something meant to expire in hours anyway.
+const leagueLockOverrides = new Map();
+
+export function setLeagueLockOverride(leagueId, expiresAtMs) {
+  leagueLockOverrides.set(leagueId, expiresAtMs);
+}
+
+export function isSeasonLocked(leagueId) {
+  if (Date.now() < seasonConfig.lockAt) return false;
+  if (leagueId) {
+    const expiresAt = leagueLockOverrides.get(leagueId);
+    if (expiresAt && Date.now() < expiresAt) return false;
+  }
+  return true;
 }
 
 // ---- Leagues ----
