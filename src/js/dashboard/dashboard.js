@@ -150,6 +150,29 @@ function getLogoPath(team) {
   return `/logos/${teamLogoMap[mascot] || "default.png"}`;
 }
 
+// Non-bonus picks in My Week / the Picks tab, ordered by when their game is
+// actually played — gamesForWeek's own array order is already chronological
+// (the backend passes ESPN's schedule order straight through, un-reordered),
+// so a team's index in it doubles as its kickoff order for games in
+// different broadcast slots. But several games always share one exact
+// kickoff time (the Sunday 1:00, 4:05/4:25, etc. slates) — those still get
+// distinct, arbitrary array positions from the schedule API, which isn't a
+// real chronological difference, so within one real time slot this
+// alphabetizes instead of leaning on that arbitrary order. Checked via
+// weekday+gameTime rather than array index for exactly this reason; once a
+// game is decided gameTime goes back to null (see mapGames.js), so decided
+// games always fall back to their (still-correct) schedule-order index.
+// Mutates and returns teamEntries, same as Array.prototype.sort.
+function sortPicksChronologically(teamEntries, gamesForWeek) {
+  return teamEntries.sort(([a], [b]) => {
+    const gameA = gamesForWeek.find((g) => g.homeTeam === a || g.awayTeam === a);
+    const gameB = gamesForWeek.find((g) => g.homeTeam === b || g.awayTeam === b);
+    const sameSlot = gameA?.gameTime != null && gameA.weekday === gameB?.weekday && gameA.gameTime === gameB?.gameTime;
+    if (sameSlot) return a.localeCompare(b);
+    return gamesForWeek.indexOf(gameA) - gamesForWeek.indexOf(gameB);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   initHeaderMenu();
   initThemeSwitcher();
@@ -1165,11 +1188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         const bonusTeam = Object.entries(weekData.teams).find(([, info]) => info.bonus);
         const otherTeams = Object.entries(weekData.teams).filter(([, info]) => !info.bonus);
-        otherTeams.sort(([a], [b]) => {
-          const idxA = gamesForWeek.findIndex((g) => g.homeTeam === a || g.awayTeam === a);
-          const idxB = gamesForWeek.findIndex((g) => g.homeTeam === b || g.awayTeam === b);
-          return idxA - idxB;
-        });
+        sortPicksChronologically(otherTeams, gamesForWeek);
 
         const orderedTeams = [];
         if (bonusTeam) orderedTeams.push(bonusTeam);
@@ -1547,11 +1566,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (hasPicks) {
         const bonusTeam = Object.entries(weekData.teams).find(([, info]) => info.bonus);
         const otherTeams = Object.entries(weekData.teams).filter(([, info]) => !info.bonus);
-        otherTeams.sort(([a], [b]) => {
-          const idxA = gamesForWeek.findIndex((g) => g.homeTeam === a || g.awayTeam === a);
-          const idxB = gamesForWeek.findIndex((g) => g.homeTeam === b || g.awayTeam === b);
-          return idxA - idxB;
-        });
+        sortPicksChronologically(otherTeams, gamesForWeek);
         orderedTeams = bonusTeam ? [bonusTeam, ...otherTeams] : otherTeams;
       }
 
