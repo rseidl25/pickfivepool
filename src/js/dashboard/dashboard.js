@@ -71,12 +71,12 @@ function formatPostTime(dateInput, seasonYear) {
   return new Intl.DateTimeFormat("en-US", opts).format(date);
 }
 
-// A post is treated as a GIF share only when its entire (trimmed) body is
-// nothing but the link — keeps "check this out: <link>"-style messages as
-// plain text instead of silently swallowing the caption.
-const GIF_URL_RE = /^https?:\/\/\S+\.gif(\?\S*)?$/i;
-function isGifUrl(body) {
-  return GIF_URL_RE.test(body.trim());
+// A post is treated as an image share only when its entire (trimmed) body
+// is nothing but the link — keeps "check this out: <link>"-style messages
+// as plain text instead of silently swallowing the caption.
+const IMAGE_URL_RE = /^https?:\/\/\S+\.(gif|jpe?g|png|webp|avif)(\?\S*)?$/i;
+function isImageUrl(body) {
+  return IMAGE_URL_RE.test(body.trim());
 }
 
 function isSameDay(a, b) {
@@ -584,22 +584,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         // a name label above or a delete button below is also present.
         const bubbleAnchor = document.createElement("div");
         bubbleAnchor.className = "post-bubble-anchor";
-        if (isGifUrl(post.body)) {
-          const gif = document.createElement("img");
-          gif.className = "post-gif";
-          gif.src = post.body.trim();
-          gif.alt = "GIF";
-          gif.loading = "lazy";
-          gif.referrerPolicy = "no-referrer";
+        if (isImageUrl(post.body)) {
+          const img = document.createElement("img");
+          img.className = "post-image";
+          img.src = post.body.trim();
+          img.alt = "Image";
+          img.loading = "lazy";
+          img.referrerPolicy = "no-referrer";
           // Link may have rotted or never been an image — fall back to plain
           // text so a broken link doesn't just leave a broken-image icon.
-          gif.onerror = () => {
-            gif.replaceWith(Object.assign(document.createElement("div"), {
+          img.onerror = () => {
+            img.replaceWith(Object.assign(document.createElement("div"), {
               className: "post-body-text",
               textContent: post.body,
             }));
           };
-          bubbleAnchor.appendChild(gif);
+          bubbleAnchor.appendChild(img);
         } else {
           const body = document.createElement("div");
           body.className = "post-body-text";
