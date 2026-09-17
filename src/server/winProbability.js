@@ -321,23 +321,37 @@ function enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid) {
   return { callerWinProbability, callerTop3Probability, totalOutcomes, winningOutcomes };
 }
 
+// A plain Math.round(x*100) reads "0%" identically whether a player is
+// mathematically eliminated or just has a genuine, small-but-real shot
+// (e.g. 0.6% rounds to "0" too) — those are very different situations to
+// see on your own screen. Below 1e-9 is floating-point noise from summing
+// thousands of probability-weighted terms, not a real signal, so that
+// still reports as a flat "0"; anything above that but under 1% reports as
+// "<1" instead of rounding away to a falsely-absolute zero.
+function formatChancePct(probability) {
+  const pct = probability * 100;
+  if (pct < 1e-9) return "0";
+  if (pct < 1) return "<1";
+  return String(Math.round(pct));
+}
+
 /**
  * @param leagueSeasonPicks Map<uid, Map<week, {teamsPicked, bonusPick}>> — the whole league's picks
  * @param gamesForWeek this week's games from the poller
  * @param week e.g. "week3"
  * @param callerUid whose chances we want
- * @returns { winChancePct, top3ChancePct } both 0-100 — outright-win chance
- * alone reads as needlessly bleak early in a week (a single already-decided
- * game — e.g. someone else's bonus pick — can crater it to single digits
- * before the caller's own games have even kicked off), so top3ChancePct is
- * shown alongside it as a steadier, still-honest read on how someone's
- * actually doing.
+ * @returns { winChancePct, top3ChancePct } both strings ("0"-"100" or "<1")
+ * — outright-win chance alone reads as needlessly bleak early in a week (a
+ * single already-decided game — e.g. someone else's bonus pick — can crater
+ * it to single digits before the caller's own games have even kicked off),
+ * so top3ChancePct is shown alongside it as a steadier, still-honest read
+ * on how someone's actually doing.
  */
 export function simulateWeekChances(leagueSeasonPicks, gamesForWeek, week, callerUid) {
   const { callerWinProbability, callerTop3Probability } = enumerateOutcomes(leagueSeasonPicks, gamesForWeek, week, callerUid);
   return {
-    winChancePct: Math.round(callerWinProbability * 100),
-    top3ChancePct: Math.round(callerTop3Probability * 100),
+    winChancePct: formatChancePct(callerWinProbability),
+    top3ChancePct: formatChancePct(callerTop3Probability),
   };
 }
 
