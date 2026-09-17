@@ -71,6 +71,14 @@ function formatPostTime(dateInput, seasonYear) {
   return new Intl.DateTimeFormat("en-US", opts).format(date);
 }
 
+// A post is treated as a GIF share only when its entire (trimmed) body is
+// nothing but the link — keeps "check this out: <link>"-style messages as
+// plain text instead of silently swallowing the caption.
+const GIF_URL_RE = /^https?:\/\/\S+\.gif(\?\S*)?$/i;
+function isGifUrl(body) {
+  return GIF_URL_RE.test(body.trim());
+}
+
 function isSameDay(a, b) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
@@ -576,10 +584,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         // a name label above or a delete button below is also present.
         const bubbleAnchor = document.createElement("div");
         bubbleAnchor.className = "post-bubble-anchor";
-        const body = document.createElement("div");
-        body.className = "post-body-text";
-        body.textContent = post.body;
-        bubbleAnchor.appendChild(body);
+        if (isGifUrl(post.body)) {
+          const gif = document.createElement("img");
+          gif.className = "post-gif";
+          gif.src = post.body.trim();
+          gif.alt = "GIF";
+          gif.loading = "lazy";
+          gif.referrerPolicy = "no-referrer";
+          // Link may have rotted or never been an image — fall back to plain
+          // text so a broken link doesn't just leave a broken-image icon.
+          gif.onerror = () => {
+            gif.replaceWith(Object.assign(document.createElement("div"), {
+              className: "post-body-text",
+              textContent: post.body,
+            }));
+          };
+          bubbleAnchor.appendChild(gif);
+        } else {
+          const body = document.createElement("div");
+          body.className = "post-body-text";
+          body.textContent = post.body;
+          bubbleAnchor.appendChild(body);
+        }
 
         // Hidden by default — revealed on hover (desktop) or, on any tap
         // anywhere in the board, all of these toggle on/off together (see
