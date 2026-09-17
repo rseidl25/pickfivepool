@@ -550,6 +550,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // instead, falling back to the snapshot if they've since left the league.
       const currentNameByUid = new Map(league.members.map((m) => [m.uid, m.displayName]));
       const me = auth.currentUser;
+      const imageLoadPromises = [];
       postsList.innerHTML = "";
       if (posts.length === 0) {
         postsList.innerHTML = "<li class='no-posts'>No posts yet — say something!</li>";
@@ -587,18 +588,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (isImageUrl(post.body)) {
           const img = document.createElement("img");
           img.className = "post-image";
-          img.src = post.body.trim();
           img.alt = "Image";
-          img.loading = "lazy";
           img.referrerPolicy = "no-referrer";
-          // Link may have rotted or never been an image — fall back to plain
-          // text so a broken link doesn't just leave a broken-image icon.
-          img.onerror = () => {
-            img.replaceWith(Object.assign(document.createElement("div"), {
-              className: "post-body-text",
-              textContent: post.body,
-            }));
-          };
+          // The scroll-to-bottom below runs once every image has finished
+          // loading (or failed) — otherwise it fires against the pre-load
+          // layout height and lands short of the true bottom once images
+          // pop in and push the list taller.
+          imageLoadPromises.push(
+            new Promise((resolve) => {
+              img.onload = resolve;
+              // Link may have rotted or never been an image — fall back to
+              // plain text so a broken link doesn't just leave a broken-image icon.
+              img.onerror = () => {
+                img.replaceWith(Object.assign(document.createElement("div"), {
+                  className: "post-body-text",
+                  textContent: post.body,
+                }));
+                resolve();
+              };
+            })
+          );
+          img.src = post.body.trim();
           bubbleAnchor.appendChild(img);
         } else {
           const body = document.createElement("div");
@@ -635,6 +645,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         postsList.appendChild(li);
       });
+      // Scroll immediately for instant feedback, then again once every image
+      // has settled — its pre-load height is ~0, so the first pass alone
+      // would land short of the true bottom whenever the newest post is an
+      // image.
+      postsList.scrollTop = postsList.scrollHeight;
+      await Promise.all(imageLoadPromises);
       postsList.scrollTop = postsList.scrollHeight;
     } catch (err) {
       postsList.innerHTML = `<li>Error loading posts: ${err.message}</li>`;
