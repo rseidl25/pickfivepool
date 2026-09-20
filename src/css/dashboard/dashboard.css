@@ -809,16 +809,49 @@ html, body { height: 100%; }
 .modal-content label { font: var(--md-type-label-lg); color: var(--md-sys-color-on-surface-variant); }
 .modal-content .m3-btn[type="submit"] { align-self: flex-end; margin-top: 8px; }
 
-/* ---- Message Board (chat-style: history above, input pinned to the
-   bottom, newest message at the bottom — same shape as iMessage/IG DMs) ---- */
-.message-board-content { height: 78vh; max-height: 640px; }
-.message-board-content .modal-body {
+/* ---- Chat (chat-style: history above, input pinned to the bottom,
+   newest message at the bottom — same shape as iMessage/IG DMs).
+   A tab like the other three, not a modal — height:100% (not min-height,
+   which every other tab uses) is deliberate: it caps the section at the
+   visible area so .posts-list's own overflow-y:auto scrolls, instead of
+   the whole page growing with the conversation. On desktop it's also
+   narrowed to the middle 50% of the available width (not full-bleed like
+   the other tabs) — a wide chat column reads worse than a narrower one;
+   the mobile media query below hands that width back. */
+#message-board-section.tab-section:not(.hidden) {
+  display: flex; flex-direction: column; height: 100%; min-height: 0;
+  width: 50%; margin: 0 auto;
+}
+#message-board-section .section-title { flex-shrink: 0; }
+/* The card is desktop-only framing around the narrowed 50% column — a
+   surface + elevation like the My Week cards, so Chat doesn't just float
+   on the bare page background. .m3-card/.m3-card-elevated (m3-tokens.css)
+   supply the background/shadow/radius; this just makes it a flex column
+   that fills the section beneath the title. */
+.chat-panel {
   display: flex; flex-direction: column; flex: 1; min-height: 0;
   padding: 12px 20px 16px; overflow: hidden;
 }
+@media (max-width: 900px) {
+  /* Full width back on mobile — the 50% desktop column would be cramped on
+     a phone screen. Must come after the unconditional rule above: same
+     selector/specificity, so source order is what makes this win at
+     narrow widths instead of the desktop rule winning everywhere. */
+  #message-board-section.tab-section:not(.hidden) { width: 100%; margin: 0; }
+  /* Week select bar hidden while chatting — freed-up vertical space matters
+     more on a phone, and the week rail is meaningless in this tab anyway
+     (see the disabled week chips in dashboard.js). Scoped to mobile only:
+     toggled via JS on .week-rail regardless of screen size, but this class
+     only takes effect below the breakpoint, so desktop's rail is untouched. */
+  .week-rail.week-rail-chat-hidden { display: none; }
+  /* Flat/full-bleed on mobile like every other tab — the card is a
+     desktop-only affordance for the narrowed column, same reasoning as the
+     width reset above (source order, not specificity, is what wins here). */
+  .chat-panel { background: none; box-shadow: none; border-radius: 0; padding: 0; }
+}
 
 .posts-list {
-  list-style: none; margin: 0 0 12px; padding: 4px 2px;
+  list-style: none; margin: 0 0 12px; padding: 4px 16px 4px 2px;
   display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
   flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
 }
@@ -885,6 +918,15 @@ html, body { height: 100%; }
 }
 .post-send-btn svg { width: 17px; height: 17px; }
 .post-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.post-image-btn {
+  flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.post-image-btn svg { width: 19px; height: 19px; }
+.post-image-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.post-image-btn.uploading svg { animation: post-image-spin 0.9s linear infinite; }
+@keyframes post-image-spin { to { transform: rotate(360deg); } }
 .post-body-counter { align-self: flex-end; font: var(--md-type-body-sm); color: var(--md-sys-color-on-surface-variant); margin: 2px 10px 0 0; }
 .post-body-counter.limit-reached { color: var(--md-sys-color-error); font-weight: bold; }
 .no-picks-message { grid-column: 1 / -1; color: var(--md-sys-color-on-surface-variant); font-style: italic; text-align: center; padding: 24px 0; }
@@ -1056,6 +1098,10 @@ html, body { height: 100%; }
   /* Extra top padding beyond the desktop value — without it the leaderboard
      table / filter dropdowns crowd right up against the week-select row. */
   .dashboard-main { padding: 20px 12px 24px; }
+  /* Chat's pinned input row doesn't need that same bottom breathing room —
+     sitting closer to the bottom nav bar reads better than floating above
+     it with a big gap. Toggled in dashboard.js's showSection(). */
+  .dashboard-main.chat-active { padding-bottom: 8px; }
 
   /* 2nd/3rd stack instead of sitting side by side — too narrow otherwise. */
   .podium-bottom-row { flex-direction: column; }

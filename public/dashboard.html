@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" href="icons/favicon.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
 
-  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=15">
-  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=95">
+  <link rel="stylesheet" href="../src/css/m3-tokens.css?v=16">
+  <link rel="stylesheet" href="../src/css/dashboard/dashboard.css?v=101">
 </head>
 <body>
   <div id="page-loading-overlay" class="page-loading-overlay">
@@ -43,11 +43,9 @@
         <div class="m3-menu-wrap">
           <button id="menu-trigger" type="button" class="m3-icon-btn" aria-label="Menu" aria-haspopup="true" aria-expanded="false" style="display:none;">
             <span class="hamburger-bars"><span></span><span></span><span></span></span>
-            <span id="menu-trigger-dot" class="unread-dot hidden"></span>
           </button>
           <div id="header-menu" class="m3-menu hidden">
             <button id="how-to-play-btn" type="button" class="m3-menu-item">How to Play</button>
-            <button id="message-board-btn" type="button" class="m3-menu-item">Message Board<span id="message-board-dot" class="unread-dot unread-dot-inline hidden"></span></button>
             <button id="league-stats-btn" type="button" class="m3-menu-item">League Stats</button>
             <button id="settings-btn" type="button" class="m3-menu-item">Edit Profile</button>
             <button id="theme-btn" type="button" class="m3-menu-item">Theme</button>
@@ -114,6 +112,20 @@
               </g>
             </svg>
           </span><span>Picks</span>
+        </button>
+        <button class="m3-nav-rail-item" data-tab="message-board">
+          <span class="indicator">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <g fill="currentColor">
+                <rect x="66" y="96" width="380" height="272" rx="48"/>
+                <path d="M140 368 140 452 224 368Z"/>
+                <circle cx="180" cy="232" r="26"/>
+                <circle cx="256" cy="232" r="26"/>
+                <circle cx="332" cy="232" r="26"/>
+              </g>
+            </svg>
+            <span class="unread-dot nav-tab-dot hidden"></span>
+          </span><span>Chat</span>
         </button>
         <button id="week-rail-toggle" type="button" class="week-rail-toggle" aria-label="Collapse week selector" aria-expanded="true">
           <span id="week-rail-toggle-arrow">‹</span>
@@ -221,6 +233,27 @@
             </div>
           </section>
 
+          <!-- Chat -->
+          <section id="message-board-section" class="tab-section hidden">
+            <h2 class="section-title">CHAT</h2>
+            <div class="chat-panel m3-card m3-card-elevated">
+              <ul id="posts-list" class="posts-list"></ul>
+              <form id="post-form" class="post-form">
+                <div class="post-input-bar">
+                  <button type="button" id="post-image-btn" class="post-image-btn" aria-label="Upload an image or GIF">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2v10h14V7H5Zm2 8 3.5-4.5 2.5 3 2.5-3L19 15H7Zm1.5-4A1.5 1.5 0 1 1 8.5 8a1.5 1.5 0 0 1 0 3Z"/></svg>
+                  </button>
+                  <input type="file" id="post-image-input" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+                  <textarea id="post-body" class="post-body-input" placeholder="Message the league..." maxlength="250" required rows="1"></textarea>
+                  <button type="submit" id="post-send-btn" class="post-send-btn" aria-label="Send message" disabled>
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2Z"/></svg>
+                  </button>
+                </div>
+                <span id="post-body-counter" class="post-body-counter">0/250</span>
+              </form>
+            </div>
+          </section>
+
         </main>
       </div>
     </div>
@@ -279,6 +312,20 @@
           </svg>
         </span><span>Picks</span>
       </button>
+      <button class="m3-nav-bar-item" data-tab="message-board">
+        <span class="indicator">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <g fill="currentColor">
+              <rect x="66" y="96" width="380" height="272" rx="48"/>
+              <path d="M140 368 140 452 224 368Z"/>
+              <circle cx="180" cy="232" r="26"/>
+              <circle cx="256" cy="232" r="26"/>
+              <circle cx="332" cy="232" r="26"/>
+            </g>
+          </svg>
+          <span class="unread-dot nav-tab-dot hidden"></span>
+        </span><span>Chat</span>
+      </button>
     </nav>
 
     <footer class="dashboard-footer">
@@ -317,31 +364,6 @@
       </div>
       <div class="modal-body">
         <p class="last-updated-modal-text">Scores and games were last refreshed at <span class="last-updated-time">[TIME]</span>.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Message Board -->
-  <div id="message-board-modal" class="modal hidden">
-    <div class="modal-content m3-dialog message-board-content">
-      <div class="modal-header">
-        <div>
-          <h2 id="message-board-title">League</h2>
-          <p class="modal-header-subtitle">Message Board</p>
-        </div>
-        <span class="close-btn" id="close-message-board">&times;</span>
-      </div>
-      <div class="modal-body">
-        <ul id="posts-list" class="posts-list"></ul>
-        <form id="post-form" class="post-form">
-          <div class="post-input-bar">
-            <textarea id="post-body" class="post-body-input" placeholder="Message the league..." maxlength="250" required rows="1"></textarea>
-            <button type="submit" id="post-send-btn" class="post-send-btn" aria-label="Send message" disabled>
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2Z"/></svg>
-            </button>
-          </div>
-          <span id="post-body-counter" class="post-body-counter">0/250</span>
-        </form>
       </div>
     </div>
   </div>
@@ -425,6 +447,6 @@
     </div>
   </div>
 
-  <script type="module" src="../src/js/dashboard/dashboard.js?v=72"></script>
+  <script type="module" src="../src/js/dashboard/dashboard.js?v=76"></script>
 </body>
 </html>

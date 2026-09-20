@@ -73,8 +73,10 @@ function formatPostTime(dateInput, seasonYear) {
 
 // A post is treated as an image share only when its entire (trimmed) body
 // is nothing but the link — keeps "check this out: <link>"-style messages
-// as plain text instead of silently swallowing the caption.
-const IMAGE_URL_RE = /^https?:\/\/\S+\.(gif|jpe?g|png|webp|avif)(\?\S*)?$/i;
+// as plain text instead of silently swallowing the caption. Also matches a
+// bare /uploads/... path, which is what the image-upload button posts (a
+// device upload has no https:// URL of its own, just our own server path).
+const IMAGE_URL_RE = /^(https?:\/\/\S+|\/uploads\/\S+)\.(gif|jpe?g|png|webp|avif)(\?\S*)?$/i;
 function isImageUrl(body) {
   return IMAGE_URL_RE.test(body.trim());
 }
@@ -257,17 +259,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const closeLastUpdated = document.getElementById("close-last-updated");
 
 
-  const messageBoardBtn = document.getElementById("message-board-btn");
-  const messageBoardModal = document.getElementById("message-board-modal");
-  const messageBoardTitle = document.getElementById("message-board-title");
-  const closeMessageBoard = document.getElementById("close-message-board");
   const postForm = document.getElementById("post-form");
   const postBody = document.getElementById("post-body");
   const postBodyCounter = document.getElementById("post-body-counter");
   const postSendBtn = document.getElementById("post-send-btn");
+  const postImageBtn = document.getElementById("post-image-btn");
+  const postImageInput = document.getElementById("post-image-input");
   const postsList = document.getElementById("posts-list");
-  const menuTriggerDot = document.getElementById("menu-trigger-dot");
-  const messageBoardDot = document.getElementById("message-board-dot");
+  const navTabDots = document.querySelectorAll(".nav-tab-dot");
   const POST_BODY_MAX_LEN = 250;
 
   const leagueStatsBtn = document.getElementById("league-stats-btn");
@@ -322,7 +321,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Modals — centered M3 dialogs (not anchored popovers); only one open
   // at a time, click-outside or the X closes it.
   // =========================
-  const allModals = [howToPlayModal, lastUpdatedModal, messageBoardModal, leagueStatsModal, settingsModal, themeModal];
+  const allModals = [howToPlayModal, lastUpdatedModal, leagueStatsModal, settingsModal, themeModal];
   function closeAllModals() {
     allModals.forEach((m) => m.classList.add("hidden"));
   }
@@ -457,12 +456,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Reflects the currently-selected league's hasUnread flag (from
-  // /api/leagues/mine) onto both the hamburger trigger and the Message
-  // Board menu item.
+  // /api/leagues/mine) onto the Message Board nav tab's badge (rail + bar
+  // share the .nav-tab-dot class, so both stay in sync from one call).
   function updateUnreadIndicator() {
     const hasUnread = myLeagues.find((l) => l.id === currentLeagueId)?.hasUnread || false;
-    menuTriggerDot.classList.toggle("hidden", !hasUnread);
-    messageBoardDot.classList.toggle("hidden", !hasUnread);
+    navTabDots.forEach((dot) => dot.classList.toggle("hidden", !hasUnread));
   }
 
   // Picks must be fully submitted before any dashboard tab is useful (scores
@@ -495,26 +493,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   lastUpdatedBtn.onclick = () => openModal(lastUpdatedModal);
   closeLastUpdated.onclick = () => closeAllModals();
 
-
   // =========================
-  // Message board
+  // Message board (opening the tab is the "read" action — see showSection)
   // =========================
-  messageBoardBtn.onclick = () => {
-    messageBoardTitle.textContent = myLeagues.find((l) => l.id === currentLeagueId)?.name || "League";
-    openModal(messageBoardModal, loadPosts);
-
-    // Clear immediately (don't wait on the network) — opening the board is
-    // the "read" action regardless of whether the mark-read call succeeds,
-    // and re-flagging on a failed request would just be confusing.
-    menuTriggerDot.classList.add("hidden");
-    messageBoardDot.classList.add("hidden");
-    const league = myLeagues.find((l) => l.id === currentLeagueId);
-    if (league) league.hasUnread = false;
-
-    markMessageBoardRead(currentLeagueId).catch((err) => console.error("Error marking message board read:", err));
-  };
-  closeMessageBoard.onclick = () => closeAllModals();
-
   postBody.addEventListener("input", () => {
     const len = postBody.value.length;
     postBodyCounter.textContent = `${len}/${POST_BODY_MAX_LEN}`;
@@ -677,6 +658,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (err) {
       showToast("Error posting: " + err.message, "error");
       postSendBtn.disabled = postBody.value.trim().length === 0;
+    }
+  });
+
+  const POST_IMAGE_MAX_BYTES = 5 * 1024 * 1024; // mirrors uploads.js's MAX_FILE_BYTES
+  postImageBtn.onclick = () => postImageInput.click();
+  postImageInput.addEventListener("change", async () => {
+    const file = postImageInput.files[0];
+    postImageInput.value = "";
+    if (!file) return;
+    if (file.size > POST_IMAGE_MAX_BYTES) {
+      showToast("That file is too large — 5MB max.", "error");
+      return;
+    }
+    postImageBtn.disabled = true;
+    postImageBtn.classList.add("uploading");
+    try {
+      const formData = new FormData();
+      formData.append("photo", file);
+      const { url } = await authedFetch(`/api/leagues/${currentLeagueId}/posts/photo`, { method: "POST", body: formData });
+      // The uploaded file's URL becomes the post body verbatim — loadPosts'
+      // isImageUrl() check then renders it inline exactly like a pasted link.
+      await authedFetch(`/api/leagues/${currentLeagueId}/posts`, { method: "POST", body: JSON.stringify({ body: url }) });
+      await loadPosts();
+    } catch (err) {
+      showToast("Error uploading image: " + err.message, "error");
+    } finally {
+      postImageBtn.disabled = false;
+      postImageBtn.classList.remove("uploading");
     }
   });
 
@@ -882,11 +891,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentWeek = await getCurrentWeek();
 
     sections.forEach((section) => section.classList.toggle("hidden", section.id !== `${tab}-section`));
+    // Only takes effect below the mobile breakpoint (see the CSS) — desktop's
+    // week rail stays visible in every tab, including Chat.
+    weekRail.classList.toggle("week-rail-chat-hidden", tab === "message-board");
     // .dashboard-main is the scroll container (overflow-y: auto), not the
     // window — switching tabs doesn't reset it on its own, so a section
     // scrolled down before switching would leave the newly-shown tab
     // starting mid-page instead of at the top.
-    document.querySelector(".dashboard-main")?.scrollTo(0, 0);
+    const dashboardMain = document.querySelector(".dashboard-main");
+    dashboardMain?.scrollTo(0, 0);
+    // Trims .dashboard-main's usual bottom padding on mobile so the message
+    // input sits closer to the bottom nav bar instead of floating above it
+    // with a big gap — only matters for Chat's pinned input row.
+    dashboardMain?.classList.toggle("chat-active", tab === "message-board");
     navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.tab === tab));
 
     renderWeekButtons();
@@ -907,6 +924,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         myWeekOnYourHeels.innerHTML = "";
         myWeekTrendChart.innerHTML = "";
         myWeekWinChance.innerHTML = `<span class="my-week-win-chance-label">No league selected</span>`;
+      }
+      if (tab === "message-board") {
+        postsList.innerHTML = "<li class='no-posts'>No league selected — create or join one from the Leagues screen.</li>";
       }
       return;
     }
@@ -948,6 +968,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (btn) btn.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
     }
     if (tab === "my-week") loadMyWeek(currentWeek);
+    if (tab === "message-board") {
+      loadPosts();
+      // Opening the tab is the "read" action — clear immediately (don't
+      // wait on the network), since re-flagging on a failed request would
+      // just be confusing.
+      navTabDots.forEach((dot) => dot.classList.add("hidden"));
+      const league = myLeagues.find((l) => l.id === currentLeagueId);
+      if (league) league.hasUnread = false;
+      markMessageBoardRead(currentLeagueId).catch((err) => console.error("Error marking message board read:", err));
+    }
   }
 
   navButtons.forEach((btn) => btn.addEventListener("click", () => showSection(btn.dataset.tab)));
@@ -979,7 +1009,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       btn.textContent = `Week ${i}`;
       btn.className = "m3-chip week-chip";
       btn.dataset.week = i;
-      btn.disabled = currentTab === "my-week";
+      btn.disabled = currentTab === "my-week" || currentTab === "message-board";
       btn.addEventListener("click", () => {
         currentWeek = i;
         updateTitles();
