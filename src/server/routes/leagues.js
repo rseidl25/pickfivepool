@@ -10,6 +10,7 @@ import { makeImageUpload, UPLOADS_ROOT } from "../uploads.js";
 const router = Router();
 
 const leaguePhotoUpload = makeImageUpload((req) => path.join(UPLOADS_ROOT, "leagues", req.params.id));
+const postImageUpload = makeImageUpload((req) => path.join(UPLOADS_ROOT, "posts", req.params.id));
 
 function requireLeagueMember(req, res, next) {
   const league = store.getLeague(req.params.id);
@@ -321,6 +322,22 @@ router.post("/:id/posts/read", requireAuth, requireLeagueMember, async (req, res
   await db.collection("leagues").doc(leagueId).collection("messageBoardReads").doc(req.uid).set({ lastReadAt });
   store.setLastReadInMemory(leagueId, req.uid, lastReadAt);
   res.json({ ok: true });
+});
+
+// POST /api/leagues/:id/posts/photo — any member can upload an image/gif
+// from their device to share on the board. Returns just the URL; the client
+// then posts a normal message whose body is exactly that URL, so it renders
+// inline via the same isImageUrl() check a pasted link goes through.
+router.post("/:id/posts/photo", requireAuth, requireLeagueMember, (req, res, next) => {
+  postImageUpload.single("photo")(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No image uploaded" });
+  }
+  res.status(201).json({ url: `/uploads/posts/${req.params.id}/${req.file.filename}` });
 });
 
 // POST /api/leagues/:id/posts — any member can post
