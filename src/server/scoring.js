@@ -26,10 +26,15 @@ export function computeScores(leaguePicksMap, gamesData) {
         );
 
         if (game && game.status === "Completed") {
-          const homeWin = game.homeScore > game.awayScore;
-          const winner = homeWin ? game.homeTeam : game.awayTeam;
+          // A tie must fall through to neither branch — the old `homeWin ?
+          // homeTeam : awayTeam` ternary silently credited the away team as
+          // "winner" whenever scores were equal, awarding points to anyone
+          // who picked them in what was actually a tied (0-point) game.
+          const winner = game.homeScore > game.awayScore ? game.homeTeam
+            : game.awayScore > game.homeScore ? game.awayTeam
+            : null;
 
-          if (winner.includes(team)) {
+          if (winner && winner.includes(team)) {
             if (isBonus) {
               const actualScore = game.homeTeam.includes(team) ? game.homeScore : game.awayScore;
               points = 10 + actualScore;
