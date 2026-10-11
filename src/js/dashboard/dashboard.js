@@ -226,8 +226,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   let showOdds = localStorage.getItem("pick5_showOdds") === "true";
   const toggleMinimalBtn = document.getElementById("toggle-minimal-btn");
   let minimalView = localStorage.getItem("pick5_minimalView") === "true";
+  const togglePinMeBtn = document.getElementById("toggle-pin-me-btn");
+  let pinMe = localStorage.getItem("pick5_pinMe") === "true";
   toggleOddsBtn.checked = showOdds;
   toggleMinimalBtn.checked = minimalView;
+  togglePinMeBtn.checked = pinMe;
   // Just the checkbox + panel visibility here, not the panel's actual
   // content — currentWeek isn't known yet this early in startup. Content
   // fills in on its own once the Picks tab is actually loaded, since
@@ -1627,7 +1630,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       playerCards = playerCards.filter((player) => selectedTeam in (player.weekData.teams || {}));
     }
 
-    playerCards.sort((a, b) => (b.correctedTotal !== a.correctedTotal ? b.correctedTotal - a.correctedTotal : a.name.localeCompare(b.name)));
+    const myUid = auth.currentUser?.uid;
+    playerCards.sort((a, b) => {
+      // Pin Me: the caller's own card jumps to the top regardless of score;
+      // everyone else keeps the normal greatest-to-least order beneath it.
+      if (pinMe && (a.uid === myUid) !== (b.uid === myUid)) return a.uid === myUid ? -1 : 1;
+      return b.correctedTotal !== a.correctedTotal ? b.correctedTotal - a.correctedTotal : a.name.localeCompare(b.name);
+    });
 
     playerCards.forEach((player) => {
       const weekData = player.weekData;
@@ -1908,7 +1917,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         home.appendChild(homeName);
 
         if (game.status === "Completed") {
-          if (game.homeScore > game.awayScore) {
+          // A tie (same bug scoring.js had: an `else` here would brand the
+          // away team a false "winner") gets its own distinct styling on
+          // both sides instead of one side reading as having won.
+          if (game.homeScore === game.awayScore) {
+            home.classList.add("tie"); homeScore.classList.add("tie");
+            away.classList.add("tie"); awayScore.classList.add("tie");
+          } else if (game.homeScore > game.awayScore) {
             home.classList.add("winner"); homeScore.classList.add("winner");
             away.classList.add("loser"); awayScore.classList.add("loser");
           } else {
@@ -1948,6 +1963,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   toggleOddsBtn.addEventListener("change", () => {
     showOdds = toggleOddsBtn.checked;
     localStorage.setItem("pick5_showOdds", showOdds);
+    if (currentTab === "picks") loadWeeklyPicks(currentWeek);
+  });
+
+  togglePinMeBtn.addEventListener("change", () => {
+    pinMe = togglePinMeBtn.checked;
+    localStorage.setItem("pick5_pinMe", pinMe);
     if (currentTab === "picks") loadWeeklyPicks(currentWeek);
   });
 

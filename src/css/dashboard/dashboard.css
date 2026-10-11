@@ -765,6 +765,12 @@ html, body { height: 100%; }
 .team-score { font-weight: bold; }
 .winner { color: #146c2e !important; }
 .loser { color: var(--md-sys-color-error) !important; }
+/* Not --brand-gold directly — that token (#e9c400/#ffd700) is tuned for
+   fills/pills, not text; at normal text size on a white row it fails
+   WCAG contrast (~1.5:1). This is the same gold hue darkened until it
+   clears 4.5:1 against white, so it reads clearly while still looking
+   like "gold," not an unrelated color. */
+.tie { color: #8a6d00 !important; }
 
 /* ---- Navigation Bar (mobile, hidden on desktop) ---- */
 .nav-bar { display: none; }
